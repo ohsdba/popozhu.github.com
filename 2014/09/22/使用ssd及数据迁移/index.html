@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>使用ssd及数据迁移 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">使用ssd及数据迁移</div> 
+		<small>
+		    <time datetime="2014-09-22T14:21:18.000Z" itemprop="datePublished">September 22nd 2014</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>给笔记本 Macbook pro 2012 版添加了一个 ssd，ssd 买的是 intel 530 系列，容量为 240G，看中的是：1. 存储上使用 MLC 颗粒，主控芯片没研究； 2. 看评论都提到 intel 牌子的稳定性好，当然大家只是说了一下，没说明怎么稳定； 3. 公司服务器上有用到 intel 的 ssd，工作期间暂无遇到故障。</p>
+<p>系统版本是 Yosemite 10.10(14A361p)，测试版本。</p>
+<p>ssd 的更换上，考虑两个方案：</p>
+<ol>
+<li>直接用 ssd 替换现有的硬盘，只使用 ssd</li>
+<li>现有的硬盘不动，把 ssd 安装到光驱位，两者位置最好不要调换</li>
+</ol>
+<p>准备工作包括有：</p>
+<ol>
+<li>检查螺丝刀能否拆开笔记本，需要两把螺丝刀：拆卸笔记本背部的十字螺丝刀（也用于拆光驱）、硬盘四角的六角螺丝刀（我是用小钳子转松拧开）。购买 ssd 前我为了减轻笔记本重量先拆掉了光驱，硬盘则更容易拆卸。</li>
+<li>买一个 ssd</li>
+<li>对于方案1，买一个外置的 usb 硬盘盒，用来容纳换下来的机械硬盘</li>
+<li>对于方案2，买一个光驱位托架，容纳 ssd</li>
+<li>数据要实现无缝迁移，不重装系统，不丢失配置。预备方案：a. 使用软件 Carbon copy cloner，但对系统版本有限制； b. 在「终端」使用 rsync + bless。</li>
+</ol>
+<p>硬件上，我本想使用方案1，只使用 ssd，这样笔记本就可以随意地移动，但是我发现系统的「磁盘工具」认不到该 ssd，心好累。额外再买了一个光驱托架，尝试方案2，倒正常了。</p>
+<p>硬盘位置认不到 ssd 的问题，考虑到该 ssd 已经有最新 intel 的固件，也看到有人评价在同型号笔记本上能正常使用(系统是10.9)，怀疑是测试版本的系统导致。硬盘位置和光驱位置的这两个 sata3 接口初步判定是一样的，故障原因可能有：</p>
+<ol>
+<li>测试版本的系统</li>
+<li>ssd 的固件，当前的版本是<code>DC32</code></li>
+<li>笔记本上的两个 sata3 接口的兼容性，两个都是<code>Intel 7 Series Chipset</code>，以及<code>AHCI Version 1.30 Supported</code></li>
+</ol>
+<p><br></p>
+<p>对于方案1，更换思路为：</p>
+<ol>
+<li>把笔记本的硬盘拆出来，放到外置 usb 硬盘盒</li>
+<li>拿到空白未格式化的 ssd， 直接装到硬盘位置。想法就是尽可能早地确认 ssd 在「最终位置」上能否正常工作</li>
+<li>开机按住 option，能够看到外置 usb 硬盘里的系统，启动该系统，这是之前一直在使用的系统</li>
+<li>进到系统后，打开「磁盘管理」工具，但我在该软件中看不到 ssd，该方案中断，否则可以继续</li>
+<li>在「磁盘管理」中对 ssd 进行分区</li>
+<li>安装并使用 Carbon copy cloner 来转移数据，如果 ssd 空间比机械硬盘的小，需要在「用户」目录中排除一些文件。相比TimeMachine，看中就是这个软件的这点可选择性。好吧，我也没TimeMachine备份。</li>
+<li>迁移数据后设置从 ssd 启动系统</li>
+<li>拔掉外置 usb 硬盘</li>
+</ol>
+<p>对于方案2，更换思路为：</p>
+<ol>
+<li>拆下光驱，把 ssd 放到光驱托架</li>
+<li>从现有的机械硬盘启动系统</li>
+<li>打开「磁盘管理」工具，能看到光驱位置上新装的 ssd，否则该方案中断</li>
+<li>在「磁盘管理」中对 ssd 进行分区</li>
+<li>安装并使用 Carbon copy cloner 来转移数据</li>
+<li>迁移数据后设置从 ssd 启动系统</li>
+</ol>
+<p><br></p>
+<p>暂时勉强接受方案2，但在数据迁移中，由于系统是测试版本的 Yosemite，需要使用最新版本也是测试版本的 Carbon copy cloner beta 5， 然后发现根本没有转移数据到新 ssd 上，简单的事情变麻烦了。对于「更换硬盘、数据迁移」这两者，觉得上面的更换步骤太容易了。</p>
+<p>苦逼的手动迁移过程如下，其实做完后，反而觉得这个方式更简单。</p>
+<p>打开「终端」，使用命令<code>rsync + bless</code>来做数据迁移，也好，又少了一个依赖的软件。</p>
+<ol>
+<li><p>rsync操作，参考<a href="http://www.egg-tech.com/mac_backup/" target="_blank" rel="external">HOWTO: Backup Your Mac With rsync</a><br>新建一个文件<code>backup_excludes.txt</code>，排除一些文件，以及排除几个大容量的目录，这些目录最后再手动按需要复制到 ssd 上就好了</p>
+<pre><code> popozhu $ cat backup_excludes.txt 
+ */.Trash
+ /private/tmp/*
+ /private/var/run/*
+ /Users/popozhu/Documents/*
+ .Spotlight-*/
+</code></pre><p> rsync 命令使用简单的几个参数就可以了，由于目标盘是一个空白磁盘，不需要参数<code>--delete</code>。同步的源目录自然是当前系统的根目录，而目标目录，通过命令<code>df -h</code>找到 SSD 盘在系统中的挂载点，比如我给 ssd 命名为<code>MacintoshSSD</code>，其挂载到<code>/Volumes</code>下，目标目录最后为<code>/Volumes/MacintoshSSD</code></p>
+<pre><code> rsync -av -x -S --exclude-from backup_excludes.txt / /Volumes/MacintoshSSD &amp;
+</code></pre><p> 一开始 rsync 会计算一个文件列表，可以在进程管理器中看到一个rsync进程读取越来越多的数据。然后就是漫长的读写等待，我同步80G数据，大概3个小时 Orz。后来的 rsync 时，我打开 itunes 让其播放音乐，然后静音，避免电脑进入睡眠，然后睡觉了。</p>
+<p> 由于在 rsync 使用了参数<code>-v</code>，同步时会输出当前处理的文件，可以大概估算下同步到哪个目录。</p>
+<p> rsync 同步，能保留文件、目录的用户id、分组id，以及权限，这些是非常重要的。总之是没有差别地迁移「系统文件」+「用户数据」到新的 ssd。需要了解哪些文件、目录是必须的，哪些又是没必要的。但既然使用到「终端」，我想这个问题应该不是什么大问题：清楚知道当前命令在做什么事情。</p>
+</li>
+<li><p>bless操作<br>看了上面的博客，才知道<code>bless</code>这个命令，简单来说，就是引导 EFI 的加载程序从 ssd 的那个目录加载操作系统。<br>对于当前 ssd 的挂载点<code>/Volumes/MacintoshSSD</code>，需要执行：</p>
+<pre><code> sudo bless -folder /Volumes/MacintoshSSD/System/Library/CoreServices
+</code></pre><p> 一开始我不知道要 bless，从 ssd 启动时等了好久，还以为我 rsync 后文件有错误，看到上面博客提到的<code>bless</code>，如获至宝。</p>
+<p> 至此，设置从 ssd 启动系统就可以了。</p>
+</li>
+</ol>
+<p><br></p>
+<p>当然，我做的不止这些。在对 ssd 格式化之后，做 rsync 之前，我使用 diskutil 在 SSD 上也建立了一个恢复分区<code>Recovery SSD</code>，从机械硬盘上的<code>Recovery HDD</code>分区拷贝了一份数据。因为后续我只想使用 ssd，机械硬盘是打算外置留在家里做备份使用的。那么假若系统有故障需要恢复，就可以直接启动 ssd 上的恢复分区。</p>
+<p>至于开启Trim，那则是默认要做的。</p>
+<p>另外，也用<code>xbench 1.3</code>这个free软件，做了一下磁盘读写测试，记录下来。计划一段时间后再做一次对比，看看读写性能变化如何。</p>
+<p><br><br>哎，安装了两个硬盘，笔记本的发热量反而变大了，由于考虑到有机械硬盘，我还是不敢大动作移动笔记本。方案2蛮鸡肋的。</p>
+<p>又遇到，使用 ssd，解决了磁盘io缓慢， cpu 变得狂野起来，cpu 使用率很容易就飙高，也进一步加大笔记本发热，Orz</p>
+<p>由于使用了光驱托架容纳 ssd，还得准备接受光驱托架故障的情况。。。</p>
+<p>anyway，最后还是成功用上了 ssd 并完美迁移了系统和我的个人数据，开机即用，文件都跟原来一样的感觉。 </p>
+<p><hr><br>2014-10-27 更新： </p>
+<p>更换两天后，还是买了个光驱支架，把 ssd 安装到光驱位置，同时拆掉了机械硬盘，单独使用 ssd。</p>
+<p>最后确定，硬盘位置不支持该 ssd。</p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2014">2014/9/22</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/mac/">mac</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2014/09/22/使用ssd及数据迁移/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/10/27/mac-port-清理/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          mac port 清理
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2014/09/13/初次使用hbase/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">初次使用hbase</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2014/09/22/使用ssd及数据迁移/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

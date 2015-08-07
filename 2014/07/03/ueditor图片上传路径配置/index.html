@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>ueditor图片上传路径配置 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">ueditor图片上传路径配置</div> 
+		<small>
+		    <time datetime="2014-07-03T14:43:11.000Z" itemprop="datePublished">July 3rd 2014</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>这星期团队里一个页面的编辑器需要升级，看了下，使用的是百度前端开源项目ueditor，当前使用的版本是1.2.3，线上提供的最新版本是1.4.3。相比我们当前使用的旧版本，新版本曾经重构过文件上传模块webuploader。后来我就是在上传这里遇到了一个问题：上传路径的配置。</p>
+<p>整个ueditor有两个配置文件：前端配置文件、后端配置文件。我这边的web应用名为<code>ops</code>，ueditor直接部署在根目录之下。<br><br></p>
+<h3 id="前端配置文件">前端配置文件</h3><p>前端配置文件为ueditor根目录下的<code>web/ops/ueditor/ueditor.config.js</code>，里面有详细的配置条目介绍。我修改了ueditor的在我web应用中的路径</p>
+<pre><code>URL = &quot;/ops/ueditor/&quot;;
+</code></pre><p>web应用名为<code>ops</code>，ueditor位于web应用的根目录下。</p>
+<p>以及修改服务器统一请求接口路径，从默认的php修改为jsp。</p>
+<pre><code>// 服务器统一请求接口路径
+, serverUrl: URL + &quot;jsp/controller.jsp&quot;
+</code></pre><p><br></p>
+<h3 id="后端配置文件">后端配置文件</h3><p>后端配置文件为<code>web/ops/ueditor/jsp/config.json</code>，这里配置图片上传路径。按文档说明，图片上传配置两个参数：imagePathFormat、imageUrlPrefix。</p>
+<pre><code>1.4.2+ 以后路径配置主要相关的配置项是 PathFormat 和 UrlPrefix 的配置项。
+</code></pre><p>最开始我忽略后者imageUrlPrefix，其保持默认值为空，只是配置前者imagePathFormat为</p>
+<pre><code>&quot;imageUrlPrefix&quot;: &quot;&quot;, /* 图片访问路径前缀 */
+&quot;imagePathFormat&quot;: &quot;/ueditor/jsp/upload/{yyyy}{mm}{dd}/{time}{rand:6}&quot;, /* 上传保存路径,可以自定义保存路径和文件名格式 */
+</code></pre><p>在uditor上上传图片后，图片在编辑器中显示不出来，图片上传后返回的图片链接404了，为</p>
+<pre><code>https://localhost:8443/ueditor/jsp/upload/20140630/1404099623210084109.png
+</code></pre><p>而正确的链接应该带上我的web应用名<code>ops</code>，即为</p>
+<pre><code>https://localhost:8443/ops/ueditor/jsp/upload/20140630/1404099623210084109.png
+</code></pre><p>尝试修改jsp代码，对返回的图片路径增加上web名，代码demo在<a href="https://github.com/popozhu/ueditor/commit/4d37c715e11d713cf6a65e7b20d47171d2ee0561" target="_blank" rel="external">github</a>, 重新编译代码，打个uditor.jar包，部署后再上传图片，编辑器中能正确显示出图片来。但后来想了想，还是不对。</p>
+<p>再回头看<code>imageUrlPrefix</code>这个配置，在前端的js代码里找到使用它的地方了。</p>
+<p>翻多一遍官网文档<a href="http://fex-team.github.io/ueditor/#server-path" target="_blank" rel="external">通过 imageUrlPrefix 配置项给返回路径添加前缀</a>对这个字段的使用场景解释，虽然是用于跨域上传的场景，那配置上我web域名，也应该是可以的。修改配置为</p>
+<pre><code>&quot;imageUrlPrefix&quot;: &quot;https://localhost:8443/ops&quot;, /* 图片访问路径前缀 */
+&quot;imagePathFormat&quot;: &quot;/ueditor/jsp/upload/{yyyy}{mm}{dd}/{time}{rand:6}&quot;, /* 上传保存路径,可以自定义保存路径和文件名格式 */
+</code></pre><p>同时使用回默认的uditor.jar包，嗯，可以了。</p>
+<p>未细究代码，简单测试了一下，当前项目版本（1.4.3）这两个配置项的工作：</p>
+<ol>
+<li>图片上传到：当前web应用的绝对路径 +　<code>imagePathFormat</code>（如果跨域上传呢，不理解）</li>
+<li>返回<code>imagePathFormat</code>到编辑器</li>
+<li>编辑器拼接<code>imageUrlPrefix</code> +　<code>imagePathFormat</code>，形成图片的url。</li>
+</ol>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2014">2014/7/3</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/ueditor/">ueditor</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2014/07/03/ueditor图片上传路径配置/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/07/20/kerberos-extras-for-os-x/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          Kerberos Extras for OS X
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2014/06/18/想起海角七号/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">想起海角七号</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2014/07/03/ueditor图片上传路径配置/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>C-string to unicode | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">C-string to unicode</div> 
+		<small>
+		    <time datetime="2013-09-11T14:02:51.000Z" itemprop="datePublished">September 11th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>后台的C程序通过socket发给前台的消息包含了中文，前台接收后出现了乱码，有人提出让我把消息编码成unicode格式(\uxxxx)，虽然参考了一个C库做了实现，但当时的思路并不是很清晰，回来做下归纳。  </p>
+<p>包含中文字符的消息，记为msg，假若msg包含中文、英文和数字：msg = “abc我是def中文123字符”，于是需要把msg编码成unicode格式，编码后的内容保存到C的char数组里，记为unicode_str，则最终想要得到的unicode_str = “abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26”。  </p>
+<p>在c代码里，先用宽字符类型wchar_t保存msg，这个宽字符的长度可以用函数wcslen来计算，然后遍历每个宽字符，把宽字符转换成unicode格式。对每个宽字符的转换，参考了<a href="http://www.cprogramming.com/tutorial/unicode.html" target="_blank" rel="external">Unicode in C and C++: What You Can Do About It Today</a>这里提供的一个函数: u8_escape_wchar。</p>
+<pre><code class="cpp">int u8_escape_wchar(char *buf, int sz, uint32_t ch)
+{
+    if (ch == L&#39;\n&#39;)
+        return snprintf(buf, sz, &quot;\\n&quot;);
+    else if (ch == L&#39;\t&#39;)
+        return snprintf(buf, sz, &quot;\\t&quot;);
+    else if (ch == L&#39;\r&#39;)
+        return snprintf(buf, sz, &quot;\\r&quot;);
+    else if (ch == L&#39;\b&#39;)
+        return snprintf(buf, sz, &quot;\\b&quot;);
+    else if (ch == L&#39;\f&#39;)
+        return snprintf(buf, sz, &quot;\\f&quot;);
+    else if (ch == L&#39;\v&#39;)
+        return snprintf(buf, sz, &quot;\\v&quot;);
+    else if (ch == L&#39;\a&#39;)
+        return snprintf(buf, sz, &quot;\\a&quot;);
+    else if (ch == L&#39;\\&#39;)
+        return snprintf(buf, sz, &quot;\\\\&quot;);
+    else if (ch &lt; 32 || ch == 0x7f)
+        return snprintf(buf, sz, &quot;\\x%hhX&quot;, (unsigned char)ch);
+    else if (ch &gt; 0xFFFF)
+        return snprintf(buf, sz, &quot;\\U%.8X&quot;, (uint32_t)ch);
+    else if (ch &gt;= 0x80 &amp;&amp; ch &lt;= 0xFFFF)
+        return snprintf(buf, sz, &quot;\\u%.4hX&quot;, (unsigned short)ch);
+
+    return snprintf(buf, sz, &quot;%c&quot;, (char)ch);
+}
+</code></pre>
+<p>每个宽字符先转换为unsigned int，也就是wchar_t到unsigned int。 demo大概如下：  </p>
+<pre><code class="cpp">int main()
+{
+    setlocale(LC_ALL, &quot;zh_CN.UTF-8&quot;); 
+    wchar_t *input = L&quot;abc我是def中文123字符&quot;;
+
+    int len = wcslen(input);
+    wchar_t *p = input;
+
+    char buf[2048] = {0x0};
+    char *pbuf = buf;
+
+    int ret;
+    int i; for (i = 0; i &lt; len; i++)
+    {
+        ret = u8_escape_wchar(pbuf, sizeof(buf), (uint32_t)*p);
+        pbuf += ret; 
+        p++;
+    }
+    printf(&quot;buf[%s]\n&quot;, buf);
+
+    setlocale(LC_ALL, &quot;C&quot;);
+    return 0;
+}
+</code></pre>
+<p>demo的输出为: abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26</p>
+<p>而通过gdb查看buf的内容，可以看到每个中文字符unicode前会多一个转义的’\’:</p>
+<pre><code class="cpp">(gdb) p buf
+$1 = &quot;abc\\u6211\\u662Fdef\\u4E2D\\u6587123\\u5B57\\u7B26&quot;, &#39;\0&#39; &lt;repeats 2002 times&gt;
+</code></pre>
+<p>可以看到，对于英文字符和数字，并没有做转换。  </p>
+<p>前台的js拿到unicode之后的内容”abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26”，可以简单转换回中文字符，js的转换思路，先用JSON.stringify把源内容序列化，再用正则替换unicode码：</p>
+<pre><code class="js">function JSON_stringify(s, emit_unicode)
+{
+   var json = JSON.stringify(s);
+   return emit_unicode ? json : json.replace(/[\u007f-\uffff]/g,
+      function(c) { 
+        return &#39;\\u&#39;+(&#39;0000&#39;+c.charCodeAt(0).toString(16)).slice(-4);
+      }
+   );
+}
+
+var s = &quot;abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26&quot;;
+JSON_stringify(s, true);
+</code></pre>
+<p>输出为：abc我是def中文123字符   </p>
+<p>当然，上面的C库也提供了unicode到C-string的转换，转换的函数为：</p>
+<pre><code class="cpp">int u8_unescape(char *buf, int sz, char *src);
+</code></pre>
+<p>第3个参数是要转换的unicode码，例如: </p>
+<pre><code class="cpp">u8_unescape(mybuf, 256, &quot;hello\\u220e&quot;)
+</code></pre>
+<p><br><br>ref:  </p>
+<ol>
+<li>这个C库的代码：<br><a href="http://www.cprogramming.com/tutorial/utf8.h" target="_blank" rel="external">utf8.h  (http://www.cprogramming.com/tutorial/utf8.h)</a><br><a href="http://www.cprogramming.com/tutorial/utf8.c" target="_blank" rel="external">utf8.c  (http://www.cprogramming.com/tutorial/utf8.c)</a>  </li>
+<li><a href="http://stackoverflow.com/questions/4901133/json-and-escaping-characters" target="_blank" rel="external">JSON and escaping characters</a></li>
+</ol>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/9/11</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/c/">c</a>,<a class="category-link" href="/tags/unicode/">unicode</a>,<a class="category-link" href="/tags/utf8/">utf8</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/09/11/c-string-to-unicode/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/09/24/mac光标速度调整/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          mac光标速度调整
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/08/24/ios消息并发推送/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">ios消息并发推送</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/09/11/c-string-to-unicode/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

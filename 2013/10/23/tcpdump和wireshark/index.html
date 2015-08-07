@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>Tcpdump和Wireshark | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">Tcpdump和Wireshark</div> 
+		<small>
+		    <time datetime="2013-10-23T14:15:23.000Z" itemprop="datePublished">October 23rd 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>用过tcpdump来抓包的人，再使用Wireshark，估计都会说好。<br>很遗憾，我对tcpdump这个命令的使用，只是皮毛。拿一个曾经用过的命令，现在让我再解释每个参数的意义，还真无法一一说得上来：</p>
+<pre><code>tcpdump -i eth1 port 60777 and &#39;(((ip[2:2] - ((ip[0]&amp;0xf)&lt;&lt;2)) - ((tcp[12]&amp;0xf0)&gt;&gt;2)) != 0)&#39; -s 0 -A -n -S -q -c 1024
+</code></pre><p>每个参数的解释大概如下：  </p>
+<ol>
+<li>-i eth1: 抓取eth1这个设备的包</li>
+<li>port 60777: 只抓取端口60777的包</li>
+<li>‘(((ip[2:2] - ((ip[0]&amp;0xf)&lt;<2)) -="" ((tcp[12]&0xf0)="">&gt;2)) != 0)’: 参考自man手册，只抓有数据的包，不包括SYN, FIN和只有ACK的包</2))></li>
+<li>-s 0: 从每个包中抓取多少字节的数据，设置为0，表示抓取65535字节，我期望抓取整个包</li>
+<li>-A: 把包的内容按ASCII打印</li>
+<li>-n: ip地址保持为数值</li>
+<li>-S: 绝对序列号，而不是相对序列号</li>
+<li>-q: quiet, 显示少量的协议信息</li>
+<li>-c 1024: 抓取多少个包，抓到1024个包后就停止</li>
+</ol>
+<p>即使把这个命令放到<a href="http://explainshell.com/" target="_blank" rel="external">explainshell.com</a>去解释，它也无法完全解释。<br><img src="/img/2013/snapshot_2013-10-23_10.25.01.png" alt="explainshell"></p>
+<p>tcpdump的参数和过滤规则要玩得好，还是不简单的，还要求熟悉tcp协议和数据格式。而且抓下来的包，要进行分析也不是很直观。对于上面的命令，我抓取1024个包，然后按字段过滤包的内容（一个包一行记录），来判断我期望的数据能否正确传输。  </p>
+<p>总之，tcpdump我用起来很慢。  </p>
+<p>有同学向我推荐了wireshark这个图形界面的软件。抓包、分析包，一套搞定，跨平台，还可以分析tcpdump抓下来的包。用过几次，过滤规则跟tcpdump类似，在wireshark中设置过滤规则很简单；而对于包的分析，由于有图形界面，能自动分析出每个包中各个协议、数据，看起来非常直观。  </p>
+<p>比如我wifi连接路由器，想抓取端口49713的数据，点几下就可以设置这么一个过滤规则：<br><img src="/img/2013/QQ20131023-1.png" alt="设置规则"></p>
+<p><hr><br>抓了几个包，停止抓取，设置每个包的时间显示格式，方便查看：<br><img src="/img/2013/QQ20131023-2.png" alt="显示的时间格式"></p>
+<p><hr><br>可以查看到：  </p>
+<ol>
+<li>本地在哪个时间点发起tcp连接，哪个时间结束连接</li>
+<li>若有数据包，数据的内容，可以直接查看到</li>
+<li>由于我按端口来过滤，通过端口的指向方向，可以清楚看到本地和服务端的交互情况</li>
+<li>通过TCP的状态SYN, ACK, FIN, PSH可以清楚看到每个包是做什么的<br><img src="/img/2013/QQ20131023-31.png" alt="分析的几个点"></li>
+</ol>
+<p>在上图简单抓取的包中，如第1行的数据，在2013-10-23 22:49:58这个时间点，我本地以端口50726向服务端的49713端口发送一个SYN包，请求建立连接。  </p>
+<p>第2行的数据，服务端回复一个「SYN, ACK」给予确认，第3个包，我本地回复一个「ACK」给到服务端，连接建立。  </p>
+<p>连接建立后，第4个包，包含了「PSH, ACK」，我本地向服务端传输一个数据包，第5个包，服务端回复一个「ACK」，表示已接收数据。  </p>
+<p>第6个包，服务端发送一个「PSH, ACK」包，对上面的数据进行相应，在这个包中带有回复的数据。  </p>
+<p>第7个包，我本地收到回复的数据，发送一个「ACK」表示已接收。 </p>
+<p>然后本地发送第8个包， 即「FIN, ACK」给到服务端，表示我本地要关闭连接啦，请做好准备。  </p>
+<p>第9个包中，服务端表示当前也没有数据要给客户端了，要关闭就关闭，回复一个确认关闭的包「FIN, ACK」，给到我本地，这次socket至此关闭。</p>
+<p>第10个包，以及后续的包，跟上面类似，只不过是多了很多数据交互的包。  </p>
+<p>通过上面的抓包，看到双方交互的情况，tcp的连接和数据交互都跟预期一致，说明:  </p>
+<ol>
+<li>当前网络状况良好，没有发生tcp包重传的情况</li>
+<li>在某个时间点，服务端收到了数据，收到哪些数据，数据是否正常，到服务端查一下日志，看看服务端的处理逻辑和答复结果，是否跟预期一致，这都有助定位问题。比如出了某个故障，根据现场一些表象，猜测在某个时间点socket已经关闭，但根据抓到的包，在对应这个时间socket还在数据交互，于是就可以推翻这个猜测，有图有真相    </li>
+<li>客户端类似，核对某个时间的交互情况，都是有助定位和分析问题   </li>
+</ol>
+<p>查看时，也可以按规则来过滤出我们想要的包，比如「只」查看第一个tcp连接的情况，可以设置过滤：<br><img src="/img/2013/QQ20131023-4.png" alt="设置规则"></p>
+<p>更方便的是，可以查看某个tcp连接「完整」传输过程中所有的数据，只须在过滤出某个tcp连接之后，随便选择一行，右键，选择「follow tcp stream」，是的，我们想要的数据都出来了，这时我们会明显感觉到，https加密传输的重要性了。  </p>
+<p><hr><br>目前也只是简单用到这了。对于wireshark的常用抓包规则，推荐<a href="http://openmaniak.com/cn/wireshark_filters.php" target="_blank" rel="external">Wireshark - 简明教程 - 过滤器</a>    </p>
+<p>最后，祝自己今天生日快乐， :)  </p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/10/23</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/mac/">mac</a>,<a class="category-link" href="/tags/network/">network</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/10/23/tcpdump和wireshark/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/11/06/tmux，乱码已成往事/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          tmux，乱码已成往事
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/10/10/squirrel_input/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">鼠须管输入法</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/10/23/tcpdump和wireshark/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

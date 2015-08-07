@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>在os x上安装smokeping | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">在os x上安装smokeping</div> 
+		<small>
+		    <time datetime="2013-06-19T06:10:27.000Z" itemprop="datePublished">June 19th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <h2 id="安装rrdtool">安装rrdtool</h2><p>在mac上我使用port来安装第三方软件，为了方便，还是使用port来安装rrdtool。</p>
+<pre><code>sudo port install rrdtool
+</code></pre><p>macport会安装相应的依赖，比如一些perl的模块RRD等。<br>但smokeping改为编译源代码来安装。<br>因为port会额外安装一个apache2，版本还是跟系统自带的apache一样，太不智能了，不想维护2个apache。  </p>
+<p><br></p>
+<h2 id="安装smokeping">安装smokeping</h2><p>下载smokeping的tar包，解压，编译、安装到<code>/usr/local/smokeping</code>：  </p>
+<pre><code>./configure --prefix=/usr/local/smokeping
+// 根据configure执行结果，会提示执行脚本`build-perl-modules.sh`来下载需要perl模块
+./build-perl-modules.sh /usr/local/smokeping/thirdparty
+make
+sudo make install
+</code></pre><p>把smokeping目录设置为apache可读可写：</p>
+<pre><code>sudo chown -R _www:_www /usr/local/smokeping/
+</code></pre><p>测试配置文件，根据报错来修改配置config文件</p>
+<pre><code>/usr/local/smokeping/bin/smokeping --check
+</code></pre><p><br></p>
+<h2 id="安装mod_fastcgi(apache_modules)">安装mod_fastcgi(apache modules)</h2><p>参考: <a href="http://www.ccpt.cc/install_fastcgi_in_mac_and_example/" target="_blank" rel="external">FastCGI的安装(Mac)与简单示例</a>  </p>
+<pre><code class="plain">tar zxvf mod_fastcgi-2.4.6.tar.gz  
+cd mod_fastcgi-2.4.6  
+cp Makefile.AP2 Makefile  
+  //修改Makefile中，不同的系统不一样，换成你apache库的所在目录  
+  top_dir = /usr/share/httpd  
+  //在Makefile中增加一项:  
+  CFLAGS = -arch x86_64  
+//运行  
+make  
+make install
+</code></pre>
+<p>其中编译出错，找不到cc：  </p>
+<pre><code class="plain">popozhu ~/Downloads/mod_fastcgi-2.4.6$ make
+/usr/share/apr-1/build-1/libtool --silent --mode=compile /Applications/Xcode.app/Contents/Developer/Toolchains/OSX10.8.xctoolchain/usr/bin/cc -I/usr/local/include    -DDARWIN -DSIGPROCMASK_SETS_THREAD_MASK    -I/usr/include/apache2 -I. -I/usr/include/apr-1  -c mod_fastcgi.c &amp;&amp; touch mod_fastcgi.slo
+env: /Applications/Xcode.app/Contents/Developer/Toolchains/OSX10.8.xctoolchain/usr/bin/cc: No such file or directory
+make: *** [mod_fastcgi.slo] Error 1
+</code></pre>
+<p>做一个链接，搞定:</p>
+<pre><code class="plain">$ sudo ln -s /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/  
+/Applications/Xcode.app/Contents/Developer/Toolchains/OSX10.8.xctoolchain
+</code></pre>
+<p>这就把<strong>mod_fastcgi.so</strong>安装到<code>/usr/libexec/apache2</code>目录下.</p>
+<p><br></p>
+<h2 id="修改apache配置">修改apache配置</h2><p>在配置文件<code>/private/etc/apache2/httpd.conf</code>中，增加对fastcgi模块的加载：  </p>
+<pre><code class="plain">LoadModule fastcgi_module libexec/apache2/mod_fastcgi.so
+</code></pre>
+<p>添加smokeping的根目录，在目录中启用fcgi，同时做一个alias：</p>
+<pre><code>&lt;Directory &quot;/usr/local/smokeping/htdocs/&quot;&gt;
+    Allow from all
+    AllowOverride None
+    AddHandler cgi-script cgi 
+    AddHandler fastcgi-script .fcgi
+    Options ExecCGI
+&lt;/Directory&gt;
+Alias /smokeping &quot;/usr/local/smokeping/htdocs/&quot;
+Alias /cache &quot;/usr/local/smokeping/cache/&quot;
+</code></pre><p>重启apache:</p>
+<pre><code class="plain">popozhu /private/etc/apache2$ sudo apachectl restart
+popozhu /private/etc/apache2$ ps -ef | grep httpd
+    0 30702     1   0  2:32下午 ??         0:00.18 /usr/sbin/httpd -D FOREGROUND
+   70 30704 30702   0  2:32下午 ??         0:00.00 /usr/sbin/httpd -D FOREGROUND
+  501 30706 42154   0  2:32下午 ttys001    0:00.00 grep httpd
+</code></pre>
+<p>使用smokeping的fcgi:</p>
+<pre><code class="plain">sudo cp /usr/local/smokeping/htdocs/smokeping.fcgi.dist /usr/local/smokeping/htdocs/smokeping.fcgi
+</code></pre>
+<p>在浏览器中查看smokeping的前端：</p>
+<pre><code class="plain">http://127.0.0.1/smokeping/smokeping.fcgi
+</code></pre>
+<p>启动后台fping程序：</p>
+<pre><code class="plain">sudo /usr/local/smokeping/bin/smokeping
+</code></pre>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/6/19</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/smokeping/">smokeping</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/06/19/安装smokeping/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/06/24/一些好用的命令/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          一些好用的命令
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/06/15/libevent_r4_事件/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Libevent事件</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/06/19/安装smokeping/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

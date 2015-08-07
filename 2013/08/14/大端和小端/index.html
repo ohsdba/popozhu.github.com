@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>大端和小端 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">大端和小端</div> 
+		<small>
+		    <time datetime="2013-08-14T15:11:57.000Z" itemprop="datePublished">August 14th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>以前没理解大端和小端，<a href="http://blog.csdn.net/ce123_zhouwei/article/details/6971544" target="_blank" rel="external">详解大端模式和小端模式</a>这里对于概念上讲得很详细，再次温习了一下。  </p>
+<p>对于linux，以我工作中使用的centos为例，在头文中<code>/usr/include/endian.h</code>中我看到如下定义:</p>
+<pre><code class="cpp">/* Definitions for byte order, according to significance of bytes,
+   from low addresses to high addresses.  The value is what you get by
+   putting &#39;4&#39; in the most significant byte, &#39;3&#39; in the second most
+   significant byte, &#39;2&#39; in the second least significant byte, and &#39;1&#39;
+   in the least significant byte, and then writing down one digit for
+   each byte, starting with the byte at the lowest address at the left,
+   and proceeding to the byte with the highest address at the right.  */
+
+#define __LITTLE_ENDIAN 1234
+#define __BIG_ENDIAN    4321
+</code></pre>
+<p>这里定义了字节序，从左边到右边，内存地址由低到高，依次存放顺序如果为：最低有效位－次有效位－有效位－最高有效位，则定义为小端。数字4表示最高有效位，从4到1，依次递减。<br>理清概念时， 一个是要注意内存地址的方向，另一个是要明白字节的存放位置。<br>这样的话，对于一个十六进制表示的数：0x1234，需要2个字节来存放，放到低位字节和高位字节。  </p>
+<ol>
+<li>小端：低位字节(0x34)，高位字节(0x12)。  </li>
+<li>大端：低位字节(0x12)，高位字节(0x34)。跟<em>字符串</em>的顺序类似。 </li>
+</ol>
+<p>可以用代码验证：</p>
+<pre><code class="cpp">#include &lt;stdio.h&gt;
+
+int main()
+{
+
+    // 方法1
+    int a = 0x1234;
+    // 通过将int强制类型转换成char单字节，通过判断起始存储位置
+    // 即把a的低字节上的内容复制给b
+    char b = *(char*)&amp;a;
+    if (b == 0x12){
+        printf(&quot;big endian\n&quot;);
+    }
+    if (b == 0x34){
+        printf(&quot;little endian\n&quot;);
+    }
+
+
+    // 方法2
+    // 联合体union的存放顺序是所有成员都从低地址开始存放，
+    // 利用该特性可以轻松地获得了CPU对内存采用Little-endian还是Big-endian模式
+    union Num 
+    {
+        int a;
+        char b; //低地址字节
+    };
+
+    union Num num;
+    num.a = 0x1234;
+
+    if (num.b == 0x12){
+        printf(&quot;big endian\n&quot;);
+    }
+    if (num.b == 0x34){
+        printf(&quot;little endian\n&quot;);
+    }
+
+
+    // 方法3
+    // 通过宏来判断
+#if __BYTE_ORDER != __LITTLE_ENDIAN
+    printf(&quot;big endian\n&quot;);
+#endif
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    printf(&quot;little endian\n&quot;);
+#endif
+
+
+    return 0;
+}
+</code></pre>
+<p>方法3可能更实用些，在头文件<code>/usr/include/bits/endian.h</code>中如下定义：</p>
+<pre><code class="cpp">/* x86_64 is little-endian.  */
+
+#define __BYTE_ORDER __LITTLE_ENDIAN
+</code></pre>
+<p>x86架构的cpu，使用的是小端，而网络字节编码使用的是大端，根据通信协议，程序发送数值型的数据，需要转成网络字节序（大端），可以使用函数：  </p>
+<pre><code class="cpp">#include &lt;arpa/inet.h&gt;
+
+uint32_t htonl(uint32_t hostlong);
+uint16_t htons(uint16_t hostshort);
+</code></pre>
+<p>程序从网络上接收数值型的数据，按协议，需要把数据从网络字节序（大端）转成小端，可以使用：</p>
+<pre><code class="cpp">#include &lt;arpa/inet.h&gt;
+
+uint32_t ntohl(uint32_t netlong);
+uint16_t ntohs(uint16_t netshort);
+</code></pre>
+<p>函数非常容易记忆： <code>n</code>表示network，<code>h</code>表示host，<code>to</code>表示转换方向。</p>
+<p>若不转换，进程里的数值：0x1234，到了网络就是：0x3412。  </p>
+<p>对于mysql，有时候需要保存一个点分表示法的ip到数据库，但可以把ip转为数值型，入库使用mysql的函数<code>inet_aton(&#39;1.2.3.4&#39;)</code>, sql会转成数值16909060， 逆操作则是<code>inet_ntoa(16909060)</code>。</p>
+<pre><code class="sql">mysql&gt; select inet_aton(&#39;1.2.3.4&#39;);
++----------------------+
+| inet_aton(&#39;1.2.3.4&#39;) |
++----------------------+
+|             16909060 |
++----------------------+
+
+mysql&gt; select inet_ntoa(16909060);
++---------------------+
+| inet_ntoa(16909060) |
++---------------------+
+| 1.2.3.4             |
++---------------------+
+</code></pre>
+<p>同样的，<code>n</code>表示network，<code>a</code>表示a dot点分法。  </p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/8/14</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/c/">c</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/08/14/大端和小端/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/08/15/openssl和多线程/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          openssl和多线程
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/07/27/在perl里使用kyotocabinet/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">在perl里使用KyotoCabinet</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/08/14/大端和小端/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

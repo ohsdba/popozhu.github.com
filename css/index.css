@@ -1,0 +1,27 @@
+.archive_container {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+}
+.archive_title {
+  margin-top: 0.8rem;
+  font-size: 2rem;
+}
+.extend,
+.page-number {
+  font-size: 1.5rem;
+  margin-left: 0.3rem;
+  margin-right: 0.3rem;
+}
+.archive_page {
+  text-align: center;
+  width: 100%;
+}
+.extend.prev {
+  float: left;
+}
+.extend.next {
+  float: right;
+}
+.category-link {
+  margin-left: 0.3rem;
+}

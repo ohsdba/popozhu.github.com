@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>在perl里使用KyotoCabinet | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">在perl里使用KyotoCabinet</div> 
+		<small>
+		    <time datetime="2013-07-27T14:38:00.000Z" itemprop="datePublished">July 27th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>最近有个事情，统计站上所有视频文件的md5，导出的待分析的数据有28G，需要去重。我用perl的hash来处理，可以简单快速完成。但考虑到perl会使用较多内存，担心影响机器其他进程，根据一篇wiki，在perl中使用一个dbm来帮助管理内存，大概如下：</p>
+<pre><code class="perl">use KyotoCabinet;
+
+my $db = tie(my %db, &#39;KyotoCabinet::DB&#39;);
+
+# use the $db, such as:
+# $db{$key} = $value;
+
+undef($db);
+untie(%db);
+</code></pre>
+<p>参考wiki的介绍内容如下2点：  </p>
+<ol>
+<li>KyotoCabinet(简称kc)是一种轻量级的数据库，把它当做DBM，跟perl里面的tie结合，可以使用哈希结构来达到我们的计算目的。  </li>
+<li>不直接用perl的hash来做，是因为数据量比较大，怕内存溢出，实际上就是用kc来帮忙管理内存，我们可以很方便地使用哈希结构，在kc的内部kc自己会用内存做缓存的，冷的部分flush到磁盘。对比用perl hash的方案就是完全放内存的，直到物理内存溢出就用swap了，这样性能就比较低。 </li>
+</ol>
+<p>kc是一个key－value的数据库，这里应用到perl脚本里当成hash来保存我的处理数据，最后再把数据写到结果文件里。实际情况中，直接用perl的hash，使用内存达到5G，而用了kc，内存使用约为2.5G－2.8G左右（机器上有32G内存），结果文件为2.1G。当然，使用kc后perl的处理速度，相比直接使用perl的hash，相对要慢了。    </p>
+<p>在perl中使用kc，需要先安装kc，再安装kc的perl模块：  </p>
+<ol>
+<li>kc的核心库: <a href="http://fallabs.com/kyotocabinet/pkg/" target="_blank" rel="external">Source Packages of the core library (C/C++)</a><pre><code> ./configure --prefix=/opt/local
+ make &amp;&amp; make install
+</code></pre></li>
+<li>kc的perl模块，<strong>不能指定安装目录</strong>: <a href="http://fallabs.com/kyotocabinet/perlpkg/" target="_blank" rel="external">Source Packages for Perl</a><pre><code> perl Makefile.PL
+ make &amp;&amp; make install
+</code></pre></li>
+</ol>
+<p><hr><br>如果真的在只有2G内存的机器上处理100G的数据，假如结果文件的大小超过内存，其效果又如何，实在好奇。因为我使用的机器内存有32G，待处理文件也只有28G，暂时无法验证kc是否能解决这个假定，后续有机会的话找个2G内存的普通笔记本再试试，目前虚拟机也没有linux（太不专业了）。  </p>
+<p>或者有兴趣的同学试试？？  </p>
+<p>to be continue~~  </p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/7/27</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/KyotoCabinet/">KyotoCabinet</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/07/27/在perl里使用kyotocabinet/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/08/14/大端和小端/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          大端和小端
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/07/13/给hexo增加返回顶部链接/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">给hexo增加返回顶部链接</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/07/27/在perl里使用kyotocabinet/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

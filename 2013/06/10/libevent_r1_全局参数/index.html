@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>Libevent全局参数 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">Libevent全局参数</div> 
+		<small>
+		    <time datetime="2013-06-10T13:27:39.000Z" itemprop="datePublished">June 10th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <blockquote>
+<p>原文：<a href="http://www.wangafu.net/~nickm/libevent-book/Ref1_libsetup.html" target="_blank" rel="external">R1: Setting up the Libevent library</a></p>
+</blockquote>
+<p>Libevent有一些全局参数，设置的内容会影响整个库，进而影响到整个进程。若需要修改这些参数，你需要在使用Libevent之前进行设置，否则可能会因参数前后不一致而导致挂起。  </p>
+<h2 id="打印日志">打印日志</h2><p>Libevent能记录错误和警告消息。如果在编译时加入debug开关，那也能记录它自身运行的debug日志。这些日志默认写到stderr，但你能修改它，使用你自定义的日志打印函数。  </p>
+<pre><code>#define EVENT_LOG_DEBUG 0
+#define EVENT_LOG_MSG   1
+#define EVENT_LOG_WARN  2
+#define EVENT_LOG_ERR   3
+
+/* Deprecated; see note at the end of this section */
+#define _EVENT_LOG_DEBUG EVENT_LOG_DEBUG
+#define _EVENT_LOG_MSG   EVENT_LOG_MSG
+#define _EVENT_LOG_WARN  EVENT_LOG_WARN
+#define _EVENT_LOG_ERR   EVENT_LOG_ERR
+
+typedef void (*event_log_cb)(int severity, const char *msg);
+
+void event_set_log_callback(event_log_cb cb);
+</code></pre><p>使用<code>event_log_cb</code>定义你自己的日志打印函数， 然后设置（以覆盖的方式）打印日志的回调函数<code>event_set_log_callback()</code>. 当Libevent打印日志时，日志内容就传到你定义的日志打印函数。<br>若要恢复默认设置， 再调用一次<code>event_set_log_callback()</code>， 传一个NULL参数就可以了。  </p>
+<h4 id="Examples">Examples</h4><pre><code>#include &lt;event2/event.h&gt;
+#include &lt;stdio.h&gt;
+
+static void discard_cb(int severity, const char *msg)
+{
+    /* This callback does nothing. */
+}
+
+static FILE *logfile = NULL;
+static void write_to_file_cb(int severity, const char *msg)
+{
+    const char *s;
+    if (!logfile)
+        return;
+    switch (severity) {
+        case _EVENT_LOG_DEBUG: s = &quot;debug&quot;; break;
+        case _EVENT_LOG_MSG:   s = &quot;msg&quot;;   break;
+        case _EVENT_LOG_WARN:  s = &quot;warn&quot;;  break;
+        case _EVENT_LOG_ERR:   s = &quot;error&quot;; break;
+        default:               s = &quot;?&quot;;     break; /* never reached */
+    }
+    fprintf(logfile, &quot;[%s] %s\n&quot;, s, msg);
+}
+
+/* Turn off all logging from Libevent. */
+void suppress_logging(void)
+{
+    event_set_log_callback(discard_cb);
+}
+
+/* Redirect all Libevent log messages to the C stdio file &#39;f&#39;. */
+void set_logfile(FILE *f)
+{
+    logfile = f;
+    event_set_log_callback(write_to_file_cb);
+}
+</code></pre><p><strong> 注意 </strong><br>在你的自定义日志打印函数里再调用Libevent的函数是不安全的。<br>比如在你的日志打印函数里试图使用bufferevents给sock发送一个消息，这将导致一些难以定位的bug。<br>在未来的版本中一些Libevent函数可能就没有这个限制。  </p>
+<p>Libevent自身的debug日志功能没有打开。如果Libevent支持自身debug日志，那么你可以手动打开。  </p>
+<pre><code>#define EVENT_DBG_NONE 0
+#define EVENT_DBG_ALL 0xffffffffu
+
+void event_enable_debug_logging(ev_uint32_t which);
+</code></pre><p>Libevent的debug日志很多，而且多数情况下没什么用处， 调用<code>event_enable_debug_logging()</code>， 使用参数<code>EVENT_DBG_NONE</code>来设置默认行为， 使用参数<code>EVENT_DBG_ALL</code>则打开所有支持的debug日志。 未来版本可能支持更多参数。  </p>
+<p>这些函数定义在头文件<code>&lt;event2/event.h&gt;</code>。 除了<code>event_enable_debug_logging()</code>是在2.1.1-alpha版本中才出现，其他函数在版本1.0c中首次出现。  </p>
+<p><strong> 兼容备忘 </strong><br>在Libevent 2.0.19-stable这个版本之前，以<code>EVENT_LOG_</code>为前缀的这一类宏是这样命名的：<br>_EVENT_LOG_DEBUG<br>_EVENT_LOG_MSG<br>_EVENT_LOG_WARN<br>_EVENT_LOG_ERR<br>除非兼容老版本Libevent 2.0.18-stable或更早的旧版本，不应再使用这一类宏了。 未来版本中将移除这些宏。  </p>
+<p><br></p>
+<h2 id="Handling_fatal_errors_出错处理">Handling fatal errors 出错处理</h2><p>当Libevent监测到不可恢复的内部错误时，比如遇到一个毁坏的数据结构，默认是调用<code>exit()</code>或者<code>abort()</code>退出当前进程。 这些错误一般说明某处代码有bug，要么是在你的代码里，要么在Libevent自身代码里。  </p>
+<p>Libevent提供一个函数让你可以设置你的自定义函数来更为优雅地处理这类错误。  </p>
+<pre><code>typedef void (*event_fatal_cb)(int err);
+void event_set_fatal_callback(event_fatal_cb cb);
+</code></pre><p>使用上，你先定义一个新的函数，再调用<code>event_set_fatal_callback()</code>设置你的错误处理函数。后续遇到这类致命的错误，Libevent就会调用你的函数。  </p>
+<p>你的错误处理函数里不应再返回到Libevent里，否则将会导致无法预计的错误，Libevent也可能在后续退出或崩溃。 一旦开始执行你的错误处理函数，也不能再调用其他Libevent函数。  </p>
+<p>这个函数首次出现在Libevent 2.0.3-alpha，定义在<code>&lt;event2/event.h&gt;</code>。 </p>
+<p><br></p>
+<h2 id="内存管理">内存管理</h2><p>Libevent默认使用C库的内存管理函数从堆上分配内存。如果你有更高效率的内存管理方法，或者为了检查内存泄漏，你可以设置使用你的函数来替代malloc, realloc, free。  </p>
+<pre><code>void event_set_mem_functions(
+    void *(*malloc_fn)(size_t sz), 
+    void *(*realloc_fn)(void *ptr, size_t sz), 
+    void (*free_fn)(void *ptr));
+</code></pre><p>这里有个替换的例子，在自定义的函数里统计总共申请了多少字节内存。 如果在多线程里使用Libevent，那实际上你可能想在这里加一个锁来预防错误。  </p>
+<h4 id="Example">Example</h4><pre><code>#include &lt;event2/event.h&gt;
+#include &lt;sys/types.h&gt;
+#include &lt;stdlib.h&gt;
+
+/* This union&#39;s purpose is to be as big as the largest of all the
+ * types it contains. */
+union alignment {
+    size_t sz;
+    void *ptr;
+    double dbl;
+};
+/* We need to make sure that everything we return is on the right
+   alignment to hold anything, including a double. */
+#define ALIGNMENT sizeof(union alignment)
+
+/* We need to do this cast-to-char* trick on our pointers to adjust
+   them; doing arithmetic on a void* is not standard. */
+#define OUTPTR(ptr) (((char*)ptr)+ALIGNMENT)
+#define INPTR(ptr) (((char*)ptr)-ALIGNMENT)
+
+static size_t total_allocated = 0;
+static void *replacement_malloc(size_t sz)
+{
+    void *chunk = malloc(sz + ALIGNMENT);
+    if (!chunk) return chunk;
+    total_allocated += sz;
+    *(size_t*)chunk = sz;
+    return OUTPTR(chunk);
+}
+static void *replacement_realloc(void *ptr, size_t sz)
+{
+    size_t old_size = 0;
+    if (ptr) {
+        ptr = INPTR(ptr);
+        old_size = *(size_t*)ptr;
+    }
+    ptr = realloc(ptr, sz + ALIGNMENT);
+    if (!ptr)
+        return NULL;
+    *(size_t*)ptr = sz;
+    total_allocated = total_allocated - old_size + sz;
+    return OUTPTR(ptr);
+}
+static void replacement_free(void *ptr)
+{
+    ptr = INPTR(ptr);
+    total_allocated -= *(size_t*)ptr;
+    free(ptr);
+}
+void start_counting_bytes(void)
+{
+    event_set_mem_functions(replacement_malloc,
+                            replacement_realloc,
+                            replacement_free);
+}
+</code></pre><p><strong> 注意 </strong>  </p>
+<ol>
+<li>替换内存管理函数影响到Libevent后续调用allocate，resize或free，你需要在调用其他Libevent函数前设置并替换你的内存管理函数。 否则Libevent将会使用你的free函数去释放那些使用C库申请内存获得的内存</li>
+<li>你的malloc和realloc函数需要返回跟C库一样对齐长度(alignment)的内存块</li>
+<li>你的realloc函数要能正确处理<code>realloc(NULL, sz)</code>， 相当于<code>malloc(sz)</code></li>
+<li>你的relloc函数要能正确处理<code>realloc(ptr, 0)</code>， 相当于<code>free(ptr)</code></li>
+<li>你的free函数不需要处理<code>free(NUUL)</code></li>
+<li>你的malloc函数不需要处理<code>malloc(0)</code></li>
+<li>你的内存管理函数需要线程安全</li>
+<li>Libevnet使用从你的内存管理函数申请到的内存，假若Libevent返回这个内存回来，而且你也替换了你的free函数，那你需要负责调用你的free函数来释放这块内存</li>
+</ol>
+<p>这个<code>event_set_mem_functions()</code>函数定义在头文件<code>&lt;event2/event.h&gt;</code>中，首次出现在Libevent 2.0.1-alpha。  </p>
+<p>Libevent可能关闭了<code>event_set_mem_functions()</code>，那么使用这个函数的那一行代码将不会进行编译和链接。 在Libevent 2.0.2-alpha之后， 你可以检查宏<code>EVENT_SET_MEM_FUNCTIONS_IMPLEMENTED</code>是否定义来检查Libevent是否支持这个函数。  </p>
+<p><br></p>
+<h2 id="Locks_and_threading_锁和线程">Locks and threading 锁和线程</h2><p>如你所知，多线程中同时获取数据并不总是安全的。 Libevent能以三种方式在多线程中正常运行。  </p>
+<ol>
+<li>一些数据结构只在单个线程中使用：在多个线程中同时使用同一份数据从来不是安全的</li>
+<li>一些数据结构选择性加锁：你可以告诉Libevent某个数据是否同时用于多个线程</li>
+<li>一些数据结构一直加锁：如果Libevent能够加锁，那么在同个线程中使用这些数据是安全的</li>
+</ol>
+<p>你需要告诉Libevent使用哪个函数来进行加锁，且需要在申请任何共享数据之前做这个设置。  </p>
+<p>如果你使用pthread库，或者使用Windowns threading代码，那么有预定义的宏来告诉Libevent来使用pthreads或Windows函数。  </p>
+<pre><code>#ifdef WIN32
+int evthread_use_windows_threads(void);
+#define EVTHREAD_USE_WINDOWS_THREADS_IMPLEMENTED
+#endif
+#ifdef _EVENT_HAVE_PTHREADS
+int evthread_use_pthreads(void);
+#define EVTHREAD_USE_PTHREADS_IMPLEMENTED
+#endif
+</code></pre><p>2个函数返回0表示成功，返回-1表示失败。<br>如果你使用一个不同的线程库，那在之前需要做多一些工作。你需要使用你的线程库来实现这些：  </p>
+<ul>
+<li>Locks</li>
+<li>locking</li>
+<li>unlocking</li>
+<li>lock allocation</li>
+<li>lock destruction</li>
+<li>Conditions</li>
+<li>condition variable creation</li>
+<li>condition variable destruction</li>
+<li>waiting on a condition variable</li>
+<li>signaling/broadcasting to a condition variable</li>
+<li>Threads</li>
+<li>thread ID detection</li>
+</ul>
+<p>然后你调用<code>evthread_set_lock_callbacks</code>和<code>evthread_set_id_callback</code>来告诉Libevent来使用你上面自己实现的函数。  </p>
+<pre><code>#define EVTHREAD_WRITE  0x04
+#define EVTHREAD_READ   0x08
+#define EVTHREAD_TRY    0x10
+
+#define EVTHREAD_LOCKTYPE_RECURSIVE 1
+#define EVTHREAD_LOCKTYPE_READWRITE 2
+
+#define EVTHREAD_LOCK_API_VERSION 1
+
+struct evthread_lock_callbacks {
+       int lock_api_version;
+       unsigned supported_locktypes;
+       void *(*alloc)(unsigned locktype);
+       void (*free)(void *lock, unsigned locktype);
+       int (*lock)(unsigned mode, void *lock);
+       int (*unlock)(unsigned mode, void *lock);
+};
+
+int evthread_set_lock_callbacks(const struct evthread_lock_callbacks *);
+
+void evthread_set_id_callback(unsigned long (*id_fn)(void));
+
+struct evthread_condition_callbacks {
+        int condition_api_version;
+        void *(*alloc_condition)(unsigned condtype);
+        void (*free_condition)(void *cond);
+        int (*signal_condition)(void *cond, int broadcast);
+        int (*wait_condition)(void *cond, void *lock,
+            const struct timeval *timeout);
+};
+
+int evthread_set_condition_callbacks(
+        const struct evthread_condition_callbacks *);
+</code></pre><p>数据结构<code>evthread_lock_callbacks</code>描述了你的加锁回调函数以及他们的功能， 各个参数如下：  </p>
+<ol>
+<li>lock_api_version必须设置为<code>EVTHREAD_LOCK_API_VERSION</code>  </li>
+<li><strong>supported_locktypes</strong>必须设置为<code>EVTHREAD_LOCKTYPE_*</code>的一个位掩码， 表示你能支持哪种锁。（在2.0.4-alpha，强制使用<code>EVTHREAD_LOCK_RECURSIVE</code>而没有使用<code>EVTHREAD_LOCK_READWRITE</code>)</li>
+<li>alloc必须返回一个新创建的锁</li>
+<li>free释放该锁持有的资源</li>
+<li>lock这个函数必须尝试获取指定的锁，成功返回0，非0表示失败</li>
+<li>unlock这个函数必须尝试释放锁，成功返回0，非0表示失败</li>
+</ol>
+<p>可以使用的锁的类型有： </p>
+<ol>
+<li><code>0</code>: 普通的、非必要的递归锁</li>
+<li><code>EVTHREAD_LOCKTYPE_RECURSIVE</code>: 递归锁，同一个线程可以再次获得同个锁，该线程加锁多少次，则解锁同等次数之后，其他线程才能获得这个锁</li>
+<li><code>EVTHREAD_LOCKTYPE_READWRITE</code>: 读写锁，读锁可以被多个线程同时获取，但同一时间内只有一个线程能获取写锁</li>
+</ol>
+<p>可以使用的加锁模式有：  </p>
+<ol>
+<li><code>EVTHREAD_READ</code>: 只限<code>READWRITE</code>, 获取或释放该锁进行读操作</li>
+<li><code>EVTHREAD_WRITE</code>: 只限<code>READWRITE</code>, 获取或释放该锁进行写操作</li>
+<li><code>EVTHREAD_TRY</code>: 尝试获取锁，非阻塞，在尝试的时候如果能立刻获得锁则获取该锁</li>
+</ol>
+<p>函数<code>evthread_set_id_callback</code>的参数是一个函数指针id_fn，必须返回一个unsigned long值来标示是哪个线程在调用这个函数，且同个线程必须返回相同的值，也不能为同一时间运行着2个线程返回同样的值。  </p>
+<p>数据结构<code>evthread_condition_callbacks</code>表示条件锁。各个参数如下：  </p>
+<ol>
+<li>lock_api_version相对于上面，必须设置为<code>EVTHREAD_CONDITION_API_VERSION</code></li>
+<li>alloc_condition必须返回一个新创建的条件锁，入参是<code>0</code></li>
+<li>free_condition释放一个条件锁持有的资源</li>
+<li>wait_condition需要3个入参：<br> a) alloc_condition创建的条件锁<br> b) evthread_lock_callbacks.alloc这个函数创建的锁<br> c) 一个可选的超时时间<br> 调用这个函数后就能持有条件锁，也必须释放该锁。该函数一直等待，直到条件满足发起信号，或者直到超时；返回-1表示出错，0表示条件发生了，1表示超时。返回前它要再确保它持有该锁。最后，这个函数要唤醒等待条件发送的线程，如果设置了广播，则要唤醒当前所有等待的线程。  </li>
+</ol>
+<p>更多关于条件锁，参考pthread的<code>pthread_cond_*</code>函数，或者Windows的<code>CONDITION_VARIABLE</code>函数。  </p>
+<h4 id="Examples-1">Examples</h4><pre><code>For an example of how to use these functions, see evthread_pthread.c and
+evthread_win32.c in the Libevent source distribution.
+</code></pre><p>这些函数定义在头文件<code>&lt;event2/thread.h&gt;</code>，大多数首次出现在Libevent 2.0.4-alpha。从2.0.1-alpha到2.0.3-alpha，Libevent使用旧接口来设置加锁函数。 函数<code>event_use_pthreads()</code>要求你链接<code>event_pthreads</code>这个库文件。  </p>
+<p>条件变量的这些函数是在2.0.7-rc才开始使用， 为了解决一些棘手的死锁问题。  </p>
+<p>Libevent本身可以不支持加锁，如果是这样，那程序使用上面的这些函数也是没有效果的。  </p>
+<p><br></p>
+<h2 id="Debugging_lock_usage_调试锁">Debugging lock usage 调试锁</h2><p>Libevent提供一个可选的lock debugging功能，封装了使用锁的函数来捕获错误，错误包括：  </p>
+<ol>
+<li>释放一个没有获得的锁</li>
+<li>重复加锁，当该锁不是递归锁</li>
+</ol>
+<p>如果上面的错误发生，Libevent会因断言失败而退出。  </p>
+<pre><code>void evthread_enable_lock_debugging(void);
+#define evthread_enable_lock_debuging() evthread_enable_lock_debugging()
+</code></pre><p><strong>注意</strong><br>这个函数必须在创建任何锁之前先调用。为了安全，当你设置线程函数之后马上调用它。  </p>
+<p>这个函数在2.0.4-alpha中创建。  </p>
+<p><br></p>
+<h2 id="调试event">调试event</h2><p>有一些普通的错误可以被监测并向你报告，包括：  </p>
+<ol>
+<li>使用未初始化的event数据结构</li>
+<li>尝试初始化一个未决的event数据结构  </li>
+</ol>
+<p>跟踪哪些event没有初始化需要消耗额外的cpu和内存，所以在你调试程序时才使用这个功能。  </p>
+<pre><code>void event_enable_debug_mode(void);
+</code></pre><p>这个函数必须在创建任何<code>event_base</code>之前被先调用。<br>使用debug模式下，如果你的程序使用<code>event_assign()</code>[不是<code>event_new()</code>]来创建大量的event，你可能用光所有内存。 因为Libevent无法判断一个<code>event_assign()</code>创建的event是否不再使用（但它能识别<code>event_new()</code>创建的event是因为你可以调用<code>event_free()</code>来让这个event失效）。为了避免耗光内存，你可以告诉Libevent这个event不再跟踪：  </p>
+<pre><code>void event_debug_unassign(struct event *ev);
+</code></pre><p>如果没有打开调试模式，调用这个函数则没有效果。  </p>
+<h4 id="Example-1">Example</h4><pre><code>#include &lt;event2/event.h&gt;
+#include &lt;event2/event_struct.h&gt;
+
+#include &lt;stdlib.h&gt;
+
+void cb(evutil_socket_t fd, short what, void *ptr)
+{
+    /* We pass &#39;NULL&#39; as the callback pointer for the heap allocated
+     * event, and we pass the event itself as the callback pointer
+     * for the stack-allocated event. */
+    struct event *ev = ptr;
+
+    if (ev)
+        event_debug_unassign(ev);
+}
+
+/* Here&#39;s a simple mainloop that waits until fd1 and fd2 are both
+ * ready to read. */
+void mainloop(evutil_socket_t fd1, evutil_socket_t fd2, int debug_mode)
+{
+    struct event_base *base;
+    struct event event_on_stack, *event_on_heap;
+
+    if (debug_mode)
+       event_enable_debug_mode();
+
+    base = event_base_new();
+
+    event_on_heap = event_new(base, fd1, EV_READ, cb, NULL);
+    event_assign(&amp;event_on_stack, base, fd2, EV_READ, cb, &amp;event_on_stack);
+
+    event_add(event_on_heap, NULL);
+    event_add(&amp;event_on_stack, NULL);
+
+    event_base_dispatch(base);
+
+    event_free(event_on_heap);
+    event_base_free(base);
+}
+</code></pre><p><br></p>
+<h2 id="检测Libevent的版本">检测Libevent的版本</h2><p>新版本的Libevent能带来新特性和修复bugs，有时你会检测Libevent的版本，你能够：</p>
+<ol>
+<li>检测已经安装的Libevent版本，有助你创建你的程序</li>
+<li>显示Libevent版本来进行调试</li>
+<li>检测Libevent版本你能够警告用户bugs，或者解决bugs</li>
+</ol>
+<pre><code>#define LIBEVENT_VERSION_NUMBER 0x02000300
+#define LIBEVENT_VERSION &quot;2.0.3-alpha&quot;
+const char *event_get_version(void);
+ev_uint32_t event_get_version_number(void);
+</code></pre><p>宏定义的版本号可在编译时使用，而函数则在程序运行时使用。不过注意到如果你的程序是动态链接Libevent的话，那这些函数版本可能不一样。  </p>
+<p>你能够获得2种格式的版本信息：a)可以展示给用户的字符串 ， b)4个字节的数字。 数字版本号中，第1个字节表示主版本，第2个字节表示小版本，第3个字节用于修复版本，以及最后一个字节表示发布状态(0用于正式版，非0表示正在开发中)。  </p>
+<p>比如，字符串的版本号2.0.1-alpha有对应的数字版本[02 00 01 00]，或者0x02000100.  </p>
+<h4 id="Example:_Compile-time_checks">Example: Compile-time checks</h4><pre><code>#include &lt;event2/event.h&gt;
+
+#if !defined(LIBEVENT_VERSION_NUMBER) || LIBEVENT_VERSION_NUMBER &lt; 0x02000100
+#error &quot;This version of Libevent is not supported; Get 2.0.1-alpha or later.&quot;
+#endif
+
+int
+make_sandwich(void)
+{
+        /* Let&#39;s suppose that Libevent 6.0.5 introduces a make-me-a
+           sandwich function. */
+#if LIBEVENT_VERSION_NUMBER &gt;= 0x06000500
+        evutil_make_me_a_sandwich();
+        return 0;
+#else
+        return -1;
+#endif
+}
+</code></pre><h4 id="Example:_Run-time_checks">Example: Run-time checks</h4><pre><code>#include &lt;event2/event.h&gt;
+#include &lt;string.h&gt;
+
+int
+check_for_old_version(void)
+{
+    const char *v = event_get_version();
+    /* This is a dumb way to do it, but it is the only thing that works
+       before Libevent 2.0. */
+    if (!strncmp(v, &quot;0.&quot;, 2) ||
+        !strncmp(v, &quot;1.1&quot;, 3) ||
+        !strncmp(v, &quot;1.2&quot;, 3) ||
+        !strncmp(v, &quot;1.3&quot;, 3)) {
+
+        printf(&quot;Your version of Libevent is very old.  If you run into bugs,&quot;
+               &quot; consider upgrading.\n&quot;);
+        return -1;
+    } else {
+        printf(&quot;Running with Libevent version %s\n&quot;, v);
+        return 0;
+    }
+}
+
+int
+check_version_match(void)
+{
+    ev_uint32_t v_compile, v_run;
+    v_compile = LIBEVENT_VERSION_NUMBER;
+    v_run = event_get_version_number();
+    if ((v_compile &amp; 0xffff0000) != (v_run &amp; 0xffff0000)) {
+        printf(&quot;Running with a Libevent version (%s) very different from the &quot;
+               &quot;one we were built with (%s).\n&quot;, event_get_version(),
+               LIBEVENT_VERSION);
+        return -1;
+    }
+    return 0;
+}
+</code></pre><p><br></p>
+<h2 id="释放全局数据结构">释放全局数据结构</h2><p>即使你释放了所有你创建的Libevent数据，仍然有小部分全局数据结构遗留下来。 事实上这并不是个问题，一旦进程退出， 进程使用的内存会被清理回收的。 但遗留这些数据会让一些调试工具误以为Libevent存在内存泄漏问题。如果你要确保Libevent释放所有内部Libevent库使用的全局数据结构，你可以调用：  </p>
+<pre><code>void libevent_global_shutdown(void);
+</code></pre><p>这个函数并不释放那些你通过Libevent申请的数据。如果退出前你要释放那些通过Libevent申请的数据，你需要自己释放events, event_bases, bufferevents等。<br>调用<code>libevent_global_shutdown()</code>会让其他Libevent函数变得不可预测，但它可以是你程序里最后一个调用的Libevent函数。</p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/6/10</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/libevent/">libevent</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/06/10/libevent_r1_全局参数/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/06/11/libevent_r2_创建event_base/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          Libevent创建event_base
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/06/10/libevent_r0_引言/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Libevent引言</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/06/10/libevent_r1_全局参数/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

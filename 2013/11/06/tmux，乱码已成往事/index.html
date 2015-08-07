@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>tmux，乱码已成往事 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">tmux，乱码已成往事</div> 
+		<small>
+		    <time datetime="2013-11-06T13:02:25.000Z" itemprop="datePublished">November 6th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>我用tmux有一段时间了，工作中会用到它的「会话保持」这一功能。在「跳板机」上建一个tmux会话，然后打开多个tmux window，在每个window下ssh连接到「开发机」，这是非常普遍的开发方式。下班时我只要按<code>bind-key + d</code>脱离会话，电脑盖子一合就可以走人，当前机器上的多个ssh连接、打开的文档、运行的程序，都毫无「违和感」地同步「下班」。   </p>
+<p>第二天上班，我连接到「跳板机」，简单地执行2个命令，就可以重新快速挂载到昨天的tmux会话，之前建立的多个ssh连接、打开的文档、运行地程序，又都毫无「违和感」地同步「上班」，保持着昨天的状态（当然，运行着的程序没有退出的意思）。建立tmux会话时我并没有指定名称，重新挂载到会话上非常简单：   </p>
+<pre><code>[xiaojie.zhang1@FS67 ~]$ tmux ls    // 列出当前的tmux会话， ls = list session
+0: 4 windows (created Wed Nov  6 18:37:38 2013) [181x50] (attached)
+[xiaojie.zhang1@FS67 ~]$ tmux attach -t 0    // 挂载到第一个会话， -t 0
+</code></pre><p>然而使用过程中遇到一个屏幕显示错乱的问题，在ssh连上「开发机」后，在「开发机」上用vim打开包含有中文的代码，就会出现：<br><img src="/img/2013/snapshot_2013-11-06_9.08.03.png" alt="显示错乱"></p>
+<p>万能的google会告诉我在tmux的配置文件中添加2个utf8的项： </p>
+<pre><code>[xiaojie.zhang1@FS67 ~]$ grep utf8 ~/.tmux.conf
+setw -g utf8 on
+set -g status-utf8 on
+</code></pre><p>添加了之后就出现了中文「乱码」。<br><img src="/img/2013/snapshot_2013-11-06_9.28.13.png" alt="中文乱码"></p>
+<p>这2个配置项是不能解决问题的，乱码的因素有多个的好吗！！！！   </p>
+<ol>
+<li>终端的编码</li>
+<li>vim的编码</li>
+<li>tmux的编码</li>
+<li>系统的locale</li>
+</ol>
+<p>对于第1点， 我使用的iterm2，使用的字符编码为<code>Unicode(UTF-8)</code>，嗯，已经是utf8了。  </p>
+<p>对于第2点，用vim的人都知道，vim读写一个文件时，使用设置项<code>fenc</code>配置的编码，比如utf8；而vim显示文件内容，使用的是另一个设置项<code>tenc</code>配置的编码，如果这2个配置的编码不一致，就能够看到vim的乱码。我先确认vim打开文件的编码和展示都用到utf8编码，两者编码一致：</p>
+<pre><code>:set fenc    // 在vim命令行下
+  fileencoding=utf-8    // vim命令行下的输出
+:set tenc    // 同上
+  termencoding=utf-8
+</code></pre><p>其实，不用tmux，从「跳板机」ssh连上「开发机」，再使用vim打开任何文本，都是不会乱码的（因为vim配置了正确的编码方式）。  </p>
+<p>对于第3点，tmux添加了utf8的编码也没有效果（其实这2个是设置tmux window的好吗）， tmux的显示到底是根据哪里的配置？？</p>
+<p>到了第4点，确认是系统的locale问题了，tmux依赖于这些设置。由于我是在「跳板机」上使用tmux，tmux会使用到「跳板机」上的locale参数，查看：</p>
+<pre><code>[xiaojie.zhang1@FS67 ~]$ locale
+LANG=en_US.en
+LC_CTYPE=&quot;C&quot;
+LC_NUMERIC=&quot;C&quot;
+LC_TIME=&quot;C&quot;
+LC_COLLATE=&quot;C&quot;
+LC_MONETARY=&quot;C&quot;
+LC_MESSAGES=&quot;C&quot;
+LC_PAPER=&quot;C&quot;
+LC_NAME=&quot;C&quot;
+LC_ADDRESS=&quot;C&quot;
+LC_TELEPHONE=&quot;C&quot;
+LC_MEASUREMENT=&quot;C&quot;
+LC_IDENTIFICATION=&quot;C&quot;
+LC_ALL=C
+</code></pre><p>果然！！！！于是再检查「跳板机」上是否已经安装zh_cn字符集:</p>
+<pre><code>[xiaojie.zhang1@FS67 ~]$ locale -a | grep -i zh_cn
+zh_CN
+zh_CN.gb18030
+zh_CN.gb2312
+zh_CN.gbk
+zh_CN.utf8
+</code></pre><p>没让我失望，有<code>zh_cn.utf8</code>，添加到profile里吧:</p>
+<pre><code>[xiaojie.zhang1@FS67 ~]$ grep -i utf ~/.bash_profile
+export LANG=&quot;zh_CN.UTF-8&quot;
+export LC_ALL=&quot;zh_CN.UTF-8&quot;
+</code></pre><p>kill掉tmux当前的会话，重新登录「跳板机」，新建一个tmux会话，再次确认tmux加载到新的locale</p>
+<pre><code>[xiaojie.zhang1@FS67 ~]$ tmux    // 新建一个tmux会话和窗口
+
+[xiaojie.zhang1@FS67 ~]$ locale    // 进入tmux的窗口，再确认一次locale
+LANG=zh_CN.UTF-8
+LC_CTYPE=&quot;zh_CN.UTF-8&quot;
+LC_NUMERIC=&quot;zh_CN.UTF-8&quot;
+LC_TIME=&quot;zh_CN.UTF-8&quot;
+LC_COLLATE=&quot;zh_CN.UTF-8&quot;
+LC_MONETARY=&quot;zh_CN.UTF-8&quot;
+LC_MESSAGES=&quot;zh_CN.UTF-8&quot;
+LC_PAPER=&quot;zh_CN.UTF-8&quot;
+LC_NAME=&quot;zh_CN.UTF-8&quot;
+LC_ADDRESS=&quot;zh_CN.UTF-8&quot;
+LC_TELEPHONE=&quot;zh_CN.UTF-8&quot;
+LC_MEASUREMENT=&quot;zh_CN.UTF-8&quot;
+LC_IDENTIFICATION=&quot;zh_CN.UTF-8&quot;
+LC_ALL=zh_CN.UTF-8
+</code></pre><p>tmux用到了utf8了， 这时再ssh连接到「开发机」，vim打开之前的文件，乱码已成往事，当然也不会显示错乱。  </p>
+<p>也就是说，若要「乱码」已成往事，需要4个地方的编码：</p>
+<ol>
+<li>终端使用utf8编码（比如我使用iterm2，item2的终端字符集为Unicode(UTF-8) ）  </li>
+<li><p>使用tmux的机器上（比如我这里的「跳板机」），其个人profile的locale使用utf8    </p>
+<pre><code> [xiaojie.zhang1@FS67 ~]$ grep -i utf ~/.bash_profile
+ export LANG=&quot;zh_CN.UTF-8&quot;
+ export LC_ALL=&quot;zh_CN.UTF-8&quot;
+</code></pre><p> 每次登录都会export这2个环境变量，从而设置locale。  </p>
+</li>
+<li><p>开发机」上vim设置utf8编码（linux)  </p>
+<pre><code> xiaojie.zhang1@log83 ~$ grep enc ~/.vimrc
+ set enc=utf8
+ set fencs=utf8,gbk,gb2312,gb18030,cp936
+</code></pre><p> vim里其实没必要设置<code>tenc</code>，它会从<code>fencs</code>列表中选一个适合的编码方式。  </p>
+</li>
+<li><p>tmux倒是可以不设置utf8    </p>
+</li>
+</ol>
+<p><br><br>推荐一个讲解vim编码方式的普及blog: <a href="http://blog.csdn.net/keepliving/article/details/5623362" target="_blank" rel="external">VIM乱码原因与解决方案</a>  </p>
+<p>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/11/6</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/iterm/">iterm</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/11/06/tmux，乱码已成往事/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/11/17/安装phabricato/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          安装Phabricato
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/10/23/tcpdump和wireshark/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Tcpdump和Wireshark</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/11/06/tmux，乱码已成往事/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

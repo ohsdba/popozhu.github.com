@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>Libevent引言 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">Libevent引言</div> 
+		<small>
+		    <time datetime="2013-06-10T11:58:27.000Z" itemprop="datePublished">June 10th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <blockquote>
+<p>原文：<a href="http://www.wangafu.net/~nickm/libevent-book/Ref0_meta.html" target="_blank" rel="external">R0: Preliminaries</a></p>
+</blockquote>
+<h2 id="总览">总览</h2><p>Libevent适用于开发可移植高速非阻塞IO程序，它的设计理念：    </p>
+<ol>
+<li><p>移植<br>一个使用Libevent的程序能跨平台运行。即使没有更好的方式来实现非阻塞IO，Libevent也能凑合用，让你的程序在资源有限的环境下运行。  </p>
+</li>
+<li><p>速度<br>Libevent尝试在不同平台上选择效率最好的方式来实现非阻塞IO，且不增加额外的开销。（比如，在linux下，libevent封装了epoll，但相对epoll，libevnet不要求更多开销）  </p>
+</li>
+<li><p>伸缩性<br>Libevent在设计上就是为了能支撑千万级别的sock IO。  </p>
+</li>
+<li><p>使用方便<br>使用起来很稳定、轻巧。  </p>
+</li>
+</ol>
+<h3 id="Libevent划分成下面几个部分">Libevent划分成下面几个部分</h3><ol>
+<li><p><strong>evutil</strong><br>把不同平台的网络实现智能地抽象和封装起来。</p>
+</li>
+<li><p><strong>event和event_base</strong><br>Libevent的核心。 他们提供的接口，封装了不同平台上基于事情驱动、非阻塞IO的实现，当sock可读写、事件超时，或者有信号到来的时候通知你的程序。  </p>
+</li>
+<li><p><strong>bufferevent</strong><br>这部分的函数对Libevent的事件驱动核心做了一个更为方便的封装，提供带buffer的sock读和写。<br>bufferevent也对不同平台的高速非阻塞IO的实现都做了封装，包括Windows IOCP API，这样可以在不同平台上使用该平台提供的高速非阻塞IO实现。  </p>
+</li>
+<li><p><strong>evbuffer</strong><br>这个模块实现bufferevent的buffer，提供各种更高效的或更方便的读写buffer函数。  </p>
+</li>
+<li><p><strong>evhttp</strong><br>一个简单的HTTP客户端/服务端实现。  </p>
+</li>
+<li><p><strong>evdns</strong><br>一个简单的DNS客户端/服务端实现。  </p>
+</li>
+<li><p><strong>evrpc</strong><br>一个简单的RPC实现。  </p>
+</li>
+</ol>
+<p><br></p>
+<h2 id="库文件Libraries">库文件Libraries</h2><p>当安装Libevent，默认安装下面的库文件：  </p>
+<ol>
+<li><p><strong>libevent_core</strong><br>包含核心的event（事件）和buffer（缓冲）功能，包含所有的event_base， evbuffer， buffereven和各种辅助函数。  </p>
+</li>
+<li><p><strong>libevent_extra</strong><br>定义了一些平台相关的函数，你也许不会用到，包含HTTP， DNS， RPc。  </p>
+</li>
+<li><p><strong>libevent</strong><br>因历史原因才存在的库文件，包含了上面2个库文件的内容，但你不应该再使用这个库文件了，在未来的版本中它或许不再使用。  </p>
+</li>
+</ol>
+<p>下面的库文件只在一些平台上才安装：  </p>
+<ol>
+<li><p><strong>libevent_pthreads</strong><br>基于pthreads（linux平台）这个线程库，封装了线程和锁。这个库从libevent_core分离出来，这样的话，如果你不是在linux上使用线程，在链接时你可以不使用这个库文件。  </p>
+</li>
+<li><p><strong>libevent_openssl</strong><br>使用bufferevents和开源的OpenSSL，提供加密环境。如果你不使用OpenSSL， 你也不用链接这个库文件。</p>
+</li>
+</ol>
+<p><br></p>
+<h2 id="头文件Headers">头文件Headers</h2><p>当前Libevent提供的头文件都再<code>&lt;event&gt;</code>这个目录下，可以归类成三大类：  </p>
+<ol>
+<li><p><strong>API headers</strong><br>定义程序可以使用的接口，在命名上，这里的接口没有带特殊的后缀。  </p>
+</li>
+<li><p><strong>Compatibility headers</strong><br>为了兼容才提供的头文件，你不应该使用这里的定义，除非你再移植一个使用了旧版本Libevent的程序。  </p>
+</li>
+<li><p><strong>Structure headers</strong><br>定义各种可能会改变的数据结构。为了方便你查看，一些数据结构的定义公开出来，但一些则是因为历史原因才公开出来。假若在你的程序代码里直接使用这里定义的数据结构，那你的程序将不能跟其他Libevent兼容，且难以debug。 这些头文件有一个后缀<code>_struct.h</code>.  </p>
+</li>
+</ol>
+<p>在<code>&lt;event&gt;</code>目录之外也有其他旧版本的头文件。</p>
+<p><br></p>
+<h2 id="如果你使用的是旧版本">如果你使用的是旧版本</h2><p>略。（主要是讲旧版本的头文件被替换成新的文件后，新文件名是什么，若有兴趣请查看原文)  </p>
+<p><br></p>
+<h2 id="一些旧版本的说明">一些旧版本的说明</h2><p>简单说来，请使用2.0或以后的版本。</p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/6/10</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/libevent/">libevent</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/06/10/libevent_r0_引言/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/06/10/libevent_r1_全局参数/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          Libevent全局参数
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/06/09/Libevent_第2节_说说异步io/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Libevent印象，说说异步IO</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/06/10/libevent_r0_引言/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

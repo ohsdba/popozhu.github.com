@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>初次使用hbase | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">初次使用hbase</div> 
+		<small>
+		    <time datetime="2014-09-13T15:05:47.000Z" itemprop="datePublished">September 13th 2014</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p><br></p>
+<h3 id="背景">背景</h3><p>因为用到了 hbase，也算第一次纯 java 开发，所以做一下笔记，</p>
+<p>小组内有个日志收集系统，最近一个月把日志的存储从 mysql 迁移到 hbase，这种写入后就不会再做修改的应用场景，非常适合切换到 hbase。</p>
+<p>改造之前存在的问题：</p>
+<ol>
+<li>每天能收集到500G+的日志，现有的方案只存储异常日志，当某种日志很多时，从mysql中查询时会超时</li>
+<li>收集上来的日志裸露存在普通硬盘，单个磁盘最大2T。由一个脚本每个小时做一次rsync，平均分散到4个机器的某个磁盘，当该磁盘写满后，需要手工修改脚本切换另一个磁盘</li>
+<li>存储冗余，磁盘裸露保存最近n天的日志，mysql里又保存最近m天的异常日志</li>
+<li>需要额外维护脚本定时删除磁盘、mysql里的日志</li>
+<li>未有存储所有日志</li>
+</ol>
+<p>简单来说，需要定期人工维护；存储层不容易横向扩展，后者是关键点。</p>
+<p>一个月前有新的需求，需要有一个大前提，要有最近n天的所有日志；快速读取日志查询日志。</p>
+<p>后来决定把存储从 mysql 切换到 hbase，搜索组那边有一个 hbase 集群，可直接使用。</p>
+<p><br></p>
+<h3 id="收集环节">收集环节</h3><p>这个小系统现在分为两个部分：收集、分析和存储。</p>
+<p>收集环节，由 master 端把收集任务下发到分布式的 agent，agent 拿到任务后，依赖 inotify 机制读取指定的日志文件，提交到 master。</p>
+<p>master 端实时接收agent的数据，每个小时创建新的文件，文件名带有「小时」段的时间戳。</p>
+<p>现有方案是另有一个写db的进程，把master吐出的文件写入 mysql， 它会分析日志内容，只保存异常日志。</p>
+<p>以上程序全部由C实现。</p>
+<p><br></p>
+<h3 id="分析、存储">分析、存储</h3><p>为了不影响现有的方案，实现平稳改造，继续依赖 inotify 。我另外用 java 写了个小程序，使用了一个叫 <a href="http://jnotify.sourceforge.net" target="_blank" rel="external">JNotify</a> 的jar包，该包封装了 inotify。</p>
+<ol>
+<li>在 java 进程中开一个 inoitfy 线程，检查 master 定时吐出的文件，当 inotify 检测到「新创建」的文件，回调 JNotifyListener 接口下的函数</li>
+<li>回调函数把新创建的文件，按轮训的策略，平均分发给 n 个 worker 线程中的其中一个，存入该 worker 线程的文件队列里，inotify 线程的逻辑到此为止</li>
+<li>每个 worker 线程通过检测文件位移 offset，判断是否有新的日志内容需要读取。这里没有继续依赖 inotify 了，有利有弊</li>
+<li>worker 线程把新增的日志内容 map 到内存中，一次最多读取 10M 内容</li>
+<li>worker 线程根据日志的种类，调用不同的分析器；为每种日志类型实现一个分析器 parser， 接口声明下的 parser 会做3个事情</li>
+<li>分析后由 worker 写入hbase，value为每行日志内容，考虑到 value 的长度，现在是每1000条提交一次，同时记录当前位移 offset</li>
+<li>worker 线程定时从队列中删除1个小时前的文件</li>
+</ol>
+<p>在 worker 的流程中，只是在调用分析器这里需要对日志种类做一下判断，其余的逻辑跟文件类型无关。以后若有其他种类的日志，为该类日志新增一个分析器，worker 再增加对该分析器的调用就可以了。</p>
+<p>分析器 parser 做3个事情：</p>
+<ol>
+<li>维护它自己的正则表达式，使用该表达式分析日志，表达式可为空，可配置</li>
+<li>根据分析情况，返回一个字符串到 worker 线程，worker 线程使用这个字符串来拼接 hbase 的 row key，不能为空。后续从hbase查询时，会优先使用这个字符串，即为了方便查询</li>
+<li>保存统计信息，分析日志的过程可以顺便做简单统计，worker 线程调用该函数提交统计信息；该函数也可以什么都不做。因为一些简单的分析、统计任务，合并在一起后，后续就没必要由 map reduce 再次从 hbase 日志中读取日志来一次分析、统计。好吧，其实是搜索组说机器的计算资源不够，目前也才几百G的日志文件，统计的过程对导入过程的效率影响不大。</li>
+</ol>
+<p><br></p>
+<h3 id="hbase_的_row_key_考虑">hbase 的 row key 考虑</h3><p>hbase 里的数据表预先创建好，设置了 TTL， 暂时日志保存3天，后续根据需要再做调整，减轻人工维护存储成本。</p>
+<pre><code>hbase(main):001:0&gt; describe &#39;table_name_xxx&#39;
+DESCRIPTION                                                                                       ENABLED
+ &#39;table_name_xxx&#39;, {NAME =&gt; &#39;l&#39;, DATA_BLOCK_ENCODING =&gt; &#39;NONE&#39;, BLOOMFILTER =&gt; &#39;ROW&#39;, REPLICATION_ true
+ SCOPE =&gt; &#39;0&#39;, VERSIONS =&gt; &#39;1&#39;, COMPRESSION =&gt; &#39;SNAPPY&#39;, MIN_VERSIONS =&gt; &#39;0&#39;, TTL =&gt; &#39;259200 SECO
+ NDS (3 DAYS)&#39;, KEEP_DELETED_CELLS =&gt; &#39;false&#39;, BLOCKSIZE =&gt; &#39;65536&#39;, IN_MEMORY =&gt; &#39;false&#39;, BLOCKC
+ ACHE =&gt; &#39;true&#39;}
+</code></pre><p>在 row key 的固定位置，保存有上面提到的各个分析器生成的字符串，以及毫秒级别的时间戳，为了避免相同时间戳，还有固定长度的 index 最为整个 row key 的后缀，目的就是为了保证 row key 的唯一。</p>
+<p>row key 的开始部分，则根据业务情况，让连续的日志尽可能多的连续写在一块，但不同的日志，则尽可能地分散到各个 region。</p>
+<p>而从 hbase 查询时，指定 start row 提供给到 hbase 一个开始查询的位置，再通过前缀匹配过滤，比如，按我的row key 设计，对于字符串<code>810552074_29_0</code>，表示某个服务器上的某种日志（这个串是属于已有的配置信息，查询之前是已知的），那我要查询这种日志在某个时间点之后的日志，就很简单了：</p>
+<pre><code>scan &#39;table_name_xxx&#39;, STARTROW=&gt;&#39;810552074_29_0_1409296887375&#39;, FILTER=&gt;&quot;PrefixFilter(&#39;810552074_29_0&#39;)&quot;, LIMIT=&gt;10
+</code></pre><p>查询后，记录下最后一行的 row key（完整的key，比如810552074_27_0_1409380765531_00000495），作为下次查询的start key， 第2、3、4…次查询所花费的时间，比第1次快了很多。</p>
+<p>因为有一个查询日志的页面给到其他团队的开发同学，他们在页面上可以实现类似<code>tail -f xx日志</code>或<code>tail -n 100 xx日志</code>的功能，无需登录服务器就可以看到他们项目的日志了（没权限…）</p>
+<p>查询样例:</p>
+<pre><code>String query_demo(String startKey, String prefixFilter, String qualifier, int limit)
+{
+    Scan scan = new Scan();
+    // todo, tested later
+    scan.setCaching(100);
+    scan.setBatch(1);
+
+    String lastRowKey = null;
+    String rowValue;
+    try {
+        // start row key, important
+        scan.setStartRow(startKey.getBytes());
+        // set filter as needed
+        FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        filterList.addFilter(new PrefixFilter(prefixFilter.getBytes()));
+        if (qualifier != null &amp;&amp; !&quot;&quot;.equals(qualifier)) {
+            filterList.addFilter(new QualifierFilter(
+                            CompareFilter.CompareOp.EQUAL,
+                            new BinaryComparator(qualifier.getBytes()))
+            );
+        }
+        scan.setFilter(filterList);
+
+        // create a hbase connection
+        HTable htable = new HTable(XXXCLASS.getHbaseSharedConf(), XXXCLASS.getTable_name());
+        ResultScanner rs = htable.getScanner(scan);
+        int cnt = 0;
+
+        try {
+            for (Result r = rs.next(); r != null; r = rs.next()) {
+                for (Cell cell : r.rawCells()) {
+                    lastRowKey = new String(CellUtil.cloneRow(cell));
+                    rowValue = new String(CellUtil.cloneValue(cell));
+
+                    // now we get a rowValue...
+                }
+                cnt++;
+                if (cnt &gt;= limit) {
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            log.error(&quot;exp: &quot;, e);
+        } finally {
+            rs.close();
+            htable.close();
+        }
+    } catch (Exception ex) {
+        log.error(&quot;exp&quot;, ex);
+    }
+
+    return lastRowKey;
+}
+</code></pre><p><br></p>
+<h3 id="效率">效率</h3><ol>
+<li>导入 hbase 时，平均 ?KB/ms</li>
+<li>从 hbase 查询，第一次查询 ?ms，后续查询平均 ?ms</li>
+</ol>
+<p><br></p>
+<p>link: </p>
+<ol>
+<li>JNotify: <a href="http://jnotify.sourceforge.net" target="_blank" rel="external">http://jnotify.sourceforge.net</a></li>
+<li>The Apache HBase™ Reference Guide: <a href="http://hbase.apache.org/book.html" target="_blank" rel="external">http://hbase.apache.org/book.html</a></li>
+</ol>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2014">2014/9/13</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/java/">java</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2014/09/13/初次使用hbase/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/09/22/使用ssd及数据迁移/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          使用ssd及数据迁移
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2014/08/09/os-x-自带的字典/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">OS X 自带的词典</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2014/09/13/初次使用hbase/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

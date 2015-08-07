@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>在hexo中添加多说评论 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">在hexo中添加多说评论</div> 
+		<small>
+		    <time datetime="2013-06-04T14:55:52.000Z" itemprop="datePublished">June 4th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <h2 id="注册duoshuo">注册duoshuo</h2><p>注册duoshuo：<a href="http://duoshuo.com/create-site/" target="_blank" rel="external">create_site</a><br>我注册使用的多说名字(short_name)是<code>popozhu</code>，这个名字在主题中进行配置，下面使用。</p>
+<p><br></p>
+<h2 id="在使用的主题里配置duoshuo">在使用的主题里配置duoshuo</h2><p>以hexo默认主题light为例，在主题的配置文件<code>themes/light/_config.yml</code>中增加duoshuo的一个变量<code>shortname</code>，配置你注册的多说名字：  <code>duoshuo_shortname: popozhu</code>  </p>
+<p>备份<code>themes/light/layout/_partial/comment.ejs</code>，或者直接替换<code>comment.ejs</code>的内容。<br>代码内容：</p>
+<pre><code>&lt;% if (theme.duoshuo_shortname &amp;&amp; page.comments){ %&gt;
+&lt;!-- Duoshuo Comment BEGIN --&gt;
+&lt;div class=&quot;ds-thread&quot;&gt;&lt;/div&gt;
+&lt;script type=&quot;text/javascript&quot;&gt;
+  var duoshuoQuery = {short_name: &#39;&lt;%= theme.duoshuo_shortname %&gt;&#39; };
+  (function() {
+      var ds = document.createElement(&#39;script&#39;);
+      ds.type = &#39;text/javascript&#39;;
+      ds.async = true;
+      ds.src = &#39;http://static.duoshuo.com/embed.js&#39;;
+      ds.charset = &#39;UTF-8&#39;;
+      (document.getElementsByTagName(&#39;head&#39;)[0] 
+      || document.getElementsByTagName(&#39;body&#39;)[0]).appendChild(ds);
+  })();
+&lt;/script&gt;
+&lt;!-- Duoshuo Comment END --&gt;
+&lt;% } %&gt;
+</code></pre><p>第一行先判断主题的config文件里是否定义了<code>duoshuo_shortname</code>，以及这个page是否允许评论。<br>如果是，则加载duoshuo评论。</p>
+<p><br></p>
+<h2 id="去掉页面下方的分享按钮">去掉页面下方的分享按钮</h2><p>在<code>themes/light/_config.yml</code>配置里，把<code>addthis</code>的enable值改为false就可以。</p>
+<pre><code>addthis:
+  enable: false  //这里的true改为false
+  pubid:
+  facebook: true
+  twitter: true
+  google: true
+  pinterest: true
+</code></pre><p>–EOF–</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/6/4</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/hexo/">hexo</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/06/04/add-comment-of-duoshuo/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/06/09/Libevent_第1节_关于这份文档/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          关于这份文档
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/06/03/hello-kitty/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">hello kitty</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/06/04/add-comment-of-duoshuo/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

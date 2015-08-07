@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>Boot Camp助理 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">Boot Camp助理</div> 
+		<small>
+		    <time datetime="2013-07-09T16:42:27.000Z" itemprop="datePublished">July 10th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>之前一直觉得没必要在笔记本安装双系统，对OS X非常喜爱，用起来很舒服，而且所谓的网银问题，也有虚拟机里的Win7来支持。<br>所以一直没了解在苹果电脑上安装Windows系统是怎样，也不知道Bootcamp是什么。  </p>
+<p>最近把上个笔记本硬盘里的数据导入到mbp后，硬盘还有将近200G的空间，上个周末突发奇想，分点硬盘空间装多个系统来看看。<br>也有点怀念win7了。<br>当然，最大的好处是可以让lol充分使用上硬件资源。  </p>
+<p>mac上提供了<code>Boot Camp助理</code>这个软件，它有3个功能：   </p>
+<ol>
+<li>把windows系统的IOS文件写到u盘，创建一个win7的启动盘，会格式化u盘，我使用8G的u盘，创建启动盘后，u盘还是插在电脑上  </li>
+<li>下载apple为他们自家电脑的硬件提供的定制的win驱动，包括无限网卡驱动等  </li>
+<li>在硬盘中划分一个区域，分区完成后会马上重启电脑，从u盘中启动开始win7的安装；也用于删除通过bootcamp安装的win系统     </li>
+</ol>
+<p>上面3个步骤，可以全部选中，让mac帮你顺序执行，也可以按需要分开来。你只需要先下载一个windows的IOS文件，插入一个u盘，打开Boot Camp助理，<br>剩下的就全自动了，非常的简单。  </p>
+<p>当然，win7开始安装的时候，需要选择做一些选择（这些是微软要求的），以及格式化上面第3个功能划分出来的分区，分区名默认为BOOTCAMP。<br>安装快完成前win7会要求输入用户名等几个操作，这些都是微软自家的东西。  </p>
+<p>让我觉得很有意思的是，Boot Camp助理在上面第2功能中帮我们下载了Win7所需要的所有驱动，win7安装后（u盘到此刻还一直没拔出），<br>进入到u盘，有一个叫BootCamp的目录，点击setup.exe开始安装win7的启动。<br>驱动安装之后重启，按住<strong>option</strong>键，选择windows盘符，进入win7，至此全部完成。  </p>
+<p>bootcamp驱动默认是64位的，所以win7系统对应最好是64位，以达到最好的兼容性。<br>况且mac的硬件里一般是4G以上内存，64位的系统才能使用上全部内存。  </p>
+<p>64位的win7安装后会占用20G＋的空间，bootcamp只能从硬盘划分出一个分区给到win7，所以我划分了40G，这样才大概有15G的空间来保存我的数据，游戏足够了。  </p>
+<p>u盘里的文件列表：  </p>
+<pre><code class="plain">popozhu /Volumes/WININSTALL$ ls -lrt
+total 2368
+drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 upgrade
+drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 support
+drwxrwxrwx  1 popozhu  staff   12288 11 22  2010 sources
+-rwxrwxrwx  1 popozhu  staff  106768 11 22  2010 setup.exe
+drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 efi
+-rwxrwxrwx  1 popozhu  staff  669568 11 22  2010 bootmgr.efi
+-rwxrwxrwx  1 popozhu  staff  383786 11 22  2010 bootmgr
+drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 boot
+-rwxrwxrwx  1 popozhu  staff     122 11 22  2010 autorun.inf
+-rwxrwxrwx  1 popozhu  staff    2719  1 17 09:41 AutoUnattend.xml
+drwxrwxrwx  1 popozhu  staff    4096  1 17 10:08 $WinPEDriver$
+drwxrwxrwx  1 popozhu  staff    4096  1 26 02:38 BootCamp
+</code></pre>
+<p>最后2个目录是bootcamp下载的驱动，大小为：</p>
+<pre><code class="plain">popozhu /Volumes/WININSTALL$ du -sh BootCamp/ \$WinPEDriver\$/
+484M    BootCamp/
+339M    $WinPEDriver$/
+</code></pre>
+<p>驱动是需要联网下载的，网速慢的话，吃个苹果先吧……</p>
+<p>另，win7下mbp的触摸板漂移很严重！！！驱动问题。  </p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/7/10</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/mac/">mac</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/07/10/boot-camp助理/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/07/13/给hexo增加返回顶部链接/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          给hexo增加返回顶部链接
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/06/26/libevent_r5_bufferevent基础和概念/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">bufferevent基础和概念</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/07/10/boot-camp助理/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

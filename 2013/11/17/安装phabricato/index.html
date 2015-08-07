@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>安装Phabricato | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">安装Phabricato</div> 
+		<small>
+		    <time datetime="2013-11-16T16:27:20.000Z" itemprop="datePublished">November 17th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>翻了一下介绍文档，facebook的一个代码审核工具<code>phabricator</code>可以方便我们代码走查，可以在web页面查看每次commit的修改内容，可以方便添加修改意见和评论，目前我们也只是一些简单的需要。<br>刚刚在我自己的笔记本上做了安装，为了后续备忘，简单整理了一下，以下是安装过程，系统为OS X.</p>
+<h3 id="安装">安装</h3><p>使用已有webserver根目录，安装路径为：<code>/Library/WebServer/Documents</code></p>
+<pre><code>popozhu ~$ cd /Library/WebServer/Documents
+popozhu /Library/WebServer/Documents$ sudo git clone git://github.com/facebook/libphutil.git
+popozhu /Library/WebServer/Documents$ sudo git clone git://github.com/facebook/arcanist.git
+popozhu /Library/WebServer/Documents$ sudo git clone git://github.com/facebook/phabricator.git
+</code></pre><h3 id="域名">域名</h3><p>选取本地域名: <code>my.pha.com</code><br>写入hosts</p>
+<pre><code>popozhu ~$ grep pha.com /etc/hosts
+127.0.0.1   my.pha.com
+</code></pre><h3 id="web端软件">web端软件</h3><p>使用的组合是： nginx + php-fpm + mysql， 都是之前安装的，直接使用。</p>
+<h4 id="1-_mysql">1. mysql</h4><p>启动mysql，使用的帐号是root，密码是我的system-login-in-psssword（好像是以前安装mysql默认设置的），导入phabricator的db到mysql:</p>
+<pre><code>popozhu ~$ cd /Library/WebServer/Documents/phabricator
+popozhu /Library/WebServer/Documents/phabricator$ sudo ./bin/storage upgrade -uroot -p{system-login-in-password}
+
+popozhu ~$ mysql -uroot -p***
+mysql&gt; show databases like &#39;pha%&#39;;    // 导入了40个db
++--------------------------+
+| Database (pha%)          |
++--------------------------+
+| phabricator_audit        |
+| phabricator_auth         |
+| phabricator_cache        |
+| phabricator_calendar     |
+| phabricator_chatlog      |
+| phabricator_conduit      |
+......
+</code></pre><p>导入mysql的密码到配置中</p>
+<pre><code>popozhu ~$ cd /Library/WebServer/Documents/phabricator
+popozhu /Library/WebServer/Documents/phabricator$ sudo ./bin/config set mysql.pass ***
+
+popozhu /Library/WebServer/Documents/phabricator$ ./bin/config get mysql.pass // 查看配置项
+{
+  &quot;config&quot; : [
+    {
+      &quot;key&quot;    : &quot;mysql.pass&quot;,
+      &quot;source&quot; : &quot;local&quot;,
+      &quot;value&quot;  : &quot;***&quot;
+    }
+  ]
+}
+</code></pre><p>顺便导入自定义的uri</p>
+<pre><code>popozhu /Library/WebServer/Documents/phabricator$ sudo ./bin/config set phabricator.base-uri &quot;http://my.pha.com&quot;
+Set &#39;phabricator.base-uri&#39; in local configuration.
+
+popozhu /Library/WebServer/Documents/phabricator$ ./bin/config get phabricator.base-uri
+{
+  &quot;config&quot; : [
+    {
+      &quot;key&quot;    : &quot;phabricator.base-uri&quot;,
+      &quot;source&quot; : &quot;local&quot;,
+      &quot;value&quot;  : &quot;http:\/\/my.pha.com&quot;
+    }
+  ]
+}
+</code></pre><h4 id="2-_php_fpm">2. php_fpm</h4><p>启动php-fpm</p>
+<pre><code>popozhu ~$ sudo cp /private/etc/php-fpm.conf.default /private/etc/php-fpm.conf
+popozhu ~$ sudo /usr/sbin/php-fpm    // 若启动报错，根据报错信息修改配置文件
+
+popozhu ~$ netstat -an | grep 9000
+tcp4       0      0  127.0.0.1.9000         *.*                    LISTEN        // 9000端口已经在监听了
+</code></pre><h4 id="3-_nginx">3. nginx</h4><p>配置nginx，使用指导页面上的内容，写入nginx配置文件<code>/opt/local/conf/nginx.conf</code></p>
+<pre><code>    server {        
+        # 自定义的本地host
+        server_name  my.pha.com;
+        # phabricator的根目录
+        root    /Library/WebServer/Documents/phabricator/webroot;
+
+        try_files $uri $uri/ /index.php;
+
+        location / {
+            index   index.php;
+
+            if ( !-f $request_filename )
+            {
+                rewrite ^/(.*)$ /index.php?__path__=/$1 last;
+                break;
+            }
+        }
+
+        location /index.php {
+            fastcgi_pass   localhost:9000;
+            fastcgi_index   index.php;
+
+            #required if PHP was built with --enable-force-cgi-redirect
+            fastcgi_param  REDIRECT_STATUS    200;
+
+            #variables to make the $_SERVER populate in PHP
+            fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+            fastcgi_param  QUERY_STRING       $query_string;
+            fastcgi_param  REQUEST_METHOD     $request_method;
+            fastcgi_param  CONTENT_TYPE       $content_type;
+            fastcgi_param  CONTENT_LENGTH     $content_length;
+
+            fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+
+            fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+            fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+            fastcgi_param  REMOTE_ADDR        $remote_addr;
+        }
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+</code></pre><p>然后启动nginx</p>
+<pre><code>popozhu ~$ sudo nginx -s quit
+popozhu ~$ sudo nginx
+popozhu ~$ ps -ef | grep nginx | grep -v grep
+    0 32373     1   0 11:50下午 ??         0:00.00 nginx: master process nginx
+   -2 32374 32373   0 11:50下午 ??         0:00.01 nginx: worker process
+</code></pre><p>最后，浏览器输入my.pha.com，提示完成安装，建立admin帐号，还有5个问题需要配置，算了，明天吧。<br><img src="/img/2013/snapshot_2013-11-17_12.19.05.png" alt="界面"></p>
+<p>ref: <a href="http://www.phabricator.com/docs/phabricator/index.html" target="_blank" rel="external">http://www.phabricator.com/docs/phabricator/index.html</a><br><br></p>
+<blockquote>
+<p>2013-12-20 更新  </p>
+</blockquote>
+<p>我期望的是导入svn仓库中的子项目，但pha对子项目提取的svn版本处理有误：超前了一个版本。比如在svn仓库<code>svn://*.*.26.190/sys_dev/</code>下有一个子项目proj_a，其url为：<code>svn://*.*.26.190/sys_dev/proj_a</code>， 目录proj_a的最初svn版本为114576，但pha却从114575开始去提取proj_a的svn记录，当然不可能成功，于是svn报错，pha则会一直显示：导入中……  </p>
+<p>我提了这个问题，但一个月后，仍没有得到回复：<a href="https://github.com/facebook/phabricator/issues/408" target="_blank" rel="external">https://github.com/facebook/phabricator/issues/408</a>  </p>
+<p>pha的代码并没有按版本发布，初次安装会从github上拉取「最新」的代码。在这一个月内，我又多次从gitpub上拉取代码，但让我非常无语，有一次更新我本地代码后，重新导入svn仓库的子项目，竟然遇到新的问题：找不到svn密码。 因为pha把svn/git的用户名和密码提取成一个key，相同的key可以用于不同的项目中，这本是一个很好的改动，但从项目中分离出用户名和密码之后，再执行svn命令却提示找不到密码。而我一个月之前提的问题，仍然没有解决。 </p>
+<p>很遗憾我不懂php，这个季度也很忙，没有时间去学习这个系统。此刻我以非常恶心的感受，失望地删除pha，个人觉得：</p>
+<ol>
+<li>还是需要有stable版本发布出来  </li>
+<li>测试不充分就提交了代码，issue页面还是能见到一些略低端问题  </li>
+</ol>
+<p>anyway，因为我个人原因，不想再使用这个项目。目前是采用<code>Versions + DiffMerge</code>来实现代码差异对比和走查，懒人也就用这个了。  </p>
+<p><br></p>
+<p>删除文件</p>
+<pre><code>sudo rm -rf /Library/WebServer/Documents/libphutil
+sudo rm -rf /Library/WebServer/Documents/arcanist
+sudo rm -rf /Library/WebServer/Documents/phabricator
+</code></pre><p>停了php-fpm</p>
+<pre><code>ps -ef | grep php-fpm | grep -v grep | awk &#39;{print $2}&#39; | xargs sudo kill
+</code></pre><p>删除nginx.conf中关于pha的配置  </p>
+<pre><code>sudo vim /opt/local/conf/nginx.conf
+</code></pre><p>删除hosts中的<code>127.0.0.1 my.pha.com</code>  </p>
+<p>删除db</p>
+<pre><code>drop database phabricator_audit       ;
+drop database phabricator_auth        ;
+drop database phabricator_cache       ;
+drop database phabricator_calendar    ;
+drop database phabricator_chatlog     ;
+drop database phabricator_conduit     ;
+drop database phabricator_config      ;
+drop database phabricator_conpherence ;
+drop database phabricator_countdown   ;
+drop database phabricator_daemon      ;
+drop database phabricator_differential;
+drop database phabricator_diviner     ;
+drop database phabricator_doorkeeper  ;
+drop database phabricator_draft       ;
+drop database phabricator_drydock     ;
+drop database phabricator_fact        ;
+drop database phabricator_feed        ;
+drop database phabricator_file        ;
+drop database phabricator_flag        ;
+drop database phabricator_harbormaster;
+drop database phabricator_herald      ;
+drop database phabricator_legalpad    ;
+drop database phabricator_maniphest   ;
+drop database phabricator_meta_data   ;
+drop database phabricator_metamta     ;
+drop database phabricator_nuance      ;
+drop database phabricator_oauth_server;
+drop database phabricator_owners      ;
+drop database phabricator_passphrase  ;
+drop database phabricator_pastebin    ;
+drop database phabricator_phame       ;
+drop database phabricator_phlux       ;
+drop database phabricator_pholio      ;
+drop database phabricator_phortune    ;
+drop database phabricator_phragment   ;
+drop database phabricator_phrequent   ;
+drop database phabricator_phriction   ;
+drop database phabricator_policy      ;
+drop database phabricator_ponder      ;
+drop database phabricator_project     ;
+drop database phabricator_releeph     ;
+drop database phabricator_repository  ;
+drop database phabricator_search      ;
+drop database phabricator_slowvote    ;
+drop database phabricator_token       ;
+drop database phabricator_user        ;
+drop database phabricator_worker      ;
+drop database phabricator_xhpastview  ;
+drop database phabricator_xhprof      ;
+</code></pre><p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/11/17</a> </div>
+	    <div>Tags: </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/11/17/安装phabricato/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/12/06/一份捞面/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          一份捞面
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/11/06/tmux，乱码已成往事/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">tmux，乱码已成往事</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/11/17/安装phabricato/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

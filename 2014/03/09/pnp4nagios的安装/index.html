@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>pnp4nagios的安装 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">pnp4nagios的安装</div> 
+		<small>
+		    <time datetime="2014-03-09T13:05:58.000Z" itemprop="datePublished">March 9th 2014</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>pnp4nagios依赖rrdtool，把数据写入RRD文件，同时需要一个web服务器来托管pnp4nagios的php页面，因为需要安装rrdtool、pnp4nagios、php、nginx。  </p>
+<h3 id="安装rrdtool">安装rrdtool</h3><p>在系统CentOS 5.9上，我通过rpm安装rrdtool以及它的perl模块，版本为1.4.7。其他版本可以在<code>http://pkgs.repoforge.org/rrdtool/</code>下载。</p>
+<pre><code>cd /tmp
+wget http://pkgs.repoforge.org/rrdtool/perl-rrdtool-1.4.7-1.el5.rf.x86_64.rpm
+wget http://pkgs.repoforge.org/rrdtool/rrdtool-1.4.7-1.el5.rf.x86_64.rpm
+
+# 删除已有版本1.2.7
+yum remove rrdtool
+
+rpm -ivh perl-rrdtool-1.4.7-1.el5.rf.x86_64.rpm rrdtool-1.4.7-1.el5.rf.x86_64.rpm
+</code></pre><p><br></p>
+<h3 id="安装pnp4nagios">安装pnp4nagios</h3><p>pnp4nagios从sourceforge上下载最新版本，configure时配置<code>rrd文件路径perfdata</code>、<code>文件池目录spool</code>、<code>日志文件目录</code>，其他配置项可通过<code>./configure --help</code>查看</p>
+<pre><code>cd /tmp
+wget http://sourceforge.net/projects/pnp4nagios/files/PNP-0.6/pnp4nagios-0.6.21.tar.gz/download
+cd pnp4nagios-0.6.21
+./configure\
+  --prefix=/home/pnp4nagios \
+  --with-nagios-user=nagios \
+  --with-nagios-group=nagios \
+  --with-rrdtool=/usr/bin/rrdtool  \
+  --with-perfdata-dir=/diska/pnp4nagios/perfdata \
+  --with-perfdata-spool-dir=/diska/pnp4nagios/spool \
+  --with-perfdata-logfile=/diska/pnp4nagios/perf_logs
+</code></pre><p>configure后的信息如下：</p>
+<pre><code>*** Configuration summary for pnp4nagios-0.6.21 03-24-2013 ***
+
+  General Options:
+  -------------------------         -------------------
+  Nagios user/group:                nagios nagios
+  Install directory:                /home/pnp4nagios
+  HTML Dir:                         /home/pnp4nagios/share
+  Config Dir:                       /home/pnp4nagios/etc
+  Location of rrdtool binary:       /usr/bin/rrdtool Version 1.4.7
+  RRDs Perl Modules:                FOUND (Version 1.4007)
+  RRD Files stored in:              /diska/pnp4nagios/perfdata
+  process_perfdata.pl Logfile:      /diska/pnp4nagios/perf_logs
+  Perfdata files (NPCD) stored in:  /diska/pnp4nagios/spool
+
+  Web Interface Options:
+  -------------------------         -------------------
+  HTML URL:                         http://localhost/pnp4nagios
+  Apache Config File:               /etc/httpd/conf.d/pnp4nagios.conf
+</code></pre><p>再接着编译安装</p>
+<pre><code>make all  
+make fullinstall
+</code></pre><p>一开始我采用pnp4nagios的<code>npcd</code>来读取数据，启动npcd，npcd进程会扫描spool目录<code>/diska/pnp4nagios/spool</code>(spool目录在configure时配置，或者在配置文件/home/pnp4nagios/etc/npcd.cfg进行修改)  </p>
+<pre><code>/etc/init.d/npcd start
+</code></pre><p>同时我在<code>/home/pnp4nagios/etc/npcd.cfg</code>配置了npcd的日志也输出到<code>/diska/pnp4nagios/perf_logs</code>中，本意打算把各种日志都存入这个目录，方便查看。  </p>
+<h3 id="安装php和php-fpm">安装php和php-fpm</h3><pre><code>./configure --prefix=/home/pnp --enable-fpm --with-gd --with-zlib
+make
+make install
+</code></pre><p>修改配置/home/php/etc/php-fpm.conf，监听socket修改为: <code>listen = /home/php/php-fastcgi.sock</code>，打开pid文件路径，然后启动php-fpm  </p>
+<pre><code># 启动
+/home/pnp/sbin/php-fpm
+# 重启，发送INT信号
+cat /home/php/var/run/php-fpm.pid | xargs kill -INT
+# 重启，发送USR2信号
+cat /home/php/var/run/php-fpm.pid | xargs kill -USR2
+</code></pre><p><br></p>
+<h3 id="配置nginx">配置nginx</h3><p>安装略，主要是配置，在nginx的配置文件中，引入pnp4nagios的配置模板内容，<code>/home/nginx/conf/nginx.conf</code>截取如下</p>
+<pre><code># ... 
+http {
+    # ... 
+    server {
+        listen       80; 
+
+        location /pnp4nagios {
+            alias /home/pnp4nagios/share;
+            index index.php;
+
+            #auth_basic &quot;Nagios Access&quot;;
+            #auth_basic_user_file /usr/local/nagios/etc/htpasswd.users;
+
+            # if we have e.g. /pnp4nagios/media/css/common.css
+            # nginx will check
+            # /usr/local/png4nagios/share/media/css/common/css
+            # and return it if it&#39;s found
+            # if it can&#39;t find a matching file even adding a trailing /
+            # the request is handled to the @pnp4nagios location
+            try_files $uri $uri/ @pnp4nagios;
+        }   
+
+        location @pnp4nagios {
+            fastcgi_pass unix:/home/php/php-fastcgi.sock;
+            fastcgi_index index.php;
+
+            # implies an external file, but this is common nginx practice
+            include fastcgi_params;
+
+            # this splits out the trailing path
+            # eg index.php?host -&gt; $fastcgi_path_info == &#39;host&#39;
+            fastcgi_split_path_info ^(.+\.php)(.*)$;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
+            fastcgi_param SCRIPT_FILENAME /home/pnp4nagios/share/index.php;
+        }   
+    }   
+}
+</code></pre><p>在<code>alias</code>配置php4nagios的目录，在<code>fastcgi_pass</code>配置php-fpm的socket文件，启动nginx后，通过<code>http://localhost/pnp4nagios/index.php</code>后会跳转到pnp4nagios的「配置测试页面」，包含<code>PNP4Nagios Environment Tests</code>和<code>Kohana Environment Tests</code>，测试正常的话，页面底部会提示：</p>
+<pre><code>Your environment passed all requirements. Remove or rename the /home/pnp4nagios/share/install.php file now.
+</code></pre><p>若测试异常，页面上会给出红色说明，若一切都ok，则把/home/pnp4nagiosn/share/install.php删除或rename。</p>
+<p>后续就是在<code>http://localhost/pnp4nagios/index.php</code>加上参数hostname和serv来访问某个机器的数据。</p>
+<p>pnp4nagios的模板配置另外整理。</p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2014">2014/3/9</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/nagios/">nagios</a>,<a class="category-link" href="/tags/perl/">perl</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2014/03/09/pnp4nagios的安装/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/03/09/pnp4nagios的模板/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          pnp4nagios的模板
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2014/03/06/pnp4nagios的数据格式/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">pnp4nagios的数据格式</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2014/03/09/pnp4nagios的安装/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

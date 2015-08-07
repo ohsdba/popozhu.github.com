@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>mac port 清理 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">mac port 清理</div> 
+		<small>
+		    <time datetime="2014-10-27T13:43:15.000Z" itemprop="datePublished">October 27th 2014</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>使用 mac port 来安装一些软件，时间久了后（也有两年多），更新系统，更新软件，旧版本的软件(包)仍然存在于硬盘上。趁着这次更新 yosemite， 升级 mac port 后，顺道做了下清理，</p>
+<ol>
+<li><p>升级 mac port 自身  </p>
+<pre><code> sudo port selfupdate
+</code></pre><p> 更新的是 port 自身，以及仓库文件索引。  </p>
+</li>
+<li><p>更新后，先不急着更新其他软件。先找出那些是不需要可以删除的软件或依赖。  </p>
+<pre><code> port installed inactive
+</code></pre><p> 列出所有「非激活」态的软件(包)，我将删除这些软件(包)。</p>
+</li>
+<li><p>删除没有用到的软件(包)  </p>
+<pre><code> sudo port uninstall inactive
+</code></pre></li>
+<li><p>查看是否有不需要的依赖   </p>
+<pre><code> port echo leaves
+</code></pre><p> <code>leaves</code> 这个词很形象，孤立的叶子节点，很好记。</p>
+</li>
+<li><p>删除不需要的依赖</p>
+<pre><code> sudo port uninstall leaves
+</code></pre><p> 一般需要删除多次，因为有些依赖是循环依赖于前一个不需要的依赖。<br> 直到报错说没有匹配的结果为止。</p>
+<pre><code> popozhu ~$ sudo port uninstall leaves
+ Error: No ports matched the given expression
+</code></pre></li>
+<li><p>这时再查找哪些软件(包)已经有新版本</p>
+<pre><code> port outdated
+</code></pre></li>
+<li><p>建议单独升级需要的软件(包)，比如<code>A B C</code></p>
+<pre><code> sudo port upgrade A B C...
+</code></pre><p> 或者直接升级所有旧软件(包)（不推荐）</p>
+<pre><code> sudo port upgrade outdated
+</code></pre></li>
+</ol>
+<p>最后清理了1.4G的空间出来，好评。</p>
+<p>port 会在本地编译代码，期间会导致 cpu 100%，机器发热大增，升级的内容越多，所需时间也越多。就不要在临下班时做这个事情啦。</p>
+<p>现在较少用 port 来安装新的软件，若有时间，还是更倾向于下载源码tar包，自己编译安装，因为 port 安装时顺带安装的依赖，有时真的太多了，也未必都是必须的，反而花费更多时间。</p>
+<p><br><br>ref: <a href="https://guide.macports.org/chunked/using.common-tasks.html" target="_blank" rel="external">3.3. Common Tasks</a></p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2014">2014/10/27</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/mac/">mac</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2014/10/27/mac-port-清理/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/11/18/do-not-go-gentle-into-that-good-night/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          Do Not Go Gentle Into That Good Night
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2014/09/22/使用ssd及数据迁移/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">使用ssd及数据迁移</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2014/10/27/mac-port-清理/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

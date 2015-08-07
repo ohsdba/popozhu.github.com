@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>pnp4nagios的并发 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">pnp4nagios的并发</div> 
+		<small>
+		    <time datetime="2014-03-12T14:38:51.000Z" itemprop="datePublished">March 12th 2014</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>在前几天我写了个「<a href="/2014/03/09/pnp4nagios的模板/">pnp4nagios的模板</a>」后，发现使用npcd的bulk模式处理3.5w条性能数据，花费了将近30分钟时间，而我期望的是在1分钟内处理完。需要换个方式，为此我切换到<code>gearman模式</code>来并发，记录如下：</p>
+<ol>
+<li>换用SSD硬盘</li>
+<li>对3.5w条源数据做多一步处理，合并相同host相同servicedesc的数据，最后只有3.4k条</li>
+<li>停了npcd，启用gearmand做server端</li>
+<li>以4个工作进程启动process_perfdata.pl，为4个worker</li>
+<li>把3.4k条数据做为client数据，发送到server端</li>
+</ol>
+<p><br></p>
+<p>###SSD硬盘<br>硬盘空间不是很充足，我减少了RRD文件大小。之前我把pnp4nagios安装到了/home目录下，则修改<code>/home/pnp4nagios/etc/rra.cfg</code>配置，让RRD文件只保存最多90天的数据</p>
+<pre><code>RRA_STEP=60
+#
+# PNP default RRA config
+#
+# you will get 400kb of data per datasource
+#
+# 2880 entries with 1 minute step = 48 hours
+#
+RRA:AVERAGE:0.5:1:2880
+#
+# 2880 entries with 5 minute step = 10 days
+#
+RRA:AVERAGE:0.5:5:2880
+#
+# 4320 entries with 30 minute step = 90 days
+#
+RRA:AVERAGE:0.5:30:4320
+#
+# 5840 entries with 360 minute step = 4 years
+#
+#RRA:AVERAGE:0.5:360:5840
+
+RRA:MAX:0.5:1:2880
+RRA:MAX:0.5:5:2880
+RRA:MAX:0.5:30:4320
+#RRA:MAX:0.5:360:5840
+
+RRA:MIN:0.5:1:2880
+RRA:MIN:0.5:5:2880
+RRA:MIN:0.5:30:4320
+#RRA:MIN:0.5:360:5840
+</code></pre><p><br></p>
+<p>###合并数据<br>无论是npcd来调用process_perfdata.pl，或者是在gearman中启动process_perfdata.pl的worker，实际写RRD文件的，都是这个<code>process_perfdata.pl</code>脚本，减少它对源数据的解析，自然是一个优化的点。举个例子</p>
+<ol>
+<li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::rta=92.412ms;200.000;500.000;0; </li>
+<li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::pl=0%;40;80;; </li>
+<li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp     SERVICEPERFDATA::rtmax=97.281ms;;;; </li>
+<li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::rtmin=86.727ms;;;;</li>
+</ol>
+<p>上面这4条数据，通过放弃时间戳TIMET(可能不同)，他们有相同的HOSTNAME和SERVICEDESC，合并为1条</p>
+<ol>
+<li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::rta=92.412ms;200.000;500.000;0; pl=0%;40;80;; rtmax=97.281ms;;;; rtmin=86.727ms;;;;</li>
+</ol>
+<p><br></p>
+<p>###server端<br>停了npcd： <code>/etc/init.d/npcd stop</code>  </p>
+<p>修改gearmand的配置，主要添加<code>-t 4</code>，启动4个IO线程</p>
+<pre><code>$ cat /etc/sysconfig/gearmand
+### Settings for gearmand
+# OPTIONS=&quot;&quot;
+OPTIONS=&quot;--listen=127.0.0.1 --port=4730 --log-file=/diskb/pnp4nagios/gearmand/gearmand.log -t 4&quot;
+</code></pre><p>以默认端口4730启动<code>/etc/init.d/gearmand start</code>，监听client发送上来的数据</p>
+<pre><code>$ netstat -an | grep 4730
+tcp        0      0 127.0.0.1:4730              0.0.0.0:*                   LISTEN
+</code></pre><p><br></p>
+<p>###worker进程<br>在pnp4nagios的安装目录中，找到<code>/home/pnp4nagios/libexec/process_perfdata.pl</code>，修改worker工作方式，让其一直执行任务，而不需要重启，修改<code>new_child</code>这个函数(下面的第41行)</p>
+<pre><code>#
+# start a new worker process
+#
+sub new_child {
+    my $pid;
+    my $sigset;
+    my $req = 0;
+    # block signal for fork
+    $sigset = POSIX::SigSet-&gt;new(SIGINT);
+    sigprocmask(SIG_BLOCK, $sigset)
+        or die &quot;Can&#39;t block SIGINT for fork: $!\n&quot;;
+
+    die &quot;fork: $!&quot; unless defined ($pid = fork);
+
+    if ($pid) {
+        # Parent records the child&#39;s birth and returns.
+        sigprocmask(SIG_UNBLOCK, $sigset)
+            or die &quot;Can&#39;t unblock SIGINT for fork: $!\n&quot;;
+        $children{$pid} = 1;
+        $children++;
+        return;
+    } else {
+        # Child can *not* return from this subroutine.
+        $SIG{INT} = &#39;DEFAULT&#39;;      # make SIGINT kill us as it did before
+
+        # unblock signals
+        sigprocmask(SIG_UNBLOCK, $sigset)
+            or die &quot;Can&#39;t unblock SIGINT for fork: $!\n&quot;;
+
+        my $worker = Gearman::Worker-&gt;new();
+        my @job_servers = split(/,/, $conf{&#39;GEARMAN_HOST&#39;}); # allow multiple gearman job servers 
+        $worker-&gt;job_servers(@job_servers);
+        # worker向server注册的函数名为 perfdata，它对应的处理流程是 main函数
+        $worker-&gt;register_function(&quot;perfdata&quot;, 2, sub { return main(@_); });
+        my %opt = ( 
+                    on_complete =&gt; sub { $req++; }, 
+                    stop_if =&gt; sub { if ( $req &gt; $conf{&#39;REQUESTS_PER_CHILD&#39;} ) { return 1;}; } 
+                  );
+        print_log(&quot;connecting to gearmand &#39;&quot;.$conf{&#39;GEARMAN_HOST&#39;}.&quot;&#39;&quot;,0);
+
+        # 忽略REQUESTS_PER_CHILD配置项，不退出一直执行
+        $worker-&gt;work( %opt ) while 1;
+        print_log(&quot;max requests per child reached (&quot;.$conf{&#39;REQUESTS_PER_CHILD&#39;}.&quot;)&quot;,1);
+        # this exit is VERY important, otherwise the child will become
+        # a producer of more and more children, forking yourself into
+        # process death.
+        exit;
+    }
+}
+</code></pre><p>脚本中另一个修改的地方，在<code>parse_env</code>函数中，它解析client发送上来的数据<code>$job_data</code>时会做一个base64解码，但我client端的数据并没有做base编码（也没有加密），这里注释掉这个解码</p>
+<pre><code>#
+# Parse %ENV and return a global hash %NAGIOS
+#
+sub parse_env {
+    my $job_data = shift;
+    %NAGIOS = ();
+    $NAGIOS{DATATYPE} = &quot;SERVICEPERFDATA&quot;;
+
+    if(defined $opt_gm){
+        # Gearman Worker
+        # 由于我client端没做base64编码，这里就不需要解码了
+        #$job_data = decode_base64($job_data);
+        if($conf{ENCRYPTION} == 1){
+            $job_data = $cypher-&gt;decrypt( $job_data )        
+        }
+        my @LINE = split(/\t/, $job_data);
+        foreach my $k (@LINE) {
+            $k =~ /([A-Z 0-9_]+)::(.*)$/;
+            $NAGIOS{$1} = $2 if ($2);
+        }
+        if ( !$NAGIOS{HOSTNAME} ) {
+            print_log( &quot;Gearman job data missmatch. Please check your encryption key.&quot;, 0 );
+            return %NAGIOS;
+        }
+    }
+}
+</code></pre><p>同时修改这个perl脚本配置文件<code>/home/pnp4nagios/etc/process_perfdata.cfg</code>中关于gearman的配置项，主要是启动4个进程作为4个worker、server端的ip和端口号、以及不使用加密（默认是加密）:</p>
+<pre><code>#
+# File with RRA options used to create new RRD files
+#
+RRA_CFG = /home/pnp4nagios/etc/rra.cfg
+
+# Gearman Worker Config
+# Only used when running as Gearman worker
+
+#
+# How many child processes
+#
+PREFORK = 4
+
+#
+# Gearman server to connect to
+# Comma separated list of Gearman job servers
+#
+GEARMAN_HOST = localhost:4730
+
+#
+# Enables or disables encryption.
+# It is strongly advised to not disable encryption, or
+# anybody will be able to inject packages to your worker.
+# When using encryption, you will have to specify a shared
+# secret eithr via the KEY or the KEY_FILE option.
+# Default is 1.
+#
+ENCRYPTION = 0
+</code></pre><p>基于上面的修改和配置，接着启动worker进程，传入2个参数<code>--gearman --daemon</code>给到<code>process_perfdata.pl</code>即可</p>
+<pre><code>$ cat run.sh
+#!/bin/sh
+
+ps -ef | grep process_perfdata | grep -v grep | awk &#39;{print $2}&#39; | xargs kill -9
+sleep 1
+su - nagios -c &quot;perl /home/pnp4nagios/libexec/process_perfdata.pl --gearman --daemon&quot;
+sleep 1
+ps -ef | grep process_perfdata | grep -v grep
+</code></pre><p>完整的<code>process_perfdata.pl</code>在gist: <a href="https://gist.github.com/popozhu/9509554" target="_blank" rel="external">https://gist.github.com/popozhu/9509554</a></p>
+<p><br></p>
+<p>###client端<br>把合并后的数据以异步提交的方式发送到server端，由于<code>process_perfdata.pl</code>的worker向server端注册的函数名是<code>perfdata</code>，client向server端提交数据时，也得使用相同的函数名<code>perfdata</code></p>
+<pre><code>#!/usr/bin/perl
+use Gearman::Client;
+
+my $client = Gearman::Client-&gt;new;
+$client-&gt;job_servers(&quot;localhost:4730&quot;);
+
+# 其他数据处理，最后是合并后的数据，在%perfdata里
+
+foreach my $data (keys %perfdata){
+    $client-&gt;dispatch_background(&quot;perfdata&quot;, data);
+}
+</code></pre><p>可以通过<code>/usr/bin/gearadmin --status</code>来查看当前执行的情况，输出的4个字段分别为:<br><code>注册的函数 任务队列中的任务数量 工作中的worker数量 总共有多少个worker</code></p>
+<pre><code>$ /usr/bin/gearadmin --status
+perfdata        3061    4       5
+.
+</code></pre><p>最后3.4k条性能数据，以4个worker并发写入/更新到SSD硬盘的RRD文件里，大约40s，不到1分钟，收工。  </p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2014">2014/3/12</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/gearman/">gearman</a>,<a class="category-link" href="/tags/pnp4nagios/">pnp4nagios</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2014/03/12/pnp4nagios的并发/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/03/22/code-style/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          code style
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2014/03/09/pnp4nagios的模板/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">pnp4nagios的模板</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2014/03/12/pnp4nagios的并发/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>一些好用的命令 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">一些好用的命令</div> 
+		<small>
+		    <time datetime="2013-06-24T13:10:53.000Z" itemprop="datePublished">June 24th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <blockquote>
+<p>摘录自<a href="http://clippy.in/b/YJLM9W" target="_blank" rel="external">http://clippy.in/b/YJLM9W</a> </p>
+</blockquote>
+<p><code>$ sudo !!</code><br>Run the last command as root<br>Useful when you forget to use sudo for a command. “!!” grabs the last run command.  </p>
+<p><code>$ python -m SimpleHTTPServer</code><br>Serve current directory tree at <a href="http://$HOSTNAME:8000/" target="_blank" rel="external">http://$HOSTNAME:8000/</a>  </p>
+<p><code>$ :w !sudo tee %</code><br>Save a file you edited in vim without the needed permissions<br>I often forget to sudo before editing a file I don’t have write permissions on. When you come to save that file and get the infamous “E212: Can’t open file for writing”, just issue that vim command in order to save the file without the need to save it to a temp file and then copy it back again.</p>
+<p><code>$ cd -</code><br>change to the previous working directory  </p>
+<p><code>$ ^foo^bar</code><br>Runs previous command but replacing<br>Really useful for when you have a typo in a previous command. Also, arguments default to empty so if you accidentally run:<code>echo &quot;no typozs&quot;</code><br>you can correct it with<code>^z</code>  </p>
+<p><code>$ ctrl-x e</code><br>Rapidly invoke an editor to write a long, complex, or tricky command<br>Next time you are using your shell, try typing ctrl-x e (that is holding control key press x and then e). The shell will take what you’ve written on the command line thus far and paste it into the editor specified by $EDITOR. Then you can edit at leisure using all the powerful macros and commands of vi, emacs, nano, or whatever.  </p>
+<p><code>$ &lt;space&gt;command</code><br>Execute a command without saving it in the history<br>Prepending one or more spaces to your command won’t be saved in history.<br>Useful for pr0n or passwords on the commandline.<br>Tested on BASH.  </p>
+<p><code>$ &gt; file.txt</code><br>Empty a file<br>For when you want to flush all content from a file without removing it (hat-tip to Marc Kilgus).  </p>
+<p><code>$ $ssh-copy-id user@host</code><br>Copy ssh keys to user@host to enable password-less ssh logins.<br>To generate the keys use the command ssh-keygen  </p>
+<p><code>$ &#39;ALT+.&#39; or &#39;&lt;ESC&gt; .&#39;</code><br>Place the argument of the most recent command on the shell<br>When typing out long arguments, such as:<br><code>cp file.txt /var/www/wp-content/uploads/2009/03/</code><br>You can put that argument on your command line by holding down the ALT key and pressing the period ‘.’ or by pressing <esc> then the period ‘.’. For example: <code>cd &#39;ALT+.&#39;</code><br>would put ‘/var/www/wp-content/uploads/2009/03/ as my argument. Keeping pressing ‘ALT+.’ to cycle through arguments of your commands starting from most recent to oldest. This can save a ton of typing.   </esc></p>
+<p><code>$ mount | column -t</code><br>currently mounted filesystems in nice layout<br>Particularly useful if you’re mounting different drives, using the following command will allow you to see all the filesystems currently mounted on your computer and their respective specs with the added benefit of nice formatting.  </p>
+<p><code>$ ssh -N -L2001:localhost:80 somemachine</code><br>start a tunnel from some machine’s port 80 to your local post 2001<br>now you can acces the website by going to <a href="http://localhost:2001/" target="_blank" rel="external">http://localhost:2001/</a>  </p>
+<p><code>$ netstat -tlnp</code><br>Lists all listening ports together with the PID of the associated process<br>The PID will only be printed if you’re holding a root equivalent ID.  </p>
+<p><code>$ man ascii</code><br>Quick access to the ascii table.   </p>
+<p><code>$ sshfs name@server:/path/to/folder /path/to/mount/point</code><br>Mount folder/filesystem through SSH<br>Install SSHFS from <a href="http://fuse.sourceforge.net/sshfs.html" target="_blank" rel="external">http://fuse.sourceforge.net/sshfs.html</a><br>Will allow you to mount a folder security over a network.  </p>
+<p>ref:   </p>
+<ol>
+<li><a href="http://mmb.pcb.ub.es/~carlesfe/unix/tricks.txt" target="_blank" rel="external">http://mmb.pcb.ub.es/~carlesfe/unix/tricks.txt</a>  </li>
+<li><a href="http://clippy.in/b/YJLM9W" target="_blank" rel="external">http://clippy.in/b/YJLM9W</a>  </li>
+</ol>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/6/24</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/shell/">shell</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/06/24/一些好用的命令/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/06/26/libevent_r5_bufferevent基础和概念/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          bufferevent基础和概念
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/06/19/安装smokeping/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">在os x上安装smokeping</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/06/24/一些好用的命令/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

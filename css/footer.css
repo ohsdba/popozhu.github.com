@@ -1,0 +1,8 @@
+footer {
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  float: right;
+}
+footer span {
+  margin-left: 1rem;
+}

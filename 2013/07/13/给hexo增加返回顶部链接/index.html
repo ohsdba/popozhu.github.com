@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>给hexo增加返回顶部链接 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">给hexo增加返回顶部链接</div> 
+		<small>
+		    <time datetime="2013-07-12T17:24:55.000Z" itemprop="datePublished">July 13th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>今天下午deacon给一个页面增加了<code>返回顶部</code>的链接，图片是一个超人，点击后感觉超人向上飞起，上线前给我试玩，点了几次，非常有趣。  </p>
+<p>之前一直想着给自己博客也增加一个<code>返回顶部</code>的链接，想做成豆瓣小组话题页面的那个返回跳转，简洁简单，下拉之后才出现，回到顶部又消失。  </p>
+<p>我使用的是hexo默认主题<code>light</code>，因此，当部署hexo之后，给hexo添加这么一个链接也是非常简单，主要是使用hexo的<code>alignleft</code>和<code>alignright</code>这2个css属性，大概做了实现:</p>
+<ol>
+<li><p>在blog目录下的<code>themes/light/layout/_partial/</code>增加一个新的ejs文件，比如为<code>totop.ejs</code>:   </p>
+<pre><code> &lt;div class=&quot;alignright&quot;&gt;
+ &lt;a href=&quot;#&quot; id=&quot;returnTop&quot; 
+      style=&quot;text-decoration:none; bottom:-200px; position:fixed; text-align:center; width:14px; margin:8px;&quot;
+      onclick=&quot;javascript:$(&#39;html, body&#39;).animate({scrollTop: 0}, {queue:false, duration:10});&quot;&gt;↑回顶部&lt;/a&gt;
+ &lt;/div&gt;
+
+ &lt;script type=&quot;text/javascript&quot;&gt;
+ $(function(){
+     $(window).scroll(function () {
+         if ($(document).scrollTop() &gt;= 100) {
+             $(&#39;#returnTop&#39;).animate({bottom: &quot;105px&quot;}, { queue: false, duration: 10 }); 
+         } else {
+             $(&#39;#returnTop&#39;).animate({bottom: &quot;-200px&quot;}, { queue: false, duration: 10 }); 
+         }   
+     }); 
+ }); 
+ &lt;/script&gt;
+</code></pre></li>
+<li><p>修改<code>themes/light/layout/_partial/article.ejs</code>文件，在最顶部增加<code>totop.ejs</code>的包含:</p>
+<pre><code> &lt;%- partial(&#39;totop&#39;) %&gt;
+</code></pre></li>
+</ol>
+<p>注意，这里totop.ejs文件要求跟article.ejs在相同目录下，这是相对路径的用法。  </p>
+<p>可以看出，换了其他主题之后，又得重复修改，目前这也是感觉hexo不够合理的一点。  </p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/7/13</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/hexo/">hexo</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/07/13/给hexo增加返回顶部链接/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/07/27/在perl里使用kyotocabinet/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          在perl里使用KyotoCabinet
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/07/10/boot-camp助理/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">Boot Camp助理</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/07/13/给hexo增加返回顶部链接/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>

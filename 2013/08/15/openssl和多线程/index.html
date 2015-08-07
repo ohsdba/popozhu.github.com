@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>openssl和多线程 | popozhu</title>
+
+    
+
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+    
+    <span class="site-subtitle"> do not go gentle into that good night </span>
+    
+
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">openssl和多线程</div> 
+		<small>
+		    <time datetime="2013-08-15T14:26:56.000Z" itemprop="datePublished">August 15th 2013</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    <p>这星期在程序里的多线程使用openssl来进行ssl通信，看了一些openssl的文档，前两天领导提醒我注意使用锁，今晚发现openssl提供了非常简单的加锁方式：用户无需显式地进行加锁、解锁，只需提供2个回调函数：  </p>
+<pre><code class="cpp">1) void locking_function(int mode, int n, const char *file, int line); 
+
+2) unsigned long id_function(void);
+</code></pre>
+<p>对openssl设置这2个回调函数，在需要加锁、解锁时，openssl自动调用这2个函数。于是，过程大概如下：  </p>
+<ol>
+<li>自己实现回调函数1: locking_function   </li>
+<li>自己实现回调函数2: id_function   </li>
+<li>设置回调函数   </li>
+</ol>
+<p><hr><br>上面的3个子过程大概又分别如下：  </p>
+<ol>
+<li><p>实现回调函数1: locking_function</p>
+<pre><code> // 这个数组需要自己申请空间，后续给到openssl使用
+ static pthread_mutex_t *ssl_lock = NULL;
+
+ void locking_function(int mode, int type, char *file, int line)
+ {
+     // 根据第1个参数mode来判断是加锁还是解锁
+     // 第2个参数是数组下标
+     if (mode &amp; CRYPTO_LOCK){
+         pthread_mutex_lock(&amp;(ssl_lock[type]));
+     }else{
+         pthread_mutex_unlock(&amp;(ssl_lock[type]));
+     }
+ }
+</code></pre></li>
+<li><p>实现回调函数2: id_function</p>
+<pre><code> // 返回当前线程id
+ unsigned long id_function(void)
+ {
+     unsigned long ret;
+
+     ret=(unsigned long)pthread_self();
+     return(ret);
+ }
+</code></pre></li>
+<li><p>设置回调函数</p>
+<pre><code> int create_ssl_lock(void)
+ {
+     int i;
+
+     // 申请空间，锁的个数是：CRYPTO_num_locks()，
+     ssl_lock = OPENSSL_malloc(CRYPTO_num_locks() * sizeof(pthread_mutex_t));
+     if (!ssl_lock)
+         return -1;
+
+     for (i =0 ; i &lt; CRYPTO_num_locks(); i++){
+         pthread_mutex_init(&amp;(ssl_lock[i]), NULL);
+     }
+
+     // 设置回调函数，获取当前线程id
+     CRYPTO_set_id_callback((unsigned long (*)())id_function);
+
+     // 设置回调函数，加锁和解锁
+     CRYPTO_set_locking_callback((void (*)())locking_function);
+     return 0;
+ }
+</code></pre></li>
+<li><p>释放资源</p>
+<pre><code> void ssl_lock_cleanup(void)
+ {
+     int i;
+
+     if (!ssl_lock){
+         return;
+     }
+
+     CRYPTO_set_locking_callback(NULL);
+     for (i = 0; i &lt; CRYPTO_num_locks(); i++){
+         pthread_mutex_destroy(&amp;(ssl_lock[i]));
+     }
+     OPENSSL_free(ssl_lock);
+     ssl_lock = NULL;
+ }
+</code></pre></li>
+</ol>
+<p><hr><br>另外，在启动其他线程、初始化ssl之前调用<code>create_ssl_lock()</code>，在程序最后清理资源时调用<code>ssl_lock_cleanup()</code>。<br>最后总的流程大概为： </p>
+<pre><code class="cpp">main start:
+
+void init_ssl_env()
+{
+    SSL_load_error_strings();
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();
+
+
+    if (create_ssl_lock()){
+        printf(&quot;create ssl lock buffer err:%m\n&quot;);
+    }
+}
+
+// 启动其他工作线程
+// 线程里初始化ssl、使用ssl（不需显式地进行加锁、解锁）
+
+void clean_ssl_env()
+{
+    ssl_lock_cleanup();
+
+    ERR_free_strings();
+}
+
+main end
+</code></pre>
+<p>这里使用的是openssl的<strong>静态锁</strong>，固定申请<code>CRYPTO_num_locks()</code>这么多个锁。 当然也可以使用<strong>动态锁</strong>，对性能还有提高。<br>但是，openssl的<a href="http://www.openssl.org/docs/crypto/threads.html" target="_blank" rel="external">man页面</a>上说，openssl内部当前不使用动态锁，未来也许会使用： </p>
+<pre><code>Also, dynamic locks are currently not used internally by OpenSSL, but may do so in the future.
+</code></pre><p>参考自: <a href="http://my.safaribooksonline.com/book/networking/security/059600270x/support-infrastructure/openssl-chp-4-sect-1" target="_blank" rel="external">Multithread Support</a><br>ps，推荐上面这本书《Cryptography for Secure Communications》，这里是<a href="http://it-ebooks.info/book/263/" target="_blank" rel="external">pdf下载页面</a>。</p>
+<p><br><br>– EOF –</p>
+
+	
+
+	<div>
+	    <div>Categories: <a href="/archives/2013">2013/8/15</a> </div>
+	    <div>Tags:<a class="category-link" href="/tags/c/">c</a>,<a class="category-link" href="/tags/openssl/">openssl</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2013/08/15/openssl和多线程/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/08/24/ios消息并发推送/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-caption">&laquo;</span>
+      <span class="article-nav-title">
+        
+          ios消息并发推送
+        
+      </span>
+    </a>
+  
+  
+    <a href="/2013/08/14/大端和小端/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">大端和小端</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    <span> <a href="/about">About</a> </span>
+    <span> <a href="/archives">Archive</a> </span>
+
+    <span>
+	<a href="http://hexo.io/" title="Hexo">Hexo</a>
+    </span>
+    <span>
+	&copy; popozhu 2015 
+    </span>
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  
+  var disqus_url = 'http://popozhu.github.io/2013/08/15/openssl和多线程/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+    </body>
+</html>
