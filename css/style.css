@@ -51,20 +51,58 @@ a:hover {
   width: 65%;
   min-width: 18rem;
 }
-.banner .site-title {
+.banner {
   font-size: 3rem;
 }
 .banner .site-subtitle {
-  padding-left: 1rem;
   font-size: 1rem;
 }
 .archive_container {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+.archive_tip {
+  font-size: 2rem;
+  color: #0e83cd;
+  border-left: 0.5rem solid #999;
+  padding: 0 0 0 1rem;
   margin-top: 3rem;
-  margin-bottom: 3rem;
+}
+.category-count:before,
+.archive-list-count:before {
+  content: '(';
+  padding-left: 0.3rem;
+}
+.category-count:after,
+.archive-list-count:after {
+  content: ')';
 }
 .archive_title {
   margin-top: 0.8rem;
   font-size: 2rem;
+}
+.archive_detail {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: box;
+  display: flex;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  -webkit-box-pack: justify;
+  -moz-box-pack: justify;
+  -webkit-box-pack: justify;
+  -moz-box-pack: justify;
+  box-pack: justify;
+  -webkit-flex-pack: justify;
+  -moz-flex-pack: justify;
+  flex-pack: justify;
+  -webkit-justify-content: space-between;
+  -moz-justify-content: space-between;
+  justify-content: space-between;
 }
 .extend,
 .page-number {
@@ -82,6 +120,7 @@ a:hover {
 .extend.next {
   float: right;
 }
+.tag-link,
 .category-link {
   margin-left: 0.3rem;
 }

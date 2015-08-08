@@ -17,10 +17,9 @@ a:hover {
   width: 65%;
   min-width: 18rem;
 }
-.banner .site-title {
+.banner {
   font-size: 3rem;
 }
 .banner .site-subtitle {
-  padding-left: 1rem;
   font-size: 1rem;
 }
