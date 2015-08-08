@@ -5,7 +5,7 @@
   margin-bottom: 3rem;
 }
 .article-header {
-  border-left: 3px solid color-meta;
+  border-left: 0.3rem solid color-meta;
   margin: 20px 0 10px;
   padding: 0 0 0 13px;
   text-align: left;
@@ -39,12 +39,8 @@ hr:after {
   box-sizing: border-box;
 }
 img {
-  max-width: 100%;
+  max-width: 100;
   height: auto;
-  border: none;
-  vertical-align: middle;
-}
-img:before,
-img:after {
-  box-sizing: border-box;
+  display: block;
+  margin: auto;
 }

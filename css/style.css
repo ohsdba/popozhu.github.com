@@ -64,8 +64,8 @@ a:hover {
 .archive_tip {
   font-size: 2rem;
   color: #0e83cd;
-  border-left: 0.5rem solid #999;
-  padding: 0 0 0 1rem;
+  border-left: 0.3rem solid #999;
+  padding: 0 0 0 13px;
   margin-top: 3rem;
 }
 .category-count:before,
@@ -131,7 +131,7 @@ a:hover {
   margin-bottom: 3rem;
 }
 .article-header {
-  border-left: 3px solid #999;
+  border-left: 0.3rem solid #999;
   margin: 20px 0 10px;
   padding: 0 0 0 13px;
   text-align: left;
@@ -169,16 +169,10 @@ hr:after {
   box-sizing: border-box;
 }
 img {
-  max-width: 100%;
+  max-width: 100;
   height: auto;
-  border: none;
-  vertical-align: middle;
-}
-img:before,
-img:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+  display: block;
+  margin: auto;
 }
 footer {
   font-size: 1.5rem;

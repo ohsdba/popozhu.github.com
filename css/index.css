@@ -5,8 +5,8 @@
 .archive_tip {
   font-size: 2rem;
   color: color-link;
-  border-left: 0.5rem solid color-meta;
-  padding: 0 0 0 1rem;
+  border-left: 0.3rem solid color-meta;
+  padding: 0 0 0 13px;
   margin-top: 3rem;
 }
 .category-count:before,
