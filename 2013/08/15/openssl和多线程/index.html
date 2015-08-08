@@ -40,6 +40,9 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+
 	    <p>这星期在程序里的多线程使用openssl来进行ssl通信，看了一些openssl的文档，前两天领导提醒我注意使用锁，今晚发现openssl提供了非常简单的加锁方式：用户无需显式地进行加锁、解锁，只需提供2个回调函数：  </p>
 <pre><code class="cpp">1) void locking_function(int mode, int n, const char *file, int line); 
 

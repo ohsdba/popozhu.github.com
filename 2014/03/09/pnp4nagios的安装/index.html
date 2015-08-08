@@ -40,6 +40,11 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装rrdtool"><span class="toc-text">安装rrdtool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装pnp4nagios"><span class="toc-text">安装pnp4nagios</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装php和php-fpm"><span class="toc-text">安装php和php-fpm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#配置nginx"><span class="toc-text">配置nginx</span></a></li></ol> </div>
+	    
+
 	    <p>pnp4nagios依赖rrdtool，把数据写入RRD文件，同时需要一个web服务器来托管pnp4nagios的php页面，因为需要安装rrdtool、pnp4nagios、php、nginx。  </p>
 <h3 id="安装rrdtool">安装rrdtool</h3><p>在系统CentOS 5.9上，我通过rpm安装rrdtool以及它的perl模块，版本为1.4.7。其他版本可以在<code>http://pkgs.repoforge.org/rrdtool/</code>下载。</p>
 <pre><code>cd /tmp

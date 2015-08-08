@@ -40,6 +40,9 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+
 	    <p>用过tcpdump来抓包的人，再使用Wireshark，估计都会说好。<br>很遗憾，我对tcpdump这个命令的使用，只是皮毛。拿一个曾经用过的命令，现在让我再解释每个参数的意义，还真无法一一说得上来：</p>
 <pre><code>tcpdump -i eth1 port 60777 and &#39;(((ip[2:2] - ((ip[0]&amp;0xf)&lt;&lt;2)) - ((tcp[12]&amp;0xf0)&gt;&gt;2)) != 0)&#39; -s 0 -A -n -S -q -c 1024
 </code></pre><p>每个参数的解释大概如下：  </p>

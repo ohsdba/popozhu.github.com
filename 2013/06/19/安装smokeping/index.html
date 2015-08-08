@@ -40,6 +40,11 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装rrdtool"><span class="toc-text">安装rrdtool</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装smokeping"><span class="toc-text">安装smokeping</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装mod_fastcgi(apache_modules)"><span class="toc-text">安装mod_fastcgi(apache modules)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改apache配置"><span class="toc-text">修改apache配置</span></a></li></ol> </div>
+	    
+
 	    <h2 id="安装rrdtool">安装rrdtool</h2><p>在mac上我使用port来安装第三方软件，为了方便，还是使用port来安装rrdtool。</p>
 <pre><code>sudo port install rrdtool
 </code></pre><p>macport会安装相应的依赖，比如一些perl的模块RRD等。<br>但smokeping改为编译源代码来安装。<br>因为port会额外安装一个apache2，版本还是跟系统自带的apache一样，太不智能了，不想维护2个apache。  </p>

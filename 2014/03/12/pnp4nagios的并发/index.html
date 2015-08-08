@@ -40,6 +40,9 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+
 	    <p>在前几天我写了个「<a href="/2014/03/09/pnp4nagios的模板/">pnp4nagios的模板</a>」后，发现使用npcd的bulk模式处理3.5w条性能数据，花费了将近30分钟时间，而我期望的是在1分钟内处理完。需要换个方式，为此我切换到<code>gearman模式</code>来并发，记录如下：</p>
 <ol>
 <li>换用SSD硬盘</li>

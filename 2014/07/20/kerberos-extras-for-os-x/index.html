@@ -40,6 +40,9 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+
 	    <p>如果在mac上使用kerberos遇到了问题，可以考虑安装 <a href="http://web.mit.edu/macdev/KfM/Common/Documentation/osx-kerberos-extras.html" target="_blank" rel="external">Kerberos Extras</a>.</p>
 <p>对于我，我通过<code>kinit</code>成功获取到了<code>票据</code>，但连接到服务端时仍提示让我输入密码。 使用票据的话是不需再输入密码的，那么是没使用到票据，或者票据有问题。 </p>
 <p>ssh连接会使用几种验证方式(PreferredAuthentications)，通过<code>man ssh_config</code>，搜索<code>PreferredAuthentications</code>可以看到ssh使用的几种验证方式，且按顺序逐一尝试，默认是:</p>

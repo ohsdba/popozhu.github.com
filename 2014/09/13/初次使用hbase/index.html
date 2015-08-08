@@ -40,6 +40,11 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#背景"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#收集环节"><span class="toc-text">收集环节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分析、存储"><span class="toc-text">分析、存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hbase_的_row_key_考虑"><span class="toc-text">hbase 的 row key 考虑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#效率"><span class="toc-text">效率</span></a></li></ol> </div>
+	    
+
 	    <p><br></p>
 <h3 id="背景">背景</h3><p>因为用到了 hbase，也算第一次纯 java 开发，所以做一下笔记，</p>
 <p>小组内有个日志收集系统，最近一个月把日志的存储从 mysql 迁移到 hbase，这种写入后就不会再做修改的应用场景，非常适合切换到 hbase。</p>

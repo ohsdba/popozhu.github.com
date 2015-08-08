@@ -40,6 +40,11 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#前端配置文件"><span class="toc-text">前端配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#后端配置文件"><span class="toc-text">后端配置文件</span></a></li></ol> </div>
+	    
+
 	    <p>这星期团队里一个页面的编辑器需要升级，看了下，使用的是百度前端开源项目ueditor，当前使用的版本是1.2.3，线上提供的最新版本是1.4.3。相比我们当前使用的旧版本，新版本曾经重构过文件上传模块webuploader。后来我就是在上传这里遇到了一个问题：上传路径的配置。</p>
 <p>整个ueditor有两个配置文件：前端配置文件、后端配置文件。我这边的web应用名为<code>ops</code>，ueditor直接部署在根目录之下。<br><br></p>
 <h3 id="前端配置文件">前端配置文件</h3><p>前端配置文件为ueditor根目录下的<code>web/ops/ueditor/ueditor.config.js</code>，里面有详细的配置条目介绍。我修改了ueditor的在我web应用中的路径</p>

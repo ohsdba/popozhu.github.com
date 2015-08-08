@@ -39,8 +39,18 @@ hr:after {
   box-sizing: border-box;
 }
 img {
-  max-width: 100;
-  height: auto;
+  max-width: 100%;
   display: block;
+  height: auto;
   margin: auto;
+}
+.article-toc {
+  border: none;
+  border-left: 0.3rem solid color-meta;
+  background-color: color-background;
+  float: right;
+  padding: 1rem 1rem 1rem 1.5rem;
+  margin: 0 0 0.5rem 2rem;
+  text-align: left;
+  width: 250px;
 }

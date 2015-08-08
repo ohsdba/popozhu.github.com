@@ -40,6 +40,9 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+
 	    <p>最近有个事情，统计站上所有视频文件的md5，导出的待分析的数据有28G，需要去重。我用perl的hash来处理，可以简单快速完成。但考虑到perl会使用较多内存，担心影响机器其他进程，根据一篇wiki，在perl中使用一个dbm来帮助管理内存，大概如下：</p>
 <pre><code class="perl">use KyotoCabinet;
 

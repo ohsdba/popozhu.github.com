@@ -40,6 +40,9 @@
 
     <div class="article-entry" itemprop="articleBody">
 	
+	    
+	    
+
 	    <p>后台的C程序通过socket发给前台的消息包含了中文，前台接收后出现了乱码，有人提出让我把消息编码成unicode格式(\uxxxx)，虽然参考了一个C库做了实现，但当时的思路并不是很清晰，回来做下归纳。  </p>
 <p>包含中文字符的消息，记为msg，假若msg包含中文、英文和数字：msg = “abc我是def中文123字符”，于是需要把msg编码成unicode格式，编码后的内容保存到C的char数组里，记为unicode_str，则最终想要得到的unicode_str = “abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26”。  </p>
 <p>在c代码里，先用宽字符类型wchar_t保存msg，这个宽字符的长度可以用函数wcslen来计算，然后遍历每个宽字符，把宽字符转换成unicode格式。对每个宽字符的转换，参考了<a href="http://www.cprogramming.com/tutorial/unicode.html" target="_blank" rel="external">Unicode in C and C++: What You Can Do About It Today</a>这里提供的一个函数: u8_escape_wchar。</p>
