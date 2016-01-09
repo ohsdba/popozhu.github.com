@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">bufferevent基础和概念</div> 
 		<small>
-		    <time datetime="2013-06-26T13:39:50.000Z" itemprop="datePublished">June 26th 2013</time>
+		    <time datetime="2013-06-26T13:39:50.000Z" itemprop="datePublished">June 26 2013</time>
 		</small>
 	    </div>
 	</header>
@@ -100,353 +106,353 @@
 <p><br></p>
 <h2 id="使用基于socket的bufferevent">使用基于socket的bufferevent</h2><p>基于socket的bufferevent使用起来最简单。基于socket的bufferevent使用Libevent的底层事件机制来检测底层网络socket是否可读写，也使用底层网络调用（比如readv，writev，WSASend，或者WSARecv）来传输和接收数据。  </p>
 <h3 id="创建一个基于socket的bufferevent">创建一个基于socket的bufferevent</h3><p>使用<code>bufferevent_socket_new()</code>来创建。接口如下：  </p>
-<pre><code>struct bufferevent *bufferevent_socket_new(
-    struct event_base *base,
-    evutil_socket_t fd,
-    enum bufferevent_options options);
+<pre><code><span class="keyword">struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufferevent_socket_new(
+</span>    <span class="keyword">struct </span>event_base *<span class="keyword">base,
+</span>    evutil_socket_t fd,
+    enum <span class="keyword">bufferevent_options </span>options)<span class="comment">;</span>
 </code></pre><p><code>base</code>是event_base，<code>options</code>是bufferevent标志的位掩码（BEV_OPT_CLOSE_ON_FREE等）。而<code>fd</code>则是可选的socket fd，如果你想稍后再设置fd，可以传-1。  </p>
 <p>提示： 确保你提供的socket是非阻塞模式的，Libevent提供了一个便捷的函数<code>evutil_make_socket_nonblocking()</code>来设置一个socket为非阻塞。  </p>
 <p>如果成功，这个函数返回一个bufferevent，如果失败，返回NULL。  </p>
 <h3 id="在bufferevent上启用连接">在bufferevent上启用连接</h3><p>如果bufferevent的socket还没连接，你可以创建一个连接，接口：  </p>
-<pre><code>int bufferevent_socket_connect(struct bufferevent *bev,
-    struct sockaddr *address, int addrlen);
+<pre><code><span class="label">int</span> <span class="keyword">bufferevent_socket_connect(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bev,
+</span>    <span class="keyword">struct </span>sockaddr *<span class="keyword">address, </span>int <span class="keyword">addrlen);</span>
 </code></pre><p>参数<code>address</code>和<code>addrlen</code>跟标准的<code>connect()</code>一样。如果bufferevent还没有一个socker，调用这个函数会为它创建一个新的socket，并设置socket为非阻塞。  </p>
 <p>如果bufferevent已经有一个socket，调用<code>bufferevent_socket_connect()</code>告诉Libevent该socket未连接，在连接成功之前不会有读或写操作返回。  </p>
 <p>在连接返回前向输出buffer添加数据则是可以的。  </p>
 <p>如果连接成功建立，这个函数返回0，如果出现错误，返回-1。  </p>
-<h4 id="Example">Example</h4><pre><code>#include &lt;event2/event.h&gt;
-#include &lt;event2/bufferevent.h&gt;
-#include &lt;sys/socket.h&gt;
-#include &lt;string.h&gt;
+<h4 id="Example">Example</h4><pre><code><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/bufferevent.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span>
 
-void eventcb(struct bufferevent *bev, short events, void *ptr)
-{
-    if (events &amp; BEV_EVENT_CONNECTED) {
-         /* We&#39;re connected to 127.0.0.1:8080.   Ordinarily we&#39;d do
-            something here, like start reading or writing. */
-    } else if (events &amp; BEV_EVENT_ERROR) {
-         /* An error occured while connecting. */
+<span class="function"><span class="keyword">void</span> <span class="title">eventcb</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev, <span class="keyword">short</span> events, <span class="keyword">void</span> *ptr)</span>
+</span>{
+    <span class="keyword">if</span> (events &amp; BEV_EVENT_CONNECTED) {
+         <span class="comment">/* We're connected to 127.0.0.1:8080.   Ordinarily we'd do
+            something here, like start reading or writing. */</span>
+    } <span class="keyword">else</span> <span class="keyword">if</span> (events &amp; BEV_EVENT_ERROR) {
+         <span class="comment">/* An error occured while connecting. */</span>
     }
 }
 
-int main_loop(void)
-{
-    struct event_base *base;
-    struct bufferevent *bev;
-    struct sockaddr_in sin;
+<span class="function"><span class="keyword">int</span> <span class="title">main_loop</span><span class="params">(<span class="keyword">void</span>)</span>
+</span>{
+    <span class="keyword">struct</span> event_base *base;
+    <span class="keyword">struct</span> bufferevent *bev;
+    <span class="keyword">struct</span> sockaddr_in <span class="built_in">sin</span>;
 
     base = event_base_new();
 
-    memset(&amp;sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = htonl(0x7f000001); /* 127.0.0.1 */
-    sin.sin_port = htons(8080); /* Port 8080 */
+    <span class="built_in">memset</span>(&amp;<span class="built_in">sin</span>, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="built_in">sin</span>));
+    <span class="built_in">sin</span>.sin_family = AF_INET;
+    <span class="built_in">sin</span>.sin_addr.s_addr = htonl(<span class="number">0x7f000001</span>); <span class="comment">/* 127.0.0.1 */</span>
+    <span class="built_in">sin</span>.sin_port = htons(<span class="number">8080</span>); <span class="comment">/* Port 8080 */</span>
 
-    bev = bufferevent_socket_new(base, -1, BEV_OPT_CLOSE_ON_FREE);
+    bev = bufferevent_socket_new(base, -<span class="number">1</span>, BEV_OPT_CLOSE_ON_FREE);
 
-    bufferevent_setcb(bev, NULL, NULL, eventcb, NULL);
+    bufferevent_setcb(bev, <span class="literal">NULL</span>, <span class="literal">NULL</span>, eventcb, <span class="literal">NULL</span>);
 
-    if (bufferevent_socket_connect(bev,
-        (struct sockaddr *)&amp;sin, sizeof(sin)) &lt; 0) {
-        /* Error starting connection */
+    <span class="keyword">if</span> (bufferevent_socket_connect(bev,
+        (<span class="keyword">struct</span> sockaddr *)&amp;<span class="built_in">sin</span>, <span class="keyword">sizeof</span>(<span class="built_in">sin</span>)) &lt; <span class="number">0</span>) {
+        <span class="comment">/* Error starting connection */</span>
         bufferevent_free(bev);
-        return -1;
+        <span class="keyword">return</span> -<span class="number">1</span>;
     }
 
     event_base_dispatch(base);
-    return 0;
+    <span class="keyword">return</span> <span class="number">0</span>;
 }
 </code></pre><p>注意如果你尝试使用<code>bufferevent_socket_connect()</code>来触发调用<code>connect()</code>，你只会有一个<code>BEV_EVENT_CONNECTED</code>事件。如果你自己调用<code>connect()</code>，该连接触发的是一个写事件。  </p>
 <h3 id="使用hostname来建立连接">使用hostname来建立连接</h3><p>更普遍的做法是把解析host和创建连接合并为一个操作，这里有一个接口：</p>
-<pre><code>int bufferevent_socket_connect_hostname(struct bufferevent *bev,
-    struct evdns_base *dns_base, int family, const char *hostname,
-    int port);
-int bufferevent_socket_get_dns_error(struct bufferevent *bev);
+<pre><code><span class="function"><span class="keyword">int</span> <span class="title">bufferevent_socket_connect_hostname</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev,
+    <span class="keyword">struct</span> evdns_base *dns_base, <span class="keyword">int</span> family, <span class="keyword">const</span> <span class="keyword">char</span> *hostname,
+    <span class="keyword">int</span> port)</span></span>;
+<span class="function"><span class="keyword">int</span> <span class="title">bufferevent_socket_get_dns_error</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev)</span></span>;
 </code></pre><p>这个函数解析DNS名字<code>hostname</code>，查找地址的类属（AF_INET，AF_INET6和AF_UNSPEC）。如果解析失败则调用错误回调函数，如果成功则创建一个连接。  </p>
 <p>参数<code>dns_base</code>可选，如果为NULL，Libevent会阻塞直到完成域名查找，而这一般非你所愿。如果不为NULL，Libevent会使用它来异步查找域名。  </p>
 <p>跟<code>bufferevent_socket_connect()</code>一样，这个函数告诉Libevent任何已有的socket是未连接的，在完成域名解析且连接成功创建和返回前，该连接的读或写操作不应返回。  </p>
 <p>如果出现错误，可能是DNS域名查找出错，你可以调用<code>bufferevent_socket_get_dns_error()</code>来查看最近的错误。如果让会的error为0，则检测不到DNS错误。  </p>
-<h4 id="Example:_Trivial_HTTP_v0_client">Example: Trivial HTTP v0 client</h4><pre><code>/* Don&#39;t actually copy this code: it is a poor way to implement an
+<h4 id="Example:_Trivial_HTTP_v0_client">Example: Trivial HTTP v0 client</h4><pre><code><span class="comment">/* Don't actually copy this code: it is a poor way to implement an
    HTTP client.  Have a look at evhttp instead.
-*/
-#include &lt;event2/dns.h&gt;
-#include &lt;event2/bufferevent.h&gt;
-#include &lt;event2/buffer.h&gt;
-#include &lt;event2/util.h&gt;
-#include &lt;event2/event.h&gt;
+*/</span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/dns.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/bufferevent.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/buffer.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/util.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span>
 
-#include &lt;stdio.h&gt;
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span>
 
-void readcb(struct bufferevent *bev, void *ptr)
-{
-    char buf[1024];
-    int n;
-    struct evbuffer *input = bufferevent_get_input(bev);
-    while ((n = evbuffer_remove(input, buf, sizeof(buf))) &gt; 0) {
-        fwrite(buf, 1, n, stdout);
+<span class="function"><span class="keyword">void</span> <span class="title">readcb</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev, <span class="keyword">void</span> *ptr)</span>
+</span>{
+    <span class="keyword">char</span> buf[<span class="number">1024</span>];
+    <span class="keyword">int</span> n;
+    <span class="keyword">struct</span> evbuffer *input = bufferevent_get_input(bev);
+    <span class="keyword">while</span> ((n = evbuffer_remove(input, buf, <span class="keyword">sizeof</span>(buf))) &gt; <span class="number">0</span>) {
+        fwrite(buf, <span class="number">1</span>, n, <span class="built_in">stdout</span>);
     }
 }
 
-void eventcb(struct bufferevent *bev, short events, void *ptr)
-{
-    if (events &amp; BEV_EVENT_CONNECTED) {
-         printf(&quot;Connect okay.\n&quot;);
-    } else if (events &amp; (BEV_EVENT_ERROR|BEV_EVENT_EOF)) {
-         struct event_base *base = ptr;
-         if (events &amp; BEV_EVENT_ERROR) {
-                 int err = bufferevent_socket_get_dns_error(bev);
-                 if (err)
-                         printf(&quot;DNS error: %s\n&quot;, evutil_gai_strerror(err));
+<span class="function"><span class="keyword">void</span> <span class="title">eventcb</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev, <span class="keyword">short</span> events, <span class="keyword">void</span> *ptr)</span>
+</span>{
+    <span class="keyword">if</span> (events &amp; BEV_EVENT_CONNECTED) {
+         <span class="built_in">printf</span>(<span class="string">"Connect okay.\n"</span>);
+    } <span class="keyword">else</span> <span class="keyword">if</span> (events &amp; (BEV_EVENT_ERROR|BEV_EVENT_EOF)) {
+         <span class="keyword">struct</span> event_base *base = ptr;
+         <span class="keyword">if</span> (events &amp; BEV_EVENT_ERROR) {
+                 <span class="keyword">int</span> err = bufferevent_socket_get_dns_error(bev);
+                 <span class="keyword">if</span> (err)
+                         <span class="built_in">printf</span>(<span class="string">"DNS error: %s\n"</span>, evutil_gai_strerror(err));
          }
-         printf(&quot;Closing\n&quot;);
+         <span class="built_in">printf</span>(<span class="string">"Closing\n"</span>);
          bufferevent_free(bev);
-         event_base_loopexit(base, NULL);
+         event_base_loopexit(base, <span class="literal">NULL</span>);
     }
 }
 
-int main(int argc, char **argv)
-{
-    struct event_base *base;
-    struct evdns_base *dns_base;
-    struct bufferevent *bev;
+<span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span>
+</span>{
+    <span class="keyword">struct</span> event_base *base;
+    <span class="keyword">struct</span> evdns_base *dns_base;
+    <span class="keyword">struct</span> bufferevent *bev;
 
-    if (argc != 3) {
-        printf(&quot;Trivial HTTP 0.x client\n&quot;
-               &quot;Syntax: %s [hostname] [resource]\n&quot;
-               &quot;Example: %s www.google.com /\n&quot;,argv[0],argv[0]);
-        return 1;
+    <span class="keyword">if</span> (argc != <span class="number">3</span>) {
+        <span class="built_in">printf</span>(<span class="string">"Trivial HTTP 0.x client\n"</span>
+               <span class="string">"Syntax: %s [hostname] [resource]\n"</span>
+               <span class="string">"Example: %s www.google.com /\n"</span>,argv[<span class="number">0</span>],argv[<span class="number">0</span>]);
+        <span class="keyword">return</span> <span class="number">1</span>;
     }
 
     base = event_base_new();
-    dns_base = evdns_base_new(base, 1);
+    dns_base = evdns_base_new(base, <span class="number">1</span>);
 
-    bev = bufferevent_socket_new(base, -1, BEV_OPT_CLOSE_ON_FREE);
-    bufferevent_setcb(bev, readcb, NULL, eventcb, base);
+    bev = bufferevent_socket_new(base, -<span class="number">1</span>, BEV_OPT_CLOSE_ON_FREE);
+    bufferevent_setcb(bev, readcb, <span class="literal">NULL</span>, eventcb, base);
     bufferevent_enable(bev, EV_READ|EV_WRITE);
-    evbuffer_add_printf(bufferevent_get_output(bev), &quot;GET %s\r\n&quot;, argv[2]);
+    evbuffer_add_printf(bufferevent_get_output(bev), <span class="string">"GET %s\r\n"</span>, argv[<span class="number">2</span>]);
     bufferevent_socket_connect_hostname(
-        bev, dns_base, AF_UNSPEC, argv[1], 80);
+        bev, dns_base, AF_UNSPEC, argv[<span class="number">1</span>], <span class="number">80</span>);
     event_base_dispatch(base);
-    return 0;
+    <span class="keyword">return</span> <span class="number">0</span>;
 }
 </code></pre><p><br></p>
 <h2 id="bufferevent通用操作">bufferevent通用操作</h2><p>这节的函数适用于多种bufferevent实现。  </p>
-<h3 id="释放一个bufferevent">释放一个bufferevent</h3><pre><code>void bufferevent_free(struct bufferevent *bev);
+<h3 id="释放一个bufferevent">释放一个bufferevent</h3><pre><code><span class="function"><span class="keyword">void</span> <span class="title">bufferevent_free</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev)</span></span>;
 </code></pre><p>Bufferevent在内部有引用计数，如果当你释放它时它有延迟的回调函数，则再回调被执行前它不会被释放。  </p>
 <p>然而<code>bufferevent_free()</code>会尝试尽快释放bufferevent，如果bufferevent上有等待写的数据，在bufferevent被释放前它可能不会刷新缓存。   </p>
 <p>如果设置了<code>BEV_OPT_CLOSE_ON_FREE</code>标志，且该buffereavent有一个socket或一个底层bufferevent，这个底层传输会在释放时被关闭。  </p>
-<h3 id="操作回调、设置水位和启用功能">操作回调、设置水位和启用功能</h3><pre><code>typedef void (*bufferevent_data_cb)(struct bufferevent *bev, void *ctx);
-typedef void (*bufferevent_event_cb)(struct bufferevent *bev,
-    short events, void *ctx);
+<h3 id="操作回调、设置水位和启用功能">操作回调、设置水位和启用功能</h3><pre><code><span class="label">typedef</span> void (*<span class="keyword">bufferevent_data_cb)(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bev, </span>void *ctx)<span class="comment">;</span>
+<span class="label">typedef</span> void (*<span class="keyword">bufferevent_event_cb)(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bev,
+</span>    short events, void *ctx)<span class="comment">;</span>
 
-void bufferevent_setcb(struct bufferevent *bufev,
-    bufferevent_data_cb readcb, bufferevent_data_cb writecb,
-    bufferevent_event_cb eventcb, void *cbarg);
+<span class="label">void</span> <span class="keyword">bufferevent_setcb(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev,
+</span>    <span class="keyword">bufferevent_data_cb </span>readcb, <span class="keyword">bufferevent_data_cb </span>writecb,
+    <span class="keyword">bufferevent_event_cb </span>eventcb, void *cbarg)<span class="comment">;</span>
 
-void bufferevent_getcb(struct bufferevent *bufev,
-    bufferevent_data_cb *readcb_ptr,
-    bufferevent_data_cb *writecb_ptr,
-    bufferevent_event_cb *eventcb_ptr,
-    void **cbarg_ptr);
+<span class="label">void</span> <span class="keyword">bufferevent_getcb(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev,
+</span>    <span class="keyword">bufferevent_data_cb </span>*readcb_ptr,
+    <span class="keyword">bufferevent_data_cb </span>*writecb_ptr,
+    <span class="keyword">bufferevent_event_cb </span>*eventcb_ptr,
+    void **cbarg_ptr)<span class="comment">;</span>
 </code></pre><p>函数<code>bufferevent_setcb()</code>改变一个多或多个回调函数。参数readcb, writecb和eventcb在可读、可写或有事件被触发时被调用（各自被调用）。最后一个用户提供的参数<em>cbarg</em>将作为参数传给<code>bufferevent_callcb()</code>：你可以使用它来传递数据给你的回调函数。回调函数的参数<em>events</em>则是事件标志的位掩码。  </p>
 <p>你若给某个回调函数入参传一个NULL指针，则禁用该回调函数。注意到所有的回调函数共享入参<em>cbarg</em>，修改该参数会影响所有回调函数。  </p>
-<h4 id="启用/禁用">启用/禁用</h4><pre><code>void bufferevent_enable(struct bufferevent *bufev, short events);
-void bufferevent_disable(struct bufferevent *bufev, short events);
+<h4 id="启用/禁用">启用/禁用</h4><pre><code><span class="function"><span class="keyword">void</span> <span class="title">bufferevent_enable</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev, <span class="keyword">short</span> events)</span></span>;
+<span class="function"><span class="keyword">void</span> <span class="title">bufferevent_disable</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev, <span class="keyword">short</span> events)</span></span>;
 
-short bufferevent_get_enabled(struct bufferevent *bufev);
+<span class="function"><span class="keyword">short</span> <span class="title">bufferevent_get_enabled</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev)</span></span>;
 </code></pre><p>你可以在一个bufferevent上启用或禁用指定的事件：<em>EV_READ, EV_WRITE</em>, 或<em>EV_READ|EV_WRITE</em>。当读或写被禁用后，bufferevent将不会尝试读或写数据。<br>当输出缓存为空时没有必要禁用写操作：bufferevent会自动停止写，当有缓存里有数据时会自动重新开始写socket。<br>类似的，当输入缓存达到最高水位时也没必要禁用读操作，bufferevent会自动停止再读入数据，当输入缓存又有空间时bufferevent会自动重新开始读入数据到缓存。<br>默认上，一个新创建的bufferevent启用了写操作，但不包括读操作（读写buffer的操作）。<br>可以调用<code>bufferevent_get_enabled()</code>来查看bufferevent当前启用了哪些事件。  </p>
-<h4 id="设置水位">设置水位</h4><pre><code>void bufferevent_setwatermark(struct bufferevent *bufev, short events,
-    size_t lowmark, size_t highmark);
+<h4 id="设置水位">设置水位</h4><pre><code><span class="function"><span class="keyword">void</span> <span class="title">bufferevent_setwatermark</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev, <span class="keyword">short</span> events,
+    size_t lowmark, size_t highmark)</span></span>;
 </code></pre><p>函数<code>bufferevent_setwatermark()</code>调整读、写水位，或都调整。 如果参数<em>events</em>设置了EV_READ，则调整读水位，如果设置<em>EV_WRITE</em>则调整写水位。   </p>
 <p>高水位如果设置为0，则表示不限制。  </p>
-<h4 id="Example-1">Example</h4><pre><code>#include &lt;event2/event.h&gt;
-#include &lt;event2/bufferevent.h&gt;
-#include &lt;event2/buffer.h&gt;
-#include &lt;event2/util.h&gt;
+<h4 id="Example-1">Example</h4><pre><code><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/bufferevent.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/buffer.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/util.h&gt;</span></span>
 
-#include &lt;stdlib.h&gt;
-#include &lt;errno.h&gt;
-#include &lt;string.h&gt;
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;errno.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span>
 
-struct info {
-    const char *name;
-    size_t total_drained;
+<span class="keyword">struct</span> info {
+    <span class="keyword">const</span> <span class="keyword">char</span> *name;
+    <span class="keyword">size_t</span> total_drained;
 };
 
-void read_callback(struct bufferevent *bev, void *ctx)
-{
-    struct info *inf = ctx;
-    struct evbuffer *input = bufferevent_get_input(bev);
-    size_t len = evbuffer_get_length(input);
-    if (len) {
+<span class="function"><span class="keyword">void</span> <span class="title">read_callback</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev, <span class="keyword">void</span> *ctx)</span>
+</span>{
+    <span class="keyword">struct</span> info *inf = ctx;
+    <span class="keyword">struct</span> evbuffer *input = bufferevent_get_input(bev);
+    <span class="keyword">size_t</span> len = evbuffer_get_length(input);
+    <span class="keyword">if</span> (len) {
         inf-&gt;total_drained += len;
         evbuffer_drain(input, len);
-        printf(&quot;Drained %lu bytes from %s\n&quot;,
-             (unsigned long) len, inf-&gt;name);
+        <span class="built_in">printf</span>(<span class="string">"Drained %lu bytes from %s\n"</span>,
+             (<span class="keyword">unsigned</span> <span class="keyword">long</span>) len, inf-&gt;name);
     }
 }
 
-void event_callback(struct bufferevent *bev, short events, void *ctx)
-{
-    struct info *inf = ctx;
-    struct evbuffer *input = bufferevent_get_input(bev);
-    int finished = 0;
+<span class="function"><span class="keyword">void</span> <span class="title">event_callback</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev, <span class="keyword">short</span> events, <span class="keyword">void</span> *ctx)</span>
+</span>{
+    <span class="keyword">struct</span> info *inf = ctx;
+    <span class="keyword">struct</span> evbuffer *input = bufferevent_get_input(bev);
+    <span class="keyword">int</span> finished = <span class="number">0</span>;
 
-    if (events &amp; BEV_EVENT_EOF) {
-        size_t len = evbuffer_get_length(input);
-        printf(&quot;Got a close from %s.  We drained %lu bytes from it, &quot;
-            &quot;and have %lu left.\n&quot;, inf-&gt;name,
-            (unsigned long)inf-&gt;total_drained, (unsigned long)len);
-        finished = 1;
+    <span class="keyword">if</span> (events &amp; BEV_EVENT_EOF) {
+        <span class="keyword">size_t</span> len = evbuffer_get_length(input);
+        <span class="built_in">printf</span>(<span class="string">"Got a close from %s.  We drained %lu bytes from it, "</span>
+            <span class="string">"and have %lu left.\n"</span>, inf-&gt;name,
+            (<span class="keyword">unsigned</span> <span class="keyword">long</span>)inf-&gt;total_drained, (<span class="keyword">unsigned</span> <span class="keyword">long</span>)len);
+        finished = <span class="number">1</span>;
     }
-    if (events &amp; BEV_EVENT_ERROR) {
-        printf(&quot;Got an error from %s: %s\n&quot;,
+    <span class="keyword">if</span> (events &amp; BEV_EVENT_ERROR) {
+        <span class="built_in">printf</span>(<span class="string">"Got an error from %s: %s\n"</span>,
             inf-&gt;name, evutil_socket_error_to_string(EVUTIL_SOCKET_ERROR()));
-        finished = 1;
+        finished = <span class="number">1</span>;
     }
-    if (finished) {
-        free(ctx);
+    <span class="keyword">if</span> (finished) {
+        <span class="built_in">free</span>(ctx);
         bufferevent_free(bev);
     }
 }
 
-struct bufferevent *setup_bufferevent(void)
-{
-    struct bufferevent *b1 = NULL;
-    struct info *info1;
+<span class="function"><span class="keyword">struct</span> bufferevent *<span class="title">setup_bufferevent</span><span class="params">(<span class="keyword">void</span>)</span>
+</span>{
+    <span class="keyword">struct</span> bufferevent *b1 = <span class="literal">NULL</span>;
+    <span class="keyword">struct</span> info *info1;
 
-    info1 = malloc(sizeof(struct info));
-    info1-&gt;name = &quot;buffer 1&quot;;
-    info1-&gt;total_drained = 0;
+    info1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> info));
+    info1-&gt;name = <span class="string">"buffer 1"</span>;
+    info1-&gt;total_drained = <span class="number">0</span>;
 
-    /* ... Here we should set up the bufferevent and make sure it gets
-       connected... */
+    <span class="comment">/* ... Here we should set up the bufferevent and make sure it gets
+       connected... */</span>
 
-    /* Trigger the read callback only whenever there is at least 128 bytes
-       of data in the buffer. */
-    bufferevent_setwatermark(b1, EV_READ, 128, 0);
+    <span class="comment">/* Trigger the read callback only whenever there is at least 128 bytes
+       of data in the buffer. */</span>
+    bufferevent_setwatermark(b1, EV_READ, <span class="number">128</span>, <span class="number">0</span>);
 
-    bufferevent_setcb(b1, read_callback, NULL, event_callback, info1);
+    bufferevent_setcb(b1, read_callback, <span class="literal">NULL</span>, event_callback, info1);
 
-    bufferevent_enable(b1, EV_READ); /* Start reading. */
-    return b1;
+    bufferevent_enable(b1, EV_READ); <span class="comment">/* Start reading. */</span>
+    <span class="keyword">return</span> b1;
 }
 </code></pre><h3 id="操作bufferevent里的数据">操作bufferevent里的数据</h3><p>bufferevent提供一些函数让你可以向网络中读写数据：</p>
-<h4 id="Interface">Interface</h4><pre><code>struct evbuffer *bufferevent_get_input(struct bufferevent *bufev);
-struct evbuffer *bufferevent_get_output(struct bufferevent *bufev);
+<h4 id="Interface">Interface</h4><pre><code><span class="keyword">struct </span>evbuffer *<span class="keyword">bufferevent_get_input(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev);
+</span><span class="keyword">struct </span>evbuffer *<span class="keyword">bufferevent_get_output(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev);</span>
 </code></pre><p>这两个基础函数非常有用，分别返回输入缓存和输出缓存。evbuffer更多操作函数，见下节。  </p>
 <p>注意，程序可能只从输入缓存里读取数据（而不添加数据），只向输出缓存里添加数据（而不删除）。  </p>
 <p>如果输出缓存里太少数据而导致bufferevent的写操作被推迟，可以向输出缓存里添加数据，bufferevent就会自动重新开始把输出缓存里的数据写socket。对于输入缓存也类似。  </p>
-<h4 id="Interface-1">Interface</h4><pre><code>int bufferevent_write(struct bufferevent *bufev,
-    const void *data, size_t size);
-int bufferevent_write_buffer(struct bufferevent *bufev,
-    struct evbuffer *buf);
+<h4 id="Interface-1">Interface</h4><pre><code><span class="function"><span class="keyword">int</span> <span class="title">bufferevent_write</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev,
+    <span class="keyword">const</span> <span class="keyword">void</span> *data, size_t size)</span></span>;
+<span class="function"><span class="keyword">int</span> <span class="title">bufferevent_write_buffer</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev,
+    <span class="keyword">struct</span> evbuffer *buf)</span></span>;
 </code></pre><p>这2个函数添加数据到输出缓存里，调用<code>bufferevent_write()</code>把内存里<em>data</em>位置的<em>size</em>字节添加到输出缓存的末尾。调用<code>bufferevent_write_buffer()</code>则把<em>buf</em>的整块内存添加到输出缓存的末端，并把<em>buf</em>的数据删除。<br>成功返回0，遇到出错返回-1。</p>
-<h4 id="Interface-2">Interface</h4><pre><code>size_t bufferevent_read(struct bufferevent *bufev, void *data, size_t size);
-int bufferevent_read_buffer(struct bufferevent *bufev,
-    struct evbuffer *buf);
+<h4 id="Interface-2">Interface</h4><pre><code><span class="label">size_t</span> <span class="keyword">bufferevent_read(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev, </span>void *<span class="preprocessor">data</span>, size_t size)<span class="comment">;</span>
+<span class="label">int</span> <span class="keyword">bufferevent_read_buffer(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev,
+</span>    <span class="keyword">struct </span>evbuffer *<span class="keyword">buf);</span>
 </code></pre><p>这2个函数从输入缓存里读取数据。调用bufferevent_read()从输入缓存里删除<em>size</em>字节，存到内存的<em>data</em>位置，返回被删除的字节数。bufferevent_read_buffer()则删除输入缓存里的所有数据，存放到<em>buf</em>里，成功返回0，失败返回-1。  </p>
 <p>注意使用bufferevent_read()，内存<em>data</em>位置一定要有足够的空间来容纳<em>size</em>字节的数据。   </p>
-<h4 id="Example-2">Example</h4><pre><code>#include &lt;event2/bufferevent.h&gt;
-#include &lt;event2/buffer.h&gt;
+<h4 id="Example-2">Example</h4><pre><code><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/bufferevent.h&gt;</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/buffer.h&gt;</span></span>
 
-#include &lt;ctype.h&gt;
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;ctype.h&gt;</span></span>
 
-void
-read_callback_uppercase(struct bufferevent *bev, void *ctx)
-{
-        /* This callback removes the data from bev&#39;s input buffer 128
+<span class="function"><span class="keyword">void</span>
+<span class="title">read_callback_uppercase</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev, <span class="keyword">void</span> *ctx)</span>
+</span>{
+        <span class="comment">/* This callback removes the data from bev's input buffer 128
            bytes at a time, uppercases it, and starts sending it
            back.
 
-           (Watch out!  In practice, you shouldn&#39;t use toupper to implement
+           (Watch out!  In practice, you shouldn't use toupper to implement
            a network protocol, unless you know for a fact that the current
            locale is the one you want to be using.)
-         */
+         */</span>
 
-        char tmp[128];
-        size_t n;
-        int i;
-        while (1) {
-                n = bufferevent_read(bev, tmp, sizeof(tmp));
-                if (n &lt;= 0)
-                        break; /* No more data. */
-                for (i=0; i&lt;n; ++i)
-                        tmp[i] = toupper(tmp[i]);
+        <span class="keyword">char</span> tmp[<span class="number">128</span>];
+        <span class="keyword">size_t</span> n;
+        <span class="keyword">int</span> i;
+        <span class="keyword">while</span> (<span class="number">1</span>) {
+                n = bufferevent_read(bev, tmp, <span class="keyword">sizeof</span>(tmp));
+                <span class="keyword">if</span> (n &lt;= <span class="number">0</span>)
+                        <span class="keyword">break</span>; <span class="comment">/* No more data. */</span>
+                <span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;n; ++i)
+                        tmp[i] = <span class="built_in">toupper</span>(tmp[i]);
                 bufferevent_write(bev, tmp, n);
         }
 }
 
-struct proxy_info {
-        struct bufferevent *other_bev;
+<span class="keyword">struct</span> proxy_info {
+        <span class="keyword">struct</span> bufferevent *other_bev;
 };
-void
-read_callback_proxy(struct bufferevent *bev, void *ctx)
-{
-        /* You might use a function like this if you&#39;re implementing
+<span class="function"><span class="keyword">void</span>
+<span class="title">read_callback_proxy</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev, <span class="keyword">void</span> *ctx)</span>
+</span>{
+        <span class="comment">/* You might use a function like this if you're implementing
            a simple proxy: it will take data from one connection (on
            bev), and write it to another, copying as little as
-           possible. */
-        struct proxy_info *inf = ctx;
+           possible. */</span>
+        <span class="keyword">struct</span> proxy_info *inf = ctx;
 
         bufferevent_read_buffer(bev,
             bufferevent_get_output(inf-&gt;other_bev));
 }
 
-struct count {
-        unsigned long last_fib[2];
+<span class="keyword">struct</span> count {
+        <span class="keyword">unsigned</span> <span class="keyword">long</span> last_fib[<span class="number">2</span>];
 };
 
-void
-write_callback_fibonacci(struct bufferevent *bev, void *ctx)
-{
-        /* Here&#39;s a callback that adds some Fibonacci numbers to the
+<span class="function"><span class="keyword">void</span>
+<span class="title">write_callback_fibonacci</span><span class="params">(<span class="keyword">struct</span> bufferevent *bev, <span class="keyword">void</span> *ctx)</span>
+</span>{
+        <span class="comment">/* Here's a callback that adds some Fibonacci numbers to the
            output buffer of bev.  It stops once we have added 1k of
-           data; once this data is drained, we&#39;ll add more. */
-        struct count *c = ctx;
+           data; once this data is drained, we'll add more. */</span>
+        <span class="keyword">struct</span> count *c = ctx;
 
-        struct evbuffer *tmp = evbuffer_new();
-        while (evbuffer_get_length(tmp) &lt; 1024) {
-                 unsigned long next = c-&gt;last_fib[0] + c-&gt;last_fib[1];
-                 c-&gt;last_fib[0] = c-&gt;last_fib[1];
-                 c-&gt;last_fib[1] = next;
+        <span class="keyword">struct</span> evbuffer *tmp = evbuffer_new();
+        <span class="keyword">while</span> (evbuffer_get_length(tmp) &lt; <span class="number">1024</span>) {
+                 <span class="keyword">unsigned</span> <span class="keyword">long</span> next = c-&gt;last_fib[<span class="number">0</span>] + c-&gt;last_fib[<span class="number">1</span>];
+                 c-&gt;last_fib[<span class="number">0</span>] = c-&gt;last_fib[<span class="number">1</span>];
+                 c-&gt;last_fib[<span class="number">1</span>] = next;
 
-                 evbuffer_add_printf(tmp, &quot;%lu&quot;, next);
+                 evbuffer_add_printf(tmp, <span class="string">"%lu"</span>, next);
         }
 
-        /* Now we add the whole contents of tmp to bev. */
+        <span class="comment">/* Now we add the whole contents of tmp to bev. */</span>
         bufferevent_write_buffer(bev, tmp);
 
-        /* We don&#39;t need tmp any longer. */
+        <span class="comment">/* We don't need tmp any longer. */</span>
         evbuffer_free(tmp);
 }
 </code></pre><h3 id="读和写的超时">读和写的超时</h3><p>跟其他事件一样，bufferevent如果一定时间之后都没有读写数据，会执行超时回调函数。  </p>
-<h4 id="Interface-3">Interface</h4><pre><code>void bufferevent_set_timeouts(struct bufferevent *bufev,
-    const struct timeval *timeout_read, const struct timeval *timeout_write);
+<h4 id="Interface-3">Interface</h4><pre><code><span class="function"><span class="keyword">void</span> <span class="title">bufferevent_set_timeouts</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev,
+    <span class="keyword">const</span> <span class="keyword">struct</span> timeval *timeout_read, <span class="keyword">const</span> <span class="keyword">struct</span> timeval *timeout_write)</span></span>;
 </code></pre><p>传NULL给超时入参来删除对应的超时回调，然后在Libevent 2.1.2-alpha之前并不适用所有的事件类型。<br>注意，超时时间只有在bufferevent尝试读或写才开始计算，换句话说，如果bufferevent禁用读操作，或者输入缓存满了（达到最高水位），读操作超时时间不会启用。同样，写操作超时时间也并不会被启用如果禁用了些操作，或者没有数据可写。  </p>
 <p>如果读或写超时发生了，对应的读或写操作会被停止。事件回调函数会被执行，以标识<code>BEV_EVENT_TIMEOUT|BEV_EVENT_READING</code>或<code>BEV_EVENT_TIMEOUT|BEV_EVENT_WRITING</code>。  </p>
-<h3 id="刷新bufferevent">刷新bufferevent</h3><h4 id="Interface-4">Interface</h4><pre><code>int bufferevent_flush(struct bufferevent *bufev,
-    short iotype, enum bufferevent_flush_mode state);
+<h3 id="刷新bufferevent">刷新bufferevent</h3><h4 id="Interface-4">Interface</h4><pre><code><span class="function"><span class="keyword">int</span> <span class="title">bufferevent_flush</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev,
+    <span class="keyword">short</span> iotype, <span class="keyword">enum</span> bufferevent_flush_mode state)</span></span>;
 </code></pre><p>刷新bufferevent来告诉bufferevent忽略其他限制读或写操作的设置，强制从底层传输读或写尽可能多的数据。  </p>
 <p>参数<em>iotype</em>应为EV_READ, EV_WRITE, 或EV_READ|EV_WRITE，表示应该处理读、写操作，或两者。<br>参数<em>state</em>应为BEV_NORMAL, BEV_FLUSH, 或BEV_FINISHED。BEV_FINISHED表示应该告诉另一端数据发送完毕，BEV_NORMAL和BEV_FLUSH的差别跟bufferevent的类型有关。  </p>
 <p>函数bufferevent_flush()失败的话返回-1，如果没有数据可刷新，返回0，如果刷新了数据，返回1。  </p>
 <p><br></p>
 <h2 id="类型相关的bufferevent函数">类型相关的bufferevent函数</h2><p>这些函数并不支持所有类型的bufferevent。  </p>
-<h4 id="Interface-5">Interface</h4><pre><code>int bufferevent_priority_set(struct bufferevent *bufev, int pri);
-int bufferevent_get_priority(struct bufferevent *bufev);
+<h4 id="Interface-5">Interface</h4><pre><code><span class="function"><span class="keyword">int</span> <span class="title">bufferevent_priority_set</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev, <span class="keyword">int</span> pri)</span></span>;
+<span class="function"><span class="keyword">int</span> <span class="title">bufferevent_get_priority</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev)</span></span>;
 </code></pre><p>调整<em>bufev</em>的优先级为<em>pri</em>。参见<code>event_priority_set()</code>获取更多优先级的信息。  </p>
 <p>成功返回0，失败返回-1，只适用于基于socket的bufferevent。  </p>
-<h4 id="Interface-6">Interface</h4><pre><code>int bufferevent_setfd(struct bufferevent *bufev, evutil_socket_t fd);
-evutil_socket_t bufferevent_getfd(struct bufferevent *bufev);
+<h4 id="Interface-6">Interface</h4><pre><code><span class="label">int</span> <span class="keyword">bufferevent_setfd(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev, </span>evutil_socket_t fd)<span class="comment">;</span>
+<span class="label">evutil_socket_t</span> <span class="keyword">bufferevent_getfd(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev);</span>
 </code></pre><p>设置或获取基于fd事件的文件描述符fd，只支持基于socket的bufferevent。失败返回-1，<code>setfd()</code>成功则返回0。  </p>
-<h4 id="Interface-7">Interface</h4><pre><code>struct event_base *bufferevent_get_base(struct bufferevent *bev);
+<h4 id="Interface-7">Interface</h4><pre><code><span class="keyword">struct </span>event_base *<span class="keyword">bufferevent_get_base(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bev);</span>
 </code></pre><p>返回bufferevent的event_base。  </p>
-<h4 id="Interface-8">Interface</h4><pre><code>struct bufferevent *bufferevent_get_underlying(struct bufferevent *bufev);
+<h4 id="Interface-8">Interface</h4><pre><code><span class="keyword">struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufferevent_get_underlying(struct </span><span class="keyword">bufferevent </span>*<span class="keyword">bufev);</span>
 </code></pre><p>当底层传输使用的是另一个bufferevent，通过这个函数来获取这个底层传输的bufferevent。</p>
 <p><br></p>
 <h2 id="手工加锁或解锁bufferevent">手工加锁或解锁bufferevent</h2><p>跟evbuffer一样，有时候你想确保bufferevent上得一些操作是原子操作的。Libevent提供供你手工加锁和解锁的函数。</p>
-<h4 id="Interface-9">Interface</h4><pre><code>void bufferevent_lock(struct bufferevent *bufev);
-void bufferevent_unlock(struct bufferevent *bufev);
+<h4 id="Interface-9">Interface</h4><pre><code><span class="function"><span class="keyword">void</span> <span class="title">bufferevent_lock</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev)</span></span>;
+<span class="function"><span class="keyword">void</span> <span class="title">bufferevent_unlock</span><span class="params">(<span class="keyword">struct</span> bufferevent *bufev)</span></span>;
 </code></pre><p>注意，如果bufferevent在创建时如果没有提供BEV_OPT_THREADSAFE线程，或者启用Libevent的线程支持，加锁一个bufferevent是没有效果的。  </p>
 <p>加锁bufferevent也会锁上它关联的evbuffer。这些函数是可以重入的：对一个已获取的锁再次加锁是安全的，当然，也要由对应的解锁调用。  </p>
 <p><br></p>
@@ -499,24 +505,14 @@ void bufferevent_unlock(struct bufferevent *bufev);
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -529,9 +525,6 @@ void bufferevent_unlock(struct bufferevent *bufev);
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2013/06/26/libevent_r5_bufferevent基础和概念/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -540,6 +533,7 @@ void bufferevent_unlock(struct bufferevent *bufev);
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">pnp4nagios的数据格式</div> 
 		<small>
-		    <time datetime="2014-03-06T14:33:44.000Z" itemprop="datePublished">March 6th 2014</time>
+		    <time datetime="2014-03-06T14:33:44.000Z" itemprop="datePublished">March 6 2014</time>
 		</small>
 	    </div>
 	</header>
@@ -52,14 +58,8 @@
 </ol>
 <p>目前我使用pnp4gios提供了一个伪接口，传入机器的hostname和模板名，就可以查看数据了，调用方式类似：<br><code>http://your_hostname/pnp4nagios/index.php/graph?host=param_hostname&amp;srv=param_template</code><br>传入了2个参数：<code>host</code>和<code>srv</code>。  </p>
 <p>嗯，总的来说，使用的是pnp4nagios的<code>Bulk Mode with NPCD</code>模式，抛开nagios，把pnp4nagios单独拿出来。<br><!-- ![bulk-npcd](/img/2014/bulk-npcdmod.png) --></p>
-<p><hr><br>pnp4nagios的数据格式，也就是输入到脚本<code>process_perfdata.pl</code>的每个文件，文件名要求默认要求是以<code>perfdata</code>开头。这个perl脚本对应有一个配置文件<code>process_perfdata.cfg</code>，有较多的配置需要在这里修改。而脚本期望的每一行数据（这里假设我只使用<code>SERVICEPERFDATA</code>这个数据类型)包含如下字段，各个字段用<code>\t</code>分割，字段顺序没要求:</p>
-<pre><code>DATATYPE                            值为SERVICEPERFDATA
-TIMET                                时间戳
-HOSTNAME                            域名或ip
-SERVICEDESC                        服务描述
-SERVICEPERFDATA                    性能数据
-SERVICECHECKCOMMAND                命令名，跟模板名一致，process_perfdata.pl使用它来匹配模板名
-</code></pre><p>各个字段中，稍微复杂些的是「性能数据」<code>SERVICEPERFDATA</code>的格式，为：<code>&#39;label&#39;=value[UOM];[warn];[crit];[min];[max]</code>，可以包含多个性能数据，空格分割。<br><a href="http://docs.pnp4nagios.org/pnp-0.6/perfdata_format" target="_blank" rel="external">性能数据格式SERVICEPERFDATA</a>在pnp4nagios文档有详细描述。</p>
+<p><hr><br>pnp4nagios的数据格式，也就是输入到脚本<code>process_perfdata.pl</code>的每个文件，文件名要求默认要求是以<code>perfdata</code>开头。这个perl脚本对应有一个配置文件<code>process_perfdata.cfg</code>，有较多的配置需要在这里修改。而脚本期望的每一行数据（这里假设我只使用<code>SERVICEPERFDATA</code>这个数据类型)包含如下字段，各个字段用<code>\t</code>分割，字段顺序没要求:<br><figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="label">DATATYPE</span>							值为SERVICEPERFDATA</span><br><span class="line"><span class="label">TIMET</span>								时间戳</span><br><span class="line"><span class="label">HOSTNAME</span>							域名或<span class="literal">ip</span></span><br><span class="line"><span class="label">SERVICEDESC</span>						服务描述</span><br><span class="line"><span class="label">SERVICEPERFDATA</span>					性能数据</span><br><span class="line"><span class="label">SERVICECHECKCOMMAND</span>				命令名，跟模板名一致，process_perfdata.pl使用它来匹配模板名</span><br></pre></td></tr></table></figure></p>
+<p>各个字段中，稍微复杂些的是「性能数据」<code>SERVICEPERFDATA</code>的格式，为：<code>&#39;label&#39;=value[UOM];[warn];[crit];[min];[max]</code>，可以包含多个性能数据，空格分割。<br><a href="http://docs.pnp4nagios.org/pnp-0.6/perfdata_format" target="_blank" rel="external">性能数据格式SERVICEPERFDATA</a>在pnp4nagios文档有详细描述。</p>
 <p>总的来说，假设有一个数据样例为:   </p>
 <ol>
 <li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::rta=92.412ms;200.000;500.000;0; pl=0%;40;80;; rtmax=97.281ms;;;; rtmin=86.727ms;;;;</li>
@@ -110,24 +110,14 @@ SERVICECHECKCOMMAND                命令名，跟模板名一致，process_perf
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -140,9 +130,6 @@ SERVICECHECKCOMMAND                命令名，跟模板名一致，process_perf
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2014/03/06/pnp4nagios的数据格式/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -151,6 +138,7 @@ SERVICECHECKCOMMAND                命令名，跟模板名一致，process_perf
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

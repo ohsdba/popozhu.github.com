@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">给hexo增加返回顶部链接</div> 
 		<small>
-		    <time datetime="2013-07-12T17:24:55.000Z" itemprop="datePublished">July 13th 2013</time>
+		    <time datetime="2013-07-12T17:24:55.000Z" itemprop="datePublished">July 13 2013</time>
 		</small>
 	    </div>
 	</header>
@@ -48,26 +54,26 @@
 <p>我使用的是hexo默认主题<code>light</code>，因此，当部署hexo之后，给hexo添加这么一个链接也是非常简单，主要是使用hexo的<code>alignleft</code>和<code>alignright</code>这2个css属性，大概做了实现:</p>
 <ol>
 <li><p>在blog目录下的<code>themes/light/layout/_partial/</code>增加一个新的ejs文件，比如为<code>totop.ejs</code>:   </p>
-<pre><code> &lt;div class=&quot;alignright&quot;&gt;
- &lt;a href=&quot;#&quot; id=&quot;returnTop&quot; 
-      style=&quot;text-decoration:none; bottom:-200px; position:fixed; text-align:center; width:14px; margin:8px;&quot;
-      onclick=&quot;javascript:$(&#39;html, body&#39;).animate({scrollTop: 0}, {queue:false, duration:10});&quot;&gt;↑回顶部&lt;/a&gt;
- &lt;/div&gt;
+<pre><code><span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"alignright"</span>&gt;</span>
+<span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"#"</span> <span class="attribute">id</span>=<span class="value">"returnTop"</span> 
+     <span class="attribute">style</span>=<span class="value">"text-decoration:none; bottom:-200px; position:fixed; text-align:center; width:14px; margin:8px;"</span>
+     <span class="attribute">onclick</span>=<span class="value">"javascript:$('html, body').animate({scrollTop: 0}, {queue:false, duration:10});"</span>&gt;</span>↑回顶部<span class="tag">&lt;/<span class="title">a</span>&gt;</span>
+<span class="tag">&lt;/<span class="title">div</span>&gt;</span>
 
- &lt;script type=&quot;text/javascript&quot;&gt;
- $(function(){
-     $(window).scroll(function () {
-         if ($(document).scrollTop() &gt;= 100) {
-             $(&#39;#returnTop&#39;).animate({bottom: &quot;105px&quot;}, { queue: false, duration: 10 }); 
-         } else {
-             $(&#39;#returnTop&#39;).animate({bottom: &quot;-200px&quot;}, { queue: false, duration: 10 }); 
-         }   
-     }); 
- }); 
- &lt;/script&gt;
+<span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/javascript"</span>&gt;</span><span class="javascript">
+$(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>{
+    $(<span class="built_in">window</span>).scroll(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>{
+        <span class="keyword">if</span> ($(<span class="built_in">document</span>).scrollTop() &gt;= <span class="number">100</span>) {
+            $(<span class="string">'#returnTop'</span>).animate({bottom: <span class="string">"105px"</span>}, { queue: <span class="literal">false</span>, duration: <span class="number">10</span> }); 
+        } <span class="keyword">else</span> {
+            $(<span class="string">'#returnTop'</span>).animate({bottom: <span class="string">"-200px"</span>}, { queue: <span class="literal">false</span>, duration: <span class="number">10</span> }); 
+        }   
+    }); 
+}); 
+</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span>
 </code></pre></li>
 <li><p>修改<code>themes/light/layout/_partial/article.ejs</code>文件，在最顶部增加<code>totop.ejs</code>的包含:</p>
-<pre><code> &lt;%- partial(&#39;totop&#39;) %&gt;
+<pre><code>&lt;<span class="preprocessor">%</span>- partial<span class="comment">('totop')</span> <span class="preprocessor">%</span>&gt;
 </code></pre></li>
 </ol>
 <p>注意，这里totop.ejs文件要求跟article.ejs在相同目录下，这是相对路径的用法。  </p>
@@ -116,24 +122,14 @@
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -146,9 +142,6 @@
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2013/07/13/给hexo增加返回顶部链接/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -157,6 +150,7 @@
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

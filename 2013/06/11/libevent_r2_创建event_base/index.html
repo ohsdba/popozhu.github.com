@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">Libevent创建event_base</div> 
 		<small>
-		    <time datetime="2013-06-11T13:39:43.000Z" itemprop="datePublished">June 11th 2013</time>
+		    <time datetime="2013-06-11T13:39:43.000Z" itemprop="datePublished">June 11 2013</time>
 		</small>
 	    </div>
 	</header>
@@ -64,36 +70,12 @@
 <p>用户可以通过设置环境变量来禁用某些后端。 比如你想要禁用kqueue这个后端， 可以通过设置<code>EVENT_NOKQUEUE</code>这个环境变量，其他的类似。如果你想在程序中禁用后端， 查看下面的<code>event_config_avoid_method()</code>.  </p>
 <p><br></p>
 <h2 id="event_base默认设置">event_base默认设置</h2><p>函数<code>event_base_new()</code>创建并返回一个带有默认设置的event_base。 它先检查你的环境变量，然后返回一个指针，指向这个新创建的event_base。 如果出现错误，返回一个NULL指针。  </p>
-<p>对于上面提到的不同后端，它会选择一个当前系统支持的最高效率的后端来创建event_base。  </p>
-<pre><code>struct event_base *event_base_new(void);
-</code></pre><p>对于多数程序，创建一个默认设置的event_base已经足够了。　　<br><code>event_base_new()</code>定义在头文件<code>&lt;event2/event.h&gt;</code>中，首次出现在Libevent 1.4.3.  </p>
+<p>对于上面提到的不同后端，它会选择一个当前系统支持的最高效率的后端来创建event_base。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">struct</span> event_base *<span class="title">event_base_new</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>对于多数程序，创建一个默认设置的event_base已经足够了。　　<br><code>event_base_new()</code>定义在头文件<code>&lt;event2/event.h&gt;</code>中，首次出现在Libevent 1.4.3.  </p>
 <p><br></p>
-<h2 id="event_base更多设置">event_base更多设置</h2><p>如果你想对于创建哪种event_base有更多操作，那需要使用event_config。 event_config这个数据结构屏蔽和封装了你对event_base的设置选项。   </p>
-<pre><code>struct event_config *event_config_new(void);
-struct event_base *event_base_new_with_config(const struct event_config *cfg);
-void event_config_free(struct event_config *cfg);
-</code></pre><p>先调用<code>event_config_new()</code>创建一个event_config，再对event_config调用其他函数来进行你的设置，最后调用<code>event_base_new_with_config()</code>来创建一个event_base。最后调用<code>event_config_free()</code>来释放event_config。  </p>
-<pre><code>int event_config_avoid_method(struct event_config *cfg, const char *method);
-
-enum event_method_feature {
-    EV_FEATURE_ET = 0x01,
-    EV_FEATURE_O1 = 0x02,
-    EV_FEATURE_FDS = 0x04,
-};
-int event_config_require_features(struct event_config *cfg,
-                                  enum event_method_feature feature);
-
-enum event_base_config_flag {
-    EVENT_BASE_FLAG_NOLOCK = 0x01,
-    EVENT_BASE_FLAG_IGNORE_ENV = 0x02,
-    EVENT_BASE_FLAG_STARTUP_IOCP = 0x04,
-    EVENT_BASE_FLAG_NO_CACHE_TIME = 0x08,
-    EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST = 0x10,
-    EVENT_BASE_FLAG_PRECISE_TIMER = 0x20
-};
-int event_config_set_flag(struct event_config *cfg,
-    enum event_base_config_flag flag);
-</code></pre><p>调用<code>event_config_avoid_method()</code>来忽略指定名称的后端。调用<code>event_config_require_feature()</code>来设置Libevent不要使用不满足一些特性的那些后端。调用<code>event_config_set_flag()</code>来告诉Libevent使用一个或多个运行时标识来创建event_base。  </p>
+<h2 id="event_base更多设置">event_base更多设置</h2><p>如果你想对于创建哪种event_base有更多操作，那需要使用event_config。 event_config这个数据结构屏蔽和封装了你对event_base的设置选项。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">struct</span> event_config *<span class="title">event_config_new</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">struct</span> event_base *<span class="title">event_base_new_with_config</span><span class="params">(<span class="keyword">const</span> <span class="keyword">struct</span> event_config *cfg)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">event_config_free</span><span class="params">(<span class="keyword">struct</span> event_config *cfg)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>先调用<code>event_config_new()</code>创建一个event_config，再对event_config调用其他函数来进行你的设置，最后调用<code>event_base_new_with_config()</code>来创建一个event_base。最后调用<code>event_config_free()</code>来释放event_config。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_config_avoid_method</span><span class="params">(<span class="keyword">struct</span> event_config *cfg, <span class="keyword">const</span> <span class="keyword">char</span> *method)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> event_method_feature &#123;</span><br><span class="line">    EV_FEATURE_ET = <span class="number">0x01</span>,</span><br><span class="line">    EV_FEATURE_O1 = <span class="number">0x02</span>,</span><br><span class="line">    EV_FEATURE_FDS = <span class="number">0x04</span>,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_config_require_features</span><span class="params">(<span class="keyword">struct</span> event_config *cfg,</span><br><span class="line">                                  <span class="keyword">enum</span> event_method_feature feature)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> event_base_config_flag &#123;</span><br><span class="line">    EVENT_BASE_FLAG_NOLOCK = <span class="number">0x01</span>,</span><br><span class="line">    EVENT_BASE_FLAG_IGNORE_ENV = <span class="number">0x02</span>,</span><br><span class="line">    EVENT_BASE_FLAG_STARTUP_IOCP = <span class="number">0x04</span>,</span><br><span class="line">    EVENT_BASE_FLAG_NO_CACHE_TIME = <span class="number">0x08</span>,</span><br><span class="line">    EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST = <span class="number">0x10</span>,</span><br><span class="line">    EVENT_BASE_FLAG_PRECISE_TIMER = <span class="number">0x20</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_config_set_flag</span><span class="params">(<span class="keyword">struct</span> event_config *cfg,</span><br><span class="line">    <span class="keyword">enum</span> event_base_config_flag flag)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>调用<code>event_config_avoid_method()</code>来忽略指定名称的后端。调用<code>event_config_require_feature()</code>来设置Libevent不要使用不满足一些特性的那些后端。调用<code>event_config_set_flag()</code>来告诉Libevent使用一个或多个运行时标识来创建event_base。  </p>
 <p><code>event_config_require_features</code>可使用的特性有：  </p>
 <ol>
 <li>EV_FEATURE_ET： 要求后端能支持边沿触发IO(edge-triggered IO)</li>
@@ -117,119 +99,35 @@ int event_config_set_flag(struct event_config *cfg,
 </ol>
 <p>上面设置event_config的函数，成功则返回0，失败返回-1。  </p>
 <p><strong>注意</strong><br>如果你通过event_config设置一个系统不支持的后端，那<code>event_base_new_with_config()</code>返回NULL指针。  </p>
-<pre><code>int event_config_set_num_cpus_hint(struct event_config *cfg, int cpus)
-</code></pre><p>这个函数目前只当Windows使用IOCP时才有用，未来也许用于其他系统。 调用他来告诉event_config后续创建的event_base应该在多线程中尝试充分使用cpu的多核。 注意event_base可能使用比你设置的更多或更少的cpu。    </p>
-<pre><code>int event_config_set_max_dispatch_interval(struct event_config *cfg,
-    const struct timeval *max_interval, int max_callbacks,
-    int min_priority);
-</code></pre><p>这个函数通过在检查高优先级事件之前，对低优先级回调函数可以被调用的次数进行限制，来防止优先级的逆转。如果最大时间间隔为空，则事件轮询会在每个回调之后检查时间；如果最大时间间隔不为空，则会在这个时间间隔之后重新扫描高优先级的事件。如果最多回调次数不为负数，那达到这个次数之后，事件继续轮询更多事件。这些规则适用于最小优先级或更高优先级的任何事件。</p>
-<h3 id="Example:_Preferring_edge-triggered_backends">Example: Preferring edge-triggered backends</h3><pre><code>struct event_config *cfg;
-struct event_base *base;
-int i;
-
-/* My program wants to use edge-triggered events if at all possible.  So
-   I&#39;ll try to get a base twice: Once insisting on edge-triggered IO, and
-   once not. */
-for (i=0; i&lt;2; ++i) {
-    cfg = event_config_new();
-
-    /* I don&#39;t like select. */
-    event_config_avoid_method(cfg, &quot;select&quot;);
-
-    if (i == 0)
-        event_config_require_features(cfg, EV_FEATURE_ET);
-
-    base = event_base_new_with_config(cfg);
-    event_config_free(cfg);
-    if (base)
-        break;
-
-    /* If we get here, event_base_new_with_config() returned NULL.  If
-       this is the first time around the loop, we&#39;ll try again without
-       setting EV_FEATURE_ET.  If this is the second time around the
-       loop, we&#39;ll give up. */
-}
-</code></pre><h3 id="Example:_Avoiding_priority-inversion">Example: Avoiding priority-inversion</h3><pre><code>struct event_config *cfg;
-struct event_base *base;
-
-cfg = event_config_new();
-if (!cfg)
-   /* Handle error */;
-
-/* I&#39;m going to have events running at two priorities.  I expect that
-   some of my priority-1 events are going to have pretty slow callbacks,
-   so I don&#39;t want more than 100 msec to elapse (or 5 callbacks) before
-   checking for priority-0 events. */
-struct timeval msec_100 = { 0, 100*1000 };
-event_config_set_max_dispatch_interval(cfg, &amp;msec_100, 5, 1);
-
-base = event_base_new_with_config(cfg);
-if (!base)
-   /* Handle error */;
-
-event_base_priority_init(base, 2);
-</code></pre><p>这些函数和类型定义在头文件<code>&lt;event2/event.h&gt;</code>。  </p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_config_set_num_cpus_hint</span><span class="params">(<span class="keyword">struct</span> event_config *cfg, <span class="keyword">int</span> cpus)</span></span></span><br></pre></td></tr></table></figure>
+<p>这个函数目前只当Windows使用IOCP时才有用，未来也许用于其他系统。 调用他来告诉event_config后续创建的event_base应该在多线程中尝试充分使用cpu的多核。 注意event_base可能使用比你设置的更多或更少的cpu。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_config_set_max_dispatch_interval</span><span class="params">(<span class="keyword">struct</span> event_config *cfg,</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">struct</span> timeval *max_interval, <span class="keyword">int</span> max_callbacks,</span><br><span class="line">    <span class="keyword">int</span> min_priority)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>这个函数通过在检查高优先级事件之前，对低优先级回调函数可以被调用的次数进行限制，来防止优先级的逆转。如果最大时间间隔为空，则事件轮询会在每个回调之后检查时间；如果最大时间间隔不为空，则会在这个时间间隔之后重新扫描高优先级的事件。如果最多回调次数不为负数，那达到这个次数之后，事件继续轮询更多事件。这些规则适用于最小优先级或更高优先级的任何事件。</p>
+<h3 id="Example:_Preferring_edge-triggered_backends">Example: Preferring edge-triggered backends</h3><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">struct event_config *cfg;</span><br><span class="line">struct event_base *base;</span><br><span class="line">int i;</span><br><span class="line"></span><br><span class="line">/* My program wants <span class="keyword">to</span> use edge-triggered events <span class="keyword">if</span> <span class="keyword">at</span> all possible.  So</span><br><span class="line">   I'll <span class="keyword">try</span> <span class="keyword">to</span> <span class="keyword">get</span> a base twice: Once insisting <span class="function_start"><span class="keyword">on</span></span> edge-triggered IO, <span class="keyword">and</span></span><br><span class="line">   once <span class="keyword">not</span>. */</span><br><span class="line"><span class="keyword">for</span> (i=<span class="number">0</span>; i&lt;<span class="number">2</span>; ++i) &#123;</span><br><span class="line">    cfg = event_config_new();</span><br><span class="line"></span><br><span class="line">    /* I don't like select. */</span><br><span class="line">    event_config_avoid_method(cfg, <span class="string">"select"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (i == <span class="number">0</span>)</span><br><span class="line">        event_config_require_features(cfg, EV_FEATURE_ET);</span><br><span class="line"></span><br><span class="line">    base = event_base_new_with_config(cfg);</span><br><span class="line">    event_config_free(cfg);</span><br><span class="line">    <span class="keyword">if</span> (base)</span><br><span class="line">        break;</span><br><span class="line"></span><br><span class="line">    /* If we <span class="keyword">get</span> here, event_base_new_with_config() returned NULL.  If</span><br><span class="line">       this <span class="keyword">is</span> <span class="keyword">the</span> <span class="keyword">first</span> <span class="property">time</span> <span class="keyword">around</span> <span class="keyword">the</span> loop, we'll <span class="keyword">try</span> again <span class="keyword">without</span></span><br><span class="line">       setting EV_FEATURE_ET.  If this <span class="keyword">is</span> <span class="keyword">the</span> <span class="keyword">second</span> <span class="property">time</span> <span class="keyword">around</span> <span class="keyword">the</span></span><br><span class="line">       loop, we'll give up. */</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Example:_Avoiding_priority-inversion">Example: Avoiding priority-inversion</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> event_config *cfg;</span><br><span class="line"><span class="keyword">struct</span> event_base *base;</span><br><span class="line"></span><br><span class="line">cfg = event_config_new();</span><br><span class="line"><span class="keyword">if</span> (!cfg)</span><br><span class="line">   <span class="comment">/* Handle error */</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* I'm going to have events running at two priorities.  I expect that</span><br><span class="line">   some of my priority-1 events are going to have pretty slow callbacks,</span><br><span class="line">   so I don't want more than 100 msec to elapse (or 5 callbacks) before</span><br><span class="line">   checking for priority-0 events. */</span></span><br><span class="line"><span class="keyword">struct</span> timeval msec_100 = &#123; <span class="number">0</span>, <span class="number">100</span>*<span class="number">1000</span> &#125;;</span><br><span class="line">event_config_set_max_dispatch_interval(cfg, &amp;msec_100, <span class="number">5</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">base = event_base_new_with_config(cfg);</span><br><span class="line"><span class="keyword">if</span> (!base)</span><br><span class="line">   <span class="comment">/* Handle error */</span>;</span><br><span class="line"></span><br><span class="line">event_base_priority_init(base, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<p>这些函数和类型定义在头文件<code>&lt;event2/event.h&gt;</code>。  </p>
 <p>标识<code>EVENT_BASE_FLAG_IGNORE_ENV</code>首先出现在Libevent 2.0.2-alpha。<br>标识<code>EVENT_BASE_FLAG_PRECISE_TIMER</code>首次出现在Libevent 2.1.2-alpha。<br>函数<code>event_config_set_num_cpus_hint()</code>是在Libevent 2.0.7-rc才有，以及函数<code>event_config_set_max_dispatch_interval()</code>首先出现在2.1.1-alpha。<br>其他的则都是首次出现在Libevent 2.0.1-alpha。  </p>
 <p><br></p>
-<h2 id="检查event_base的后端函数">检查event_base的后端函数</h2><p>有时你想查看event_base有哪些特性，或者event_base使用了哪个后端函数。  </p>
-<pre><code>const char **event_get_supported_methods(void);
-</code></pre><p>函数返回一个数组指针，数组包含当前Libevent支持的后端函数。数组最后一个元素是NULL指针。  </p>
-<h4 id="Example">Example</h4><pre><code>int i;
-const char **methods = event_get_supported_methods();
-printf(&quot;Starting Libevent %s.  Available methods are:\n&quot;,
-    event_get_version());
-for (i=0; methods[i] != NULL; ++i) {
-    printf(&quot;    %s\n&quot;, methods[i]);
-}
-</code></pre><p><strong>注意</strong>: 这个函数返回的是Libevent编译中支持的后端函数列表，</p>
-<h3 id="Inteface">Inteface</h3><pre><code>const char *event_base_get_method(const struct event_base *base);
-enum event_method_feature event_base_get_features(const struct event_base *base);
-</code></pre><p><code>event_base_get_method()</code>返回event_base实际使用的后端函数。<br><code>The event_base_get_features()</code>返回一个位掩码，标识event_base支持的特性。  </p>
-<h4 id="Example-1">Example</h4><pre><code>struct event_base *base;
-enum event_method_feature f;
-
-base = event_base_new();
-if (!base) {
-    puts(&quot;Couldn&#39;t get an event_base!&quot;);
-} else {
-    printf(&quot;Using Libevent with backend method %s.&quot;,
-        event_base_get_method(base));
-    f = event_base_get_features(base);
-    if ((f &amp; EV_FEATURE_ET))
-        printf(&quot;  Edge-triggered events are supported.&quot;);
-    if ((f &amp; EV_FEATURE_O1))
-        printf(&quot;  O(1) event notification is supported.&quot;);
-    if ((f &amp; EV_FEATURE_FDS))
-        printf(&quot;  All FD types are supported.&quot;);
-    puts(&quot;&quot;);
-}
-</code></pre><p><br></p>
-<h2 id="释放event_base">释放event_base</h2><p>event_base不再使用时，你可以释放它.  </p>
-<pre><code>void event_base_free(struct event_base *base);
-</code></pre><p>注意这个函数并不会同时释放当前关联在这个event_base上的事件，不会关闭任何socket。  </p>
+<h2 id="检查event_base的后端函数">检查event_base的后端函数</h2><p>有时你想查看event_base有哪些特性，或者event_base使用了哪个后端函数。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">const</span> <span class="keyword">char</span> **<span class="title">event_get_supported_methods</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>函数返回一个数组指针，数组包含当前Libevent支持的后端函数。数组最后一个元素是NULL指针。  </p>
+<h4 id="Example">Example</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> **methods = event_get_supported_methods();</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"Starting Libevent %s.  Available methods are:\n"</span>,</span><br><span class="line">    event_get_version());</span><br><span class="line"><span class="keyword">for</span> (i=<span class="number">0</span>; methods[i] != <span class="literal">NULL</span>; ++i) &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"    %s\n"</span>, methods[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>注意</strong>: 这个函数返回的是Libevent编译中支持的后端函数列表，</p>
+<h3 id="Inteface">Inteface</h3><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> *event_base_get_method(<span class="keyword">const</span> <span class="keyword">struct</span> event_base *<span class="keyword">base</span>);</span><br><span class="line"><span class="function"><span class="keyword">enum</span> event_method_feature <span class="title">event_base_get_features</span>(<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br></pre></td></tr></table></figure>
+<p><code>event_base_get_method()</code>返回event_base实际使用的后端函数。<br><code>The event_base_get_features()</code>返回一个位掩码，标识event_base支持的特性。  </p>
+<h4 id="Example-1">Example</h4><figure class="highlight openscad"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">struct event_base <span class="built_in">*</span>base;</span><br><span class="line">enum event_method_feature f;</span><br><span class="line"></span><br><span class="line">base = event_base_new<span class="params">()</span>;</span><br><span class="line"><span class="keyword">if</span> <span class="params">(!base)</span> &#123;</span><br><span class="line">    puts<span class="params">(<span class="string">"Couldn't get an event_base!"</span>)</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    printf<span class="params">(<span class="string">"Using Libevent with backend method %s."</span>,</span><br><span class="line">        event_base_get_method<span class="params">(base)</span>)</span>;</span><br><span class="line">    f = event_base_get_features<span class="params">(base)</span>;</span><br><span class="line">    <span class="keyword">if</span> <span class="params">(<span class="params">(f &amp; EV_FEATURE_ET)</span>)</span></span><br><span class="line">        printf<span class="params">(<span class="string">"  Edge-triggered events are supported."</span>)</span>;</span><br><span class="line">    <span class="keyword">if</span> <span class="params">(<span class="params">(f &amp; EV_FEATURE_O1)</span>)</span></span><br><span class="line">        printf<span class="params">(<span class="string">"  O(1) event notification is supported."</span>)</span>;</span><br><span class="line">    <span class="keyword">if</span> <span class="params">(<span class="params">(f &amp; EV_FEATURE_FDS)</span>)</span></span><br><span class="line">        printf<span class="params">(<span class="string">"  All FD types are supported."</span>)</span>;</span><br><span class="line">    puts<span class="params">(<span class="string">""</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<h2 id="释放event_base">释放event_base</h2><p>event_base不再使用时，你可以释放它.<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">event_base_free</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>注意这个函数并不会同时释放当前关联在这个event_base上的事件，不会关闭任何socket。  </p>
 <p><br></p>
 <h2 id="设置event_base优先级">设置event_base优先级</h2><p>Libevent支持对一个event设置多个优先顺序，但是默认上一个event_base只支持一个优先等级。你可以调用<code>event_base_priority_init()</code>来设置event_base的优先级。  </p>
-<pre><code>int event_base_priority_init(struct event_base *base, int n_priorities);
-</code></pre><p>成功返回0，否则返回-1。 参数base指event_base，n_priorities是优先级对应的数字，至少为1。<br>新创建的事件的优先级则是从最重要的0到不重要的-1.<br>有一个常量<code>EVENT_MAX_PRIORITIES</code>, 是参数n_priorities的最大值，n_priorities不能超过这个值。<br><strong>注意</strong>： 你必须在激活任何事件之前调用这个函数，最好是在event_base创建之后马上调用。  </p>
-<pre><code>int event_base_get_npriorities(struct event_base *base);
-</code></pre><p>返回event_base的优先等级。例如：如果返回3，则有效的优先顺序范围为0，1，2.<br>新创建的事件关联到这个event_base后，事件的默认优先级初始化为<code>n_priorities / 2</code>.  </p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_priority_init</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span>, <span class="keyword">int</span> n_priorities</span>)</span>;</span><br></pre></td></tr></table></figure>
+<p>成功返回0，否则返回-1。 参数base指event_base，n_priorities是优先级对应的数字，至少为1。<br>新创建的事件的优先级则是从最重要的0到不重要的-1.<br>有一个常量<code>EVENT_MAX_PRIORITIES</code>, 是参数n_priorities的最大值，n_priorities不能超过这个值。<br><strong>注意</strong>： 你必须在激活任何事件之前调用这个函数，最好是在event_base创建之后马上调用。  </p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_get_npriorities</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br></pre></td></tr></table></figure>
+<p>返回event_base的优先等级。例如：如果返回3，则有效的优先顺序范围为0，1，2.<br>新创建的事件关联到这个event_base后，事件的默认优先级初始化为<code>n_priorities / 2</code>.  </p>
 <p><br></p>
-<h2 id="fock()之后重新初始化event_base">fock()之后重新初始化event_base</h2><p>在fork()之后并不是所有的事件后端都能保持干净，所以，如果你的程序使用fork()或者相关联的系统调用来开始一个新的进程，而且你想继续使用之前的event_base，那你需要重新初始化event_base。  </p>
-<pre><code>int event_reinit(struct event_base *base);
-</code></pre><p>成功返回0，失败返回-1。  </p>
-<h4 id="Example-2">Example</h4><pre><code>struct event_base *base = event_base_new();
-
-/* ... add some events to the event_base ... */
-
-if (fork()) {
-    /* In parent */
-    continue_running_parent(base); /*...*/
-} else {
-    /* In child */
-    event_reinit(base);
-    continue_running_child(base); /*...*/
-}
-</code></pre><p><br></p>
+<h2 id="fock()之后重新初始化event_base">fock()之后重新初始化event_base</h2><p>在fork()之后并不是所有的事件后端都能保持干净，所以，如果你的程序使用fork()或者相关联的系统调用来开始一个新的进程，而且你想继续使用之前的event_base，那你需要重新初始化event_base。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_reinit</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>成功返回0，失败返回-1。  </p>
+<h4 id="Example-2">Example</h4><figure class="highlight openscad"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">struct event_base <span class="built_in">*</span>base = event_base_new<span class="params">()</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* ... add some events to the event_base ... */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="params">(fork<span class="params">()</span>)</span> &#123;</span><br><span class="line">    <span class="comment">/* In parent */</span></span><br><span class="line">    continue_running_parent<span class="params">(base)</span>; <span class="comment">/*...*/</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">/* In child */</span></span><br><span class="line">    event_reinit<span class="params">(base)</span>;</span><br><span class="line">    continue_running_child<span class="params">(base)</span>; <span class="comment">/*...*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><br></p>
 <h2 id="不再使用event_base这个函数">不再使用event_base这个函数</h2><p>以前使用的是<code>struct event_base *event_init(void);</code><br>解释略。</p>
 <p><br><br>– EOF –</p>
 
@@ -275,24 +173,14 @@ if (fork()) {
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -305,9 +193,6 @@ if (fork()) {
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2013/06/11/libevent_r2_创建event_base/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -316,6 +201,7 @@ if (fork()) {
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

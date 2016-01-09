@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">OS X 自带的词典</div> 
 		<small>
-		    <time datetime="2014-08-09T14:20:53.000Z" itemprop="datePublished">August 9th 2014</time>
+		    <time datetime="2014-08-09T14:20:53.000Z" itemprop="datePublished">August 9 2014</time>
 		</small>
 	    </div>
 	</header>
@@ -74,61 +80,61 @@
 <p>另外需要为该功能添加一个快捷键，通过另一个firefox扩展<code>keyconfig</code>，为上面的功能分配一个快捷键<code>⌂+⌘+d</code>，该快捷键不能跟系统/firefox已有的冲突。</p>
 <p><hr><br>第一步，在firefox地址栏里输入<code>about:support</code>打开support页面，在<code>Application Basics - Profile Folder</code>项目里，有一个<code>Show in Finder</code>的按钮，通过它打开firefox当前的配置文件夹。在extensions目录下可找到已安装的macosxdictionary扩展，复制到其他地方。</p>
 <pre><code>.
-└── uldw6wyn.default
+└── uldw6wyn<span class="class">.default</span>
    ├── extensions
-   │   ├── macosxdictionary@micheldalal.com.xpi
+   │   ├── macosxdictionary@micheldalal<span class="class">.com</span><span class="class">.xpi</span>
 </code></pre><p>把<code>macosxdictionary@micheldalal.com.xpi</code>的xpi后缀修改为zip，解压，按如下路径找到<code>macosxdictionary.js</code>，它里面包含了实现第一步的js代码，我直接拿来使用了。</p>
-<pre><code>macosxdictionary@micheldalal.com
+<pre><code>macosxdictionary@micheldalal<span class="class">.com</span>
 ├── defaults
 │   └── preferences
 │       └── macosxdictionary.js
 </code></pre><p>提取的js代码如下，在下一步的<code>keyconfig</code>中将会使用到它。</p>
-<pre><code>function getSelectedText()
-{
+<pre><code><span class="function"><span class="keyword">function</span> <span class="title">getSelectedText</span><span class="params">()</span>
+{</span>
     var node, focusedWindow;
     var selection;
 
-    selection = &quot;&quot;;
+    selection = <span class="string">""</span>;
     node = document.popupNode;
-    if ( ( node instanceof HTMLTextAreaElement ) || ( node instanceof HTMLInputElement &amp;&amp; node.nodeType == Node.TEXT_NODE ) )
+    <span class="keyword">if</span> <span class="params">( <span class="params">( node instanceof HTMLTextAreaElement )</span> || <span class="params">( node instanceof HTMLInputElement &amp;&amp; node.nodeType == Node.TEXT_NODE )</span> )</span>
     {
-        selection = node.value.substring( node.selectionStart, node.selectionEnd );
+        selection = node.value.substring<span class="params">( node.selectionStart, node.selectionEnd )</span>;
     }
-    else
+    <span class="keyword">else</span>
     {
-        focusedWindow = new XPCNativeWrapper( document.commandDispatcher.focusedWindow, &#39;document&#39;, &#39;getSelection()&#39; );
-        selection = focusedWindow.getSelection().toString();
+        focusedWindow = new XPCNativeWrapper<span class="params">( document.commandDispatcher.focusedWindow, 'document', 'getSelection<span class="params">()</span>' )</span>;
+        selection = focusedWindow.getSelection<span class="params">()</span>.toString<span class="params">()</span>;
     }
 
-    selection = selection.replace(/(\n|\r|\t|(\r\n))+/g, &quot; &quot;);
+    selection = selection.replace<span class="params">(/<span class="params">(\n|\r|\t|<span class="params">(\r\n)</span>)</span>+/g, <span class="string">" "</span>)</span>;
 
-    // Trim the value(remove the space at the beginning and the end)
-    selection = selection.replace(/(^\s+)|(\s+$)/g, &quot;&quot;);
-    selection = selection.split(&quot; &quot;);
-    selection = selection.join(&quot; &quot;);
+    <span class="comment">// Trim the value(remove the space at the beginning and the end)</span>
+    selection = selection.replace<span class="params">(/<span class="params">(^\s+)</span>|<span class="params">(\s+$)</span>/g, <span class="string">""</span>)</span>;
+    selection = selection.split<span class="params">(<span class="string">" "</span>)</span>;
+    selection = selection.join<span class="params">(<span class="string">" "</span>)</span>;
 
     return selection;
 }
 
-var selectedText = getSelectedText();
+var selectedText = getSelectedText<span class="params">()</span>;
 
-// Open the dictionary application
+<span class="comment">// Open the dictionary application</span>
 
-// create an nsILocalFile for the executable
-var file = Components.classes[ &quot;@mozilla.org/file/local;1&quot; ].createInstance( Components.interfaces.nsILocalFile );
-file.initWithPath( &quot;/usr/bin/open&quot; );
+<span class="comment">// create an nsILocalFile for the executable</span>
+var file = Components.classes[ <span class="string">"@mozilla.org/file/local;1"</span> ].createInstance<span class="params">( Components.interfaces.nsILocalFile )</span>;
+file.initWithPath<span class="params">( <span class="string">"/usr/bin/open"</span> )</span>;
 
-// create an nsIProcess
-var process = Components.classes[ &quot;@mozilla.org/process/util;1&quot; ].createInstance( Components.interfaces.nsIProcess );
-process.init(file);
+<span class="comment">// create an nsIProcess</span>
+var process = Components.classes[ <span class="string">"@mozilla.org/process/util;1"</span> ].createInstance<span class="params">( Components.interfaces.nsIProcess )</span>;
+process.init<span class="params">(file)</span>;
 
-// Run the process.
-// If first param is true, calling thread will be blocked until
-// called process terminates.
-// Second and third params are used to pass command-line arguments
-// to the process.
-var args = [ &quot;dict:///&quot; + selectedText ];
-process.run(false, args, args.length);
+<span class="comment">// Run the process.</span>
+<span class="comment">// If first param is true, calling thread will be blocked until</span>
+<span class="comment">// called process terminates.</span>
+<span class="comment">// Second and third params are used to pass command-line arguments</span>
+<span class="comment">// to the process.</span>
+var args = [ <span class="string">"dict:///"</span> + selectedText ];
+process.run<span class="params">(<span class="literal">false</span>, args, args.length)</span>;
 </code></pre><p>每种文件有一个默认的打开app，<code>/usr/bin/open</code>会调用默认的app来打开该文件。<code>&quot;dict:///&quot; + selectedText</code>则告诉系统「词典」要对selectedText进行翻译。</p>
 <p><hr><br>安装了<code>keyconfig</code>扩展后，打开它的配置。</p>
 <ol>
@@ -191,24 +197,14 @@ process.run(false, args, args.length);
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -221,9 +217,6 @@ process.run(false, args, args.length);
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2014/08/09/os-x-自带的字典/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -232,6 +225,7 @@ process.run(false, args, args.length);
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

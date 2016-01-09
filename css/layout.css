@@ -19,7 +19,14 @@ a:hover {
 }
 .banner {
   font-size: 3rem;
+  margin-top: 1rem;
 }
 .banner .site-subtitle {
   font-size: 1rem;
+}
+.banner .banner-right {
+  font-size: 1.5rem;
+}
+.banner .banner-item {
+  margin-left: 0.3rem;
 }

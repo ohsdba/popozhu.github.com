@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">代码差异对比</div> 
 		<small>
-		    <time datetime="2014-01-15T14:53:49.000Z" itemprop="datePublished">January 15th 2014</time>
+		    <time datetime="2014-01-15T14:53:49.000Z" itemprop="datePublished">January 15 2014</time>
 		</small>
 	    </div>
 	</header>
@@ -46,27 +52,17 @@
 	    <p>使用Versions也有一个多月，平时用于查看小组内其他同学提交的代码修改。在Versions添加svn仓库的url到它的书签Bookmarks列表里（我按项目添加，一个项目一条书签），点击书签栏里的某个项目，Versions从远方的svn仓库拉取最近的svn commit列表，每次commit包含<code>1~n</code>个文件，点击其中一个文件，Versions调用外部的「比较软件」，查看该次commit和上一个commit之前的差异。在这里，我并没有使用Versions来管理我本地的svn仓库代码，因为我本地的svn版本太高了，超出Versions的支持，哎，我不觉得最新版的svn修改文件协议是一个多么必须的事情，在这个大家越来越多使用git的年代里。</p>
 <p>用于比较的软件我只使用免费的，这在Mac上可选择的就不多了，一个是FileMerge， 一个是DiffMerge。  </p>
 <p>前者打开一个文件的速度实在是惨不忍睹，卡、卡。。卡死了，烦，不再用。后者DiffMerge还可以，虽然打开慢了一些，但显示差异的效果还不错。到了昨天，突然想起，不对呀，Sublime txt打开一个文件的速度这么快，DiffMerge打开2个文件相比之下，实在是太慢了，不可忍受。  </p>
-<p>尝试用Sublime txt来比较文件，找到一个package: <code>Sublimerge</code>，虽然Sublime Txt有个命令行工具<code>subl</code>，可以用来打开多个文件，可惜不懂python，暂时没有方法在subl打开两个文件之后，再调用<code>Sublimerge</code>进行文件对比，只能放弃。</p>
-<pre><code>/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl [files]
-</code></pre><p><hr><br>回到万能的vim吧，<code>vim -d [files]</code>，简单，有效，直接。那个谁，再也不用担心我在打开大文件时等得无聊了，还不用担心编码的问题。  </p>
-<p>1.安装macvim.app</p>
-<pre><code>sudo port install MacVim
-</code></pre><p>安装后，MacVim.app位于<code>/Applications/MacPorts/MacVim.app</code>，不会跟我已有的vim配置文件<code>~/.vimrc</code>冲突，nice :)  </p>
+<p>尝试用Sublime txt来比较文件，找到一个package: <code>Sublimerge</code>，虽然Sublime Txt有个命令行工具<code>subl</code>，可以用来打开多个文件，可惜不懂python，暂时没有方法在subl打开两个文件之后，再调用<code>Sublimerge</code>进行文件对比，只能放弃。<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/Applications/</span>Sublime Text.app<span class="regexp">/Contents/</span>SharedSupport<span class="regexp">/bin/</span>subl [files]</span><br></pre></td></tr></table></figure></p>
+<p><hr><br>回到万能的vim吧，<code>vim -d [files]</code>，简单，有效，直接。那个谁，再也不用担心我在打开大文件时等得无聊了，还不用担心编码的问题。  </p>
+<p>1.安装macvim.app<br><figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">sudo</span> <span class="foreign"><span class="keyword">port</span> install MacVim</span></span><br></pre></td></tr></table></figure></p>
+<p>安装后，MacVim.app位于<code>/Applications/MacPorts/MacVim.app</code>，不会跟我已有的vim配置文件<code>~/.vimrc</code>冲突，nice :)  </p>
 <p>2.类似<code>subl</code>，通过<code>mvim</code>可以在脚本或命令行下启动MacVim.app，由于我是用port来安装MacVim.app，其路径在<code>/opt/local/bin/mvim</code>，它也是一个脚本，在启动MacVim.app前做一些检查和判断罢了。     </p>
-<p>3.在Versions中添加「对比的脚本」，脚本的位置在Versions的目录下~/Library/Application Support/Versions/Compare Scripts，cd到这个目录，添加对比脚本<code>mvimdiff.sh</code></p>
-<pre><code>popozhu ~/Library/Application Support/Versions/Compare Scripts$ cat mvimdiff.sh
-#!/bin/bash
-
-export HOME=/usr/share/vim
-/opt/local/bin/mvim -d &quot;$@&quot;
-</code></pre><p>按Versions的说明，目前它支持3个参数，前两个参数是要对比的两个文件，第3个参数指定一个文件，保存前两个文件的差异「整合」后的最终版本。<br>当Versions调用到<code>mvimdiff.sh</code>时，它会传递2个文件给到shell脚本，在shell中再通过数组<code>$@</code>传递给<code>mvim</code>，mvim再传递给MacVim.app。  </p>
+<p>3.在Versions中添加「对比的脚本」，脚本的位置在Versions的目录下~/Library/Application Support/Versions/Compare Scripts，cd到这个目录，添加对比脚本<code>mvimdiff.sh</code><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~/Library/Application Support/Versions/Compare Scripts$ cat mvimdiff.sh</span><br><span class="line"><span class="shebang">#!/bin/bash</span><br><span class="line"></span></span><br><span class="line"><span class="built_in">export</span> HOME=/usr/share/vim</span><br><span class="line">/opt/<span class="built_in">local</span>/bin/mvim <span class="operator">-d</span> <span class="string">"<span class="variable">$@</span>"</span></span><br></pre></td></tr></table></figure></p>
+<p>按Versions的说明，目前它支持3个参数，前两个参数是要对比的两个文件，第3个参数指定一个文件，保存前两个文件的差异「整合」后的最终版本。<br>当Versions调用到<code>mvimdiff.sh</code>时，它会传递2个文件给到shell脚本，在shell中再通过数组<code>$@</code>传递给<code>mvim</code>，mvim再传递给MacVim.app。  </p>
 <p>4.重启Versions，在配置中选择<code>mvimdiff.sh</code>来进行文件差异对比</p>
 <p><img src="/img/2014/QQ20140115-1.png" alt="配置"></p>
-<p>5.遇到一个问题，查看文件对比后想退出MacVim.app时（<code>shift+command+w</code>退出窗口），总提示<code>Can&#39;t write viminfo file $HOME/.viminfo</code>，所以在<code>mvimdiff.sh</code>export了一下<code>HOME</code>环境变量，然后到<code>/usr/share/vim</code>touch新增一个空文件<code>.viminfo</code>，再修改这个文件的文件为组用户可写：</p>
-<pre><code>popozhu ~$ cd /usr/share/vim
-popozhu /usr/share/vim$ sudo touch .viminfo
-popozhu /usr/share/vim$ sudo chmod u=rw,go=rw .viminfo
-</code></pre><p>搞定，收工。</p>
+<p>5.遇到一个问题，查看文件对比后想退出MacVim.app时（<code>shift+command+w</code>退出窗口），总提示<code>Can&#39;t write viminfo file $HOME/.viminfo</code>，所以在<code>mvimdiff.sh</code>export了一下<code>HOME</code>环境变量，然后到<code>/usr/share/vim</code>touch新增一个空文件<code>.viminfo</code>，再修改这个文件的文件为组用户可写：<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~$ <span class="keyword">cd</span> /usr/share/<span class="keyword">vim</span></span><br><span class="line">popozhu /usr/share/<span class="keyword">vim</span>$ sudo touch .viminfo</span><br><span class="line">popozhu /usr/share/<span class="keyword">vim</span>$ sudo chmod <span class="keyword">u</span>=rw,<span class="keyword">go</span>=rw .viminfo</span><br></pre></td></tr></table></figure></p>
+<p>搞定，收工。</p>
 <p><br><br>– EOF –</p>
 
 	
@@ -111,24 +107,14 @@ popozhu /usr/share/vim$ sudo chmod u=rw,go=rw .viminfo
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -141,9 +127,6 @@ popozhu /usr/share/vim$ sudo chmod u=rw,go=rw .viminfo
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2014/01/15/代码差异对比/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -152,6 +135,7 @@ popozhu /usr/share/vim$ sudo chmod u=rw,go=rw .viminfo
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">安装Phabricato</div> 
 		<small>
-		    <time datetime="2013-11-16T16:27:20.000Z" itemprop="datePublished">November 17th 2013</time>
+		    <time datetime="2013-11-16T16:27:20.000Z" itemprop="datePublished">November 17 2013</time>
 		</small>
 	    </div>
 	</header>
@@ -46,120 +52,16 @@
 	    
 
 	    <p>翻了一下介绍文档，facebook的一个代码审核工具<code>phabricator</code>可以方便我们代码走查，可以在web页面查看每次commit的修改内容，可以方便添加修改意见和评论，目前我们也只是一些简单的需要。<br>刚刚在我自己的笔记本上做了安装，为了后续备忘，简单整理了一下，以下是安装过程，系统为OS X.</p>
-<h3 id="安装">安装</h3><p>使用已有webserver根目录，安装路径为：<code>/Library/WebServer/Documents</code></p>
-<pre><code>popozhu ~$ cd /Library/WebServer/Documents
-popozhu /Library/WebServer/Documents$ sudo git clone git://github.com/facebook/libphutil.git
-popozhu /Library/WebServer/Documents$ sudo git clone git://github.com/facebook/arcanist.git
-popozhu /Library/WebServer/Documents$ sudo git clone git://github.com/facebook/phabricator.git
-</code></pre><h3 id="域名">域名</h3><p>选取本地域名: <code>my.pha.com</code><br>写入hosts</p>
-<pre><code>popozhu ~$ grep pha.com /etc/hosts
-127.0.0.1   my.pha.com
-</code></pre><h3 id="web端软件">web端软件</h3><p>使用的组合是： nginx + php-fpm + mysql， 都是之前安装的，直接使用。</p>
-<h4 id="1-_mysql">1. mysql</h4><p>启动mysql，使用的帐号是root，密码是我的system-login-in-psssword（好像是以前安装mysql默认设置的），导入phabricator的db到mysql:</p>
-<pre><code>popozhu ~$ cd /Library/WebServer/Documents/phabricator
-popozhu /Library/WebServer/Documents/phabricator$ sudo ./bin/storage upgrade -uroot -p{system-login-in-password}
-
-popozhu ~$ mysql -uroot -p***
-mysql&gt; show databases like &#39;pha%&#39;;    // 导入了40个db
-+--------------------------+
-| Database (pha%)          |
-+--------------------------+
-| phabricator_audit        |
-| phabricator_auth         |
-| phabricator_cache        |
-| phabricator_calendar     |
-| phabricator_chatlog      |
-| phabricator_conduit      |
-......
-</code></pre><p>导入mysql的密码到配置中</p>
-<pre><code>popozhu ~$ cd /Library/WebServer/Documents/phabricator
-popozhu /Library/WebServer/Documents/phabricator$ sudo ./bin/config set mysql.pass ***
-
-popozhu /Library/WebServer/Documents/phabricator$ ./bin/config get mysql.pass // 查看配置项
-{
-  &quot;config&quot; : [
-    {
-      &quot;key&quot;    : &quot;mysql.pass&quot;,
-      &quot;source&quot; : &quot;local&quot;,
-      &quot;value&quot;  : &quot;***&quot;
-    }
-  ]
-}
-</code></pre><p>顺便导入自定义的uri</p>
-<pre><code>popozhu /Library/WebServer/Documents/phabricator$ sudo ./bin/config set phabricator.base-uri &quot;http://my.pha.com&quot;
-Set &#39;phabricator.base-uri&#39; in local configuration.
-
-popozhu /Library/WebServer/Documents/phabricator$ ./bin/config get phabricator.base-uri
-{
-  &quot;config&quot; : [
-    {
-      &quot;key&quot;    : &quot;phabricator.base-uri&quot;,
-      &quot;source&quot; : &quot;local&quot;,
-      &quot;value&quot;  : &quot;http:\/\/my.pha.com&quot;
-    }
-  ]
-}
-</code></pre><h4 id="2-_php_fpm">2. php_fpm</h4><p>启动php-fpm</p>
-<pre><code>popozhu ~$ sudo cp /private/etc/php-fpm.conf.default /private/etc/php-fpm.conf
-popozhu ~$ sudo /usr/sbin/php-fpm    // 若启动报错，根据报错信息修改配置文件
-
-popozhu ~$ netstat -an | grep 9000
-tcp4       0      0  127.0.0.1.9000         *.*                    LISTEN        // 9000端口已经在监听了
-</code></pre><h4 id="3-_nginx">3. nginx</h4><p>配置nginx，使用指导页面上的内容，写入nginx配置文件<code>/opt/local/conf/nginx.conf</code></p>
-<pre><code>    server {        
-        # 自定义的本地host
-        server_name  my.pha.com;
-        # phabricator的根目录
-        root    /Library/WebServer/Documents/phabricator/webroot;
-
-        try_files $uri $uri/ /index.php;
-
-        location / {
-            index   index.php;
-
-            if ( !-f $request_filename )
-            {
-                rewrite ^/(.*)$ /index.php?__path__=/$1 last;
-                break;
-            }
-        }
-
-        location /index.php {
-            fastcgi_pass   localhost:9000;
-            fastcgi_index   index.php;
-
-            #required if PHP was built with --enable-force-cgi-redirect
-            fastcgi_param  REDIRECT_STATUS    200;
-
-            #variables to make the $_SERVER populate in PHP
-            fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
-            fastcgi_param  QUERY_STRING       $query_string;
-            fastcgi_param  REQUEST_METHOD     $request_method;
-            fastcgi_param  CONTENT_TYPE       $content_type;
-            fastcgi_param  CONTENT_LENGTH     $content_length;
-
-            fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
-
-            fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
-            fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
-
-            fastcgi_param  REMOTE_ADDR        $remote_addr;
-        }
-
-        # redirect server error pages to the static page /50x.html
-        #
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   html;
-        }
-    }
-</code></pre><p>然后启动nginx</p>
-<pre><code>popozhu ~$ sudo nginx -s quit
-popozhu ~$ sudo nginx
-popozhu ~$ ps -ef | grep nginx | grep -v grep
-    0 32373     1   0 11:50下午 ??         0:00.00 nginx: master process nginx
-   -2 32374 32373   0 11:50下午 ??         0:00.01 nginx: worker process
-</code></pre><p>最后，浏览器输入my.pha.com，提示完成安装，建立admin帐号，还有5个问题需要配置，算了，明天吧。<br><img src="/img/2013/snapshot_2013-11-17_12.19.05.png" alt="界面"></p>
+<h3 id="安装">安装</h3><p>使用已有webserver根目录，安装路径为：<code>/Library/WebServer/Documents</code><br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~$ cd <span class="regexp">/Library/</span>WebServer/Documents</span><br><span class="line">popozhu <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents$ sudo git clone git:/</span><span class="regexp">/github.com/</span>facebook/libphutil.git</span><br><span class="line">popozhu <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents$ sudo git clone git:/</span><span class="regexp">/github.com/</span>facebook/arcanist.git</span><br><span class="line">popozhu <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents$ sudo git clone git:/</span><span class="regexp">/github.com/</span>facebook/phabricator.git</span><br></pre></td></tr></table></figure></p>
+<h3 id="域名">域名</h3><p>选取本地域名: <code>my.pha.com</code><br>写入hosts<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~$ grep pha<span class="class">.com</span> /etc/hosts</span><br><span class="line"><span class="number">127.0</span>.<span class="number">0.1</span>   my<span class="class">.pha</span><span class="class">.com</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="web端软件">web端软件</h3><p>使用的组合是： nginx + php-fpm + mysql， 都是之前安装的，直接使用。</p>
+<h4 id="1-_mysql">1. mysql</h4><p>启动mysql，使用的帐号是root，密码是我的system-login-in-psssword（好像是以前安装mysql默认设置的），导入phabricator的db到mysql:<br><figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~$ cd /Library/WebServer/Documents/phabricator</span><br><span class="line">popozhu /Library/WebServer/Documents/phabricator$ sudo ./bin/storage upgrade -uroot -p&#123;system-login-in-password&#125;</span><br><span class="line"></span><br><span class="line">popozhu ~$ mysql -uroot -p***</span><br><span class="line"><span class="header">mysql&gt; show databases like 'pha%';	// 导入了40个db</span><br><span class="line">+--------------------------+</span></span><br><span class="line"><span class="header">| Database (pha%)          |</span><br><span class="line">+--------------------------+</span></span><br><span class="line">| phabricator<span class="emphasis">_audit        |</span><br><span class="line">| phabricator_</span>auth         |</span><br><span class="line">| phabricator<span class="emphasis">_cache        |</span><br><span class="line">| phabricator_</span>calendar     |</span><br><span class="line">| phabricator<span class="emphasis">_chatlog      |</span><br><span class="line">| phabricator_</span>conduit      |</span><br><span class="line">......</span><br></pre></td></tr></table></figure></p>
+<p>导入mysql的密码到配置中<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~$ cd <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents/</span>phabricator</span><br><span class="line">popozhu <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents/</span>phabricator$ sudo .<span class="regexp">/bin/</span>config set mysql.pass ***</span><br><span class="line"></span><br><span class="line">popozhu <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents/</span>phabricator$ .<span class="regexp">/bin/</span>config get mysql.pass <span class="comment">// 查看配置项</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"config"</span> : [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"key"</span>    : <span class="string">"mysql.pass"</span>,</span><br><span class="line">      <span class="string">"source"</span> : <span class="string">"local"</span>,</span><br><span class="line">      <span class="string">"value"</span>  : <span class="string">"***"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>顺便导入自定义的uri<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">popozhu <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents/</span>phabricator$ sudo .<span class="regexp">/bin/</span>config set phabricator.base-uri <span class="string">"http://my.pha.com"</span></span><br><span class="line">Set <span class="string">'phabricator.base-uri'</span> <span class="keyword">in</span> local configuration.</span><br><span class="line"></span><br><span class="line">popozhu <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents/</span>phabricator$ .<span class="regexp">/bin/</span>config get phabricator.base-uri</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"config"</span> : [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">"key"</span>    : <span class="string">"phabricator.base-uri"</span>,</span><br><span class="line">      <span class="string">"source"</span> : <span class="string">"local"</span>,</span><br><span class="line">      <span class="string">"value"</span>  : <span class="string">"http:\/\/my.pha.com"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="2-_php_fpm">2. php_fpm</h4><p>启动php-fpm<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~$ sudo cp /<span class="keyword">private</span>/etc/php-fpm.conf.<span class="keyword">default</span> /<span class="keyword">private</span>/etc/php-fpm.conf</span><br><span class="line">popozhu ~$ sudo /usr/sbin/php-fpm	<span class="comment">// 若启动报错，根据报错信息修改配置文件</span></span><br><span class="line"></span><br><span class="line">popozhu ~$ netstat -an | grep <span class="number">9000</span></span><br><span class="line">tcp4       <span class="number">0</span>      <span class="number">0</span>  <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="number">.9000</span>         *.*                    LISTEN		<span class="comment">// 9000端口已经在监听了</span></span><br></pre></td></tr></table></figure></p>
+<h4 id="3-_nginx">3. nginx</h4><p>配置nginx，使用指导页面上的内容，写入nginx配置文件<code>/opt/local/conf/nginx.conf</code><br><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">server &#123;        </span><br><span class="line">	# 自定义的本地host</span><br><span class="line">    server_name  my.pha.com;</span><br><span class="line">    # phabricator的根目录</span><br><span class="line">    root    /Library/WebServer/Documents/phabricator/webroot;</span><br><span class="line"></span><br><span class="line">    try_files <span class="variable">$uri</span> <span class="variable">$uri</span>/ /index.php;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        index   index.php;</span><br><span class="line"></span><br><span class="line">        if ( !-f <span class="variable">$request</span>_filename )</span><br><span class="line">        &#123;</span><br><span class="line">            rewrite ^/(.*)$ /index.php?__path_<span class="number">_</span>=/<span class="variable">$1</span> last;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location /index.php &#123;</span><br><span class="line">        fastcgi_pass   localhost:<span class="number">9000</span>;</span><br><span class="line">        fastcgi_index   index.php;</span><br><span class="line"></span><br><span class="line">        #required if PHP was built with --enable-force-cgi-redirect</span><br><span class="line">        fastcgi_param  REDIRECT_STATUS    <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line">        #variables to make the $_SERVER populate in PHP</span><br><span class="line">        fastcgi_param  SCRIPT_FILENAME    <span class="variable">$document</span>_root<span class="variable">$fastcgi</span>_script_name;</span><br><span class="line">        fastcgi_param  QUERY_STRING       <span class="variable">$query</span>_string;</span><br><span class="line">        fastcgi_param  REQUEST_METHOD     <span class="variable">$request</span>_method;</span><br><span class="line">        fastcgi_param  CONTENT_TYPE       <span class="variable">$content</span>_type;</span><br><span class="line">        fastcgi_param  CONTENT_LENGTH     <span class="variable">$content</span>_length;</span><br><span class="line"></span><br><span class="line">        fastcgi_param  SCRIPT_NAME        <span class="variable">$fastcgi</span>_script_name;</span><br><span class="line"></span><br><span class="line">        fastcgi_param  GATEWAY_INTERFACE  CGI/<span class="number">1.1</span>;</span><br><span class="line">        fastcgi_param  SERVER_SOFTWARE    nginx/<span class="variable">$nginx</span>_version;</span><br><span class="line"></span><br><span class="line">        fastcgi_param  REMOTE_ADDR        <span class="variable">$remote</span>_addr;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # redirect server error pages to the static page /<span class="number">50</span>x.html</span><br><span class="line">    #</span><br><span class="line">    error_page   <span class="number">500</span> <span class="number">502</span> <span class="number">503</span> <span class="number">504</span>  /<span class="number">50</span>x.html;</span><br><span class="line">    location = /<span class="number">50</span>x.html &#123;</span><br><span class="line">        root   html;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后启动nginx<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~$ sudo nginx -s quit</span><br><span class="line">popozhu ~$ sudo nginx</span><br><span class="line">popozhu ~$ ps -ef | grep nginx | grep -v grep</span><br><span class="line">    <span class="number">0</span> <span class="number">32373</span>     <span class="number">1</span>   <span class="number">0</span> <span class="number">11</span>:<span class="number">50</span>下午 ??         <span class="number">0</span>:<span class="number">00.00</span> nginx: master process nginx</span><br><span class="line">   -<span class="number">2</span> <span class="number">32374</span> <span class="number">32373</span>   <span class="number">0</span> <span class="number">11</span>:<span class="number">50</span>下午 ??         <span class="number">0</span>:<span class="number">00.01</span> nginx: worker process</span><br></pre></td></tr></table></figure></p>
+<p>最后，浏览器输入my.pha.com，提示完成安装，建立admin帐号，还有5个问题需要配置，算了，明天吧。<br><img src="/img/2013/snapshot_2013-11-17_12.19.05.png" alt="界面"></p>
 <p>ref: <a href="http://www.phabricator.com/docs/phabricator/index.html" target="_blank" rel="external">http://www.phabricator.com/docs/phabricator/index.html</a><br><br></p>
 <blockquote>
 <p>2013-12-20 更新  </p>
@@ -174,66 +76,12 @@ popozhu ~$ ps -ef | grep nginx | grep -v grep
 </ol>
 <p>anyway，因为我个人原因，不想再使用这个项目。目前是采用<code>Versions + DiffMerge</code>来实现代码差异对比和走查，懒人也就用这个了。  </p>
 <p><br></p>
-<p>删除文件</p>
-<pre><code>sudo rm -rf /Library/WebServer/Documents/libphutil
-sudo rm -rf /Library/WebServer/Documents/arcanist
-sudo rm -rf /Library/WebServer/Documents/phabricator
-</code></pre><p>停了php-fpm</p>
-<pre><code>ps -ef | grep php-fpm | grep -v grep | awk &#39;{print $2}&#39; | xargs sudo kill
-</code></pre><p>删除nginx.conf中关于pha的配置  </p>
-<pre><code>sudo vim /opt/local/conf/nginx.conf
-</code></pre><p>删除hosts中的<code>127.0.0.1 my.pha.com</code>  </p>
-<p>删除db</p>
-<pre><code>drop database phabricator_audit       ;
-drop database phabricator_auth        ;
-drop database phabricator_cache       ;
-drop database phabricator_calendar    ;
-drop database phabricator_chatlog     ;
-drop database phabricator_conduit     ;
-drop database phabricator_config      ;
-drop database phabricator_conpherence ;
-drop database phabricator_countdown   ;
-drop database phabricator_daemon      ;
-drop database phabricator_differential;
-drop database phabricator_diviner     ;
-drop database phabricator_doorkeeper  ;
-drop database phabricator_draft       ;
-drop database phabricator_drydock     ;
-drop database phabricator_fact        ;
-drop database phabricator_feed        ;
-drop database phabricator_file        ;
-drop database phabricator_flag        ;
-drop database phabricator_harbormaster;
-drop database phabricator_herald      ;
-drop database phabricator_legalpad    ;
-drop database phabricator_maniphest   ;
-drop database phabricator_meta_data   ;
-drop database phabricator_metamta     ;
-drop database phabricator_nuance      ;
-drop database phabricator_oauth_server;
-drop database phabricator_owners      ;
-drop database phabricator_passphrase  ;
-drop database phabricator_pastebin    ;
-drop database phabricator_phame       ;
-drop database phabricator_phlux       ;
-drop database phabricator_pholio      ;
-drop database phabricator_phortune    ;
-drop database phabricator_phragment   ;
-drop database phabricator_phrequent   ;
-drop database phabricator_phriction   ;
-drop database phabricator_policy      ;
-drop database phabricator_ponder      ;
-drop database phabricator_project     ;
-drop database phabricator_releeph     ;
-drop database phabricator_repository  ;
-drop database phabricator_search      ;
-drop database phabricator_slowvote    ;
-drop database phabricator_token       ;
-drop database phabricator_user        ;
-drop database phabricator_worker      ;
-drop database phabricator_xhpastview  ;
-drop database phabricator_xhprof      ;
-</code></pre><p><br><br>– EOF –</p>
+<p>删除文件<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo rm -rf <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents/</span>libphutil</span><br><span class="line">sudo rm -rf <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents/</span>arcanist</span><br><span class="line">sudo rm -rf <span class="regexp">/Library/</span>WebServer<span class="regexp">/Documents/</span>phabricator</span><br></pre></td></tr></table></figure></p>
+<p>停了php-fpm<br><figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef | <span class="keyword">grep</span> php-fpm | <span class="keyword">grep</span> -v <span class="keyword">grep</span> | awk <span class="string">'&#123;print $2&#125;'</span> | xargs sudo <span class="keyword">kill</span></span><br></pre></td></tr></table></figure></p>
+<p>删除nginx.conf中关于pha的配置<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="keyword">vim</span> /<span class="keyword">opt</span>/local/<span class="keyword">conf</span>/nginx.<span class="keyword">conf</span></span><br></pre></td></tr></table></figure></p>
+<p>删除hosts中的<code>127.0.0.1 my.pha.com</code>  </p>
+<p>删除db<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_audit       ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_auth        ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_cache       ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_calendar    ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_chatlog     ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_conduit     ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_config      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_conpherence ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_countdown   ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_daemon      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_differential;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_diviner     ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_doorkeeper  ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_draft       ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_drydock     ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_fact        ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_feed        ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_file        ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_flag        ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_harbormaster;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_herald      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_legalpad    ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_maniphest   ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_meta_data   ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_metamta     ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_nuance      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_oauth_server;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_owners      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_passphrase  ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_pastebin    ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_phame       ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_phlux       ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_pholio      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_phortune    ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_phragment   ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_phrequent   ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_phriction   ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_policy      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_ponder      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_project     ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_releeph     ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_repository  ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_search      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_slowvote    ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_token       ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_user        ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_worker      ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_xhpastview  ;</span></span><br><span class="line"><span class="operator"><span class="keyword">drop</span> <span class="keyword">database</span> phabricator_xhprof      ;</span></span><br></pre></td></tr></table></figure></p>
+<p><br><br>– EOF –</p>
 
 	
 
@@ -277,24 +125,14 @@ drop database phabricator_xhprof      ;
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -307,9 +145,6 @@ drop database phabricator_xhprof      ;
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2013/11/17/安装phabricato/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -318,6 +153,7 @@ drop database phabricator_xhprof      ;
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

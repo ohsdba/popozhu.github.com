@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">Kerberos Extras for OS X</div> 
 		<small>
-		    <time datetime="2014-07-20T13:29:55.000Z" itemprop="datePublished">July 20th 2014</time>
+		    <time datetime="2014-07-20T13:29:55.000Z" itemprop="datePublished">July 20 2014</time>
 		</small>
 	    </div>
 	</header>
@@ -46,9 +52,9 @@
 	    <p>如果在mac上使用kerberos遇到了问题，可以考虑安装 <a href="http://web.mit.edu/macdev/KfM/Common/Documentation/osx-kerberos-extras.html" target="_blank" rel="external">Kerberos Extras</a>.</p>
 <p>对于我，我通过<code>kinit</code>成功获取到了<code>票据</code>，但连接到服务端时仍提示让我输入密码。 使用票据的话是不需再输入密码的，那么是没使用到票据，或者票据有问题。 </p>
 <p>ssh连接会使用几种验证方式(PreferredAuthentications)，通过<code>man ssh_config</code>，搜索<code>PreferredAuthentications</code>可以看到ssh使用的几种验证方式，且按顺序逐一尝试，默认是:</p>
-<pre><code>gssapi-with-mic,hostbased,publickey,keyboard-interactive,password
+<pre><code>gssapi-<span class="keyword">with</span>-mic,hostbased,publickey,keyboard-interactive,password
 </code></pre><p>可以在配置文件<code>/etc/ssh_config</code>中增加配置项来调整尝试的方式、顺序，或者减少验证方式。 </p>
-<pre><code>PreferredAuthentications: gssapi-with-mic,hostbased,publickey,keyboard-interactive,password
+<pre><code><span class="attribute">PreferredAuthentications</span>: <span class="string">gssapi-with-mic,hostbased,publickey,keyboard-interactive,password</span>
 </code></pre><p>从默认值可以看出，第一个尝试的方式就是查找票据。 通过<code>ssh -v</code>打开更多信息输出，可以看到报错，找不到票据，最后使用了password验证的方式，提示输入密码。问题看起来是，能获取到票据，但无法使用到该票据。 它做了两个事情: </p>
 <p>在网上找到解决方法，安装<code>Kerberos Extras</code>，让kerberos支持基于CFM(Code Fragment Manager)的程序。</p>
 <ol>
@@ -58,27 +64,27 @@
 <p><strong>提示</strong>: 安装时注意有一个步骤，选择「自定义」，<strong>不要</strong>安装MIT自家的配置文件<code>edu.mit.Kerberos</code>。</p>
 <p>好啦，主要是步骤一，那些还在使用CFM的程序们就能够正确使用到kerberos，这时就能无密码连接了，在服务器端执行<code>klist</code>也能看到带上来的票据，票据初始化的时间，跟当前ssh连接的时间点是一致的；返回到本地再<code>klist</code>也能看到本地保存有服务器端的票据，票据交换成功。</p>
 <p>CFM和动态链接dyld是Mac os x上的两种运行时环境(<a href="http://osxbook.com/book/bonus/ancient/whatismacosx/programming.html" target="_blank" rel="external">Runtime Environment</a>)，摘录如下:</p>
-<pre><code>CFM determines addresses for referenced symbols in executables at build time (a static approach). The executable format used is called PEF (Preferred Executable Format). dyld resolves undefined symbols at execution time. The executable format is Mach-O (Mach object-file-format).
+<pre><code>CFM determines addresses <span class="keyword">for</span> referenced symbols <span class="operator">in</span> executables <span class="keyword">at</span> build <span class="built_in">time</span> (<span class="operator">a</span> static approach). The executable <span class="built_in">format</span> used is called PEF (Preferred Executable Format). dyld resolves undefined symbols <span class="keyword">at</span> execution <span class="built_in">time</span>. The executable <span class="built_in">format</span> is Mach-O (Mach object-<span class="built_in">file</span>-<span class="built_in">format</span>).
 </code></pre><p>看起来CFM有点像静态链接，未深究。</p>
 <p><hr><br>额外的话题，每次本地kinit时要输入密码，可以把密码保存到keychain中，<code>kinit username</code>时直接回车就可以了。</p>
-<pre><code>security add-generic-password -a &quot;xiaojie.zhang1&quot; -l &quot;XXX.OPI.COM (your_user_name)&quot; -s &quot;xxx.OPI.COM&quot; -w “your_passwd&quot; -T &quot;/usr/bin/kinit”
+<pre><code>security<span class="instruction"> add-generic-password </span>-a <span class="string">"xiaojie.zhang1"</span> -l <span class="string">"XXX.OPI.COM (your_user_name)"</span> -s <span class="string">"xxx.OPI.COM"</span> -w “your_passwd<span class="string">" -T "</span>/usr/bin/kinit”
 </code></pre><p>具体用法，<code>man security</code>，再找到<code>add-generic-password</code>的各个参数。</p>
-<pre><code>add-generic-password [-h] [-a account] [-s service] [-w password] [options...] [keychain]
-    Add a generic password item.
+<pre><code><span class="built_in">add</span>-generic-password [-h] [-<span class="operator">a</span> account] [-s service] [-w password] [options...] [keychain]
+    Add <span class="operator">a</span> generic password <span class="keyword">item</span>.
 
-    -a account      Specify account name (required)
-    -c creator      Specify item creator (optional four-character code)
-    -C type         Specify item type (optional four-character code)
-    -D kind         Specify kind (default is &quot;application password&quot;)
-    -G value        Specify generic attribute value (optional)
-    -j comment      Specify comment string (optional)
-    -l label        Specify label (if omitted, service name is used as default label)
+    -<span class="operator">a</span> account      Specify account name (required)
+    -c creator      Specify <span class="keyword">item</span> creator (optional <span class="constant">four</span>-<span class="keyword">character</span> code)
+    -C type         Specify <span class="keyword">item</span> type (optional <span class="constant">four</span>-<span class="keyword">character</span> code)
+    -D kind         Specify kind (default is <span class="string">"application password"</span>)
+    -G <span class="built_in">value</span>        Specify generic attribute <span class="built_in">value</span> (optional)
+    -j comment      Specify comment <span class="keyword">string</span> (optional)
+    -l label        Specify label (<span class="keyword">if</span> omitted, service name is used <span class="keyword">as</span> default label)
     -s service      Specify service name (required)
-    -p password     Specify password to be added (legacy option, equivalent to -w)
-    -w password     Specify password to be added
-    -A              Allow any application to access this item without warning (insecure, not recommended!)
-    -T appPath      Specify an application which may access this item (multiple -T options are allowed)
-    -U              Update item if it already exists (if omitted, the item cannot already exist)
+    -p password     Specify password <span class="built_in">to</span> be added (legacy option, equivalent <span class="built_in">to</span> -w)
+    -w password     Specify password <span class="built_in">to</span> be added
+    -A              Allow <span class="keyword">any</span> application <span class="built_in">to</span> access this <span class="keyword">item</span> <span class="keyword">without</span> warning (insecure, <span class="operator">not</span> recommended!)
+    -T appPath      Specify <span class="operator">an</span> application which may access this <span class="keyword">item</span> (multiple -T options are allowed)
+    -U              Update <span class="keyword">item</span> <span class="keyword">if</span> <span class="keyword">it</span> already exists (<span class="keyword">if</span> omitted, <span class="operator">the</span> <span class="keyword">item</span> cannot already exist)
 </code></pre><p><hr><br>票据会过期，过期后重新kinit，但tmux的session不会自动加载这个新的票据。</p>
 <p>to be continue…</p>
 <p><br><br>– EOF –</p>
@@ -125,24 +131,14 @@
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -155,9 +151,6 @@
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2014/07/20/kerberos-extras-for-os-x/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -166,6 +159,7 @@
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

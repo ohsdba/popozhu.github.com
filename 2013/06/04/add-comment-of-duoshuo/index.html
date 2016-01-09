@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">在hexo中添加多说评论</div> 
 		<small>
-		    <time datetime="2013-06-04T14:55:52.000Z" itemprop="datePublished">June 4th 2013</time>
+		    <time datetime="2013-06-04T14:55:52.000Z" itemprop="datePublished">June 4 2013</time>
 		</small>
 	    </div>
 	</header>
@@ -48,35 +54,11 @@
 	    <h2 id="注册duoshuo">注册duoshuo</h2><p>注册duoshuo：<a href="http://duoshuo.com/create-site/" target="_blank" rel="external">create_site</a><br>我注册使用的多说名字(short_name)是<code>popozhu</code>，这个名字在主题中进行配置，下面使用。</p>
 <p><br></p>
 <h2 id="在使用的主题里配置duoshuo">在使用的主题里配置duoshuo</h2><p>以hexo默认主题light为例，在主题的配置文件<code>themes/light/_config.yml</code>中增加duoshuo的一个变量<code>shortname</code>，配置你注册的多说名字：  <code>duoshuo_shortname: popozhu</code>  </p>
-<p>备份<code>themes/light/layout/_partial/comment.ejs</code>，或者直接替换<code>comment.ejs</code>的内容。<br>代码内容：</p>
-<pre><code>&lt;% if (theme.duoshuo_shortname &amp;&amp; page.comments){ %&gt;
-&lt;!-- Duoshuo Comment BEGIN --&gt;
-&lt;div class=&quot;ds-thread&quot;&gt;&lt;/div&gt;
-&lt;script type=&quot;text/javascript&quot;&gt;
-  var duoshuoQuery = {short_name: &#39;&lt;%= theme.duoshuo_shortname %&gt;&#39; };
-  (function() {
-      var ds = document.createElement(&#39;script&#39;);
-      ds.type = &#39;text/javascript&#39;;
-      ds.async = true;
-      ds.src = &#39;http://static.duoshuo.com/embed.js&#39;;
-      ds.charset = &#39;UTF-8&#39;;
-      (document.getElementsByTagName(&#39;head&#39;)[0] 
-      || document.getElementsByTagName(&#39;body&#39;)[0]).appendChild(ds);
-  })();
-&lt;/script&gt;
-&lt;!-- Duoshuo Comment END --&gt;
-&lt;% } %&gt;
-</code></pre><p>第一行先判断主题的config文件里是否定义了<code>duoshuo_shortname</code>，以及这个page是否允许评论。<br>如果是，则加载duoshuo评论。</p>
+<p>备份<code>themes/light/layout/_partial/comment.ejs</code>，或者直接替换<code>comment.ejs</code>的内容。<br>代码内容：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">%</span> <span class="attribute">if</span> (<span class="attribute">theme.duoshuo_shortname</span> &amp;&amp; <span class="attribute">page.comments</span>)&#123; %&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- Duoshuo Comment BEGIN --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">div</span> <span class="attribute">class</span>=<span class="value">"ds-thread"</span>&gt;</span><span class="tag">&lt;/<span class="title">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/javascript"</span>&gt;</span><span class="javascript"></span><br><span class="line">  <span class="keyword">var</span> duoshuoQuery = &#123;short_name: <span class="string">'&lt;%= theme.duoshuo_shortname %&gt;'</span> &#125;;</span><br><span class="line">  (<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> ds = <span class="built_in">document</span>.createElement(<span class="string">'script'</span>);</span><br><span class="line">      ds.type = <span class="string">'text/javascript'</span>;</span><br><span class="line">      ds.async = <span class="literal">true</span>;</span><br><span class="line">      ds.src = <span class="string">'http://static.duoshuo.com/embed.js'</span>;</span><br><span class="line">      ds.charset = <span class="string">'UTF-8'</span>;</span><br><span class="line">      (<span class="built_in">document</span>.getElementsByTagName(<span class="string">'head'</span>)[<span class="number">0</span>] </span><br><span class="line">      || <span class="built_in">document</span>.getElementsByTagName(<span class="string">'body'</span>)[<span class="number">0</span>]).appendChild(ds);</span><br><span class="line">  &#125;)();</span><br><span class="line"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- Duoshuo Comment END --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">%</span> &#125; %&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>第一行先判断主题的config文件里是否定义了<code>duoshuo_shortname</code>，以及这个page是否允许评论。<br>如果是，则加载duoshuo评论。</p>
 <p><br></p>
-<h2 id="去掉页面下方的分享按钮">去掉页面下方的分享按钮</h2><p>在<code>themes/light/_config.yml</code>配置里，把<code>addthis</code>的enable值改为false就可以。</p>
-<pre><code>addthis:
-  enable: false  //这里的true改为false
-  pubid:
-  facebook: true
-  twitter: true
-  google: true
-  pinterest: true
-</code></pre><p>–EOF–</p>
+<h2 id="去掉页面下方的分享按钮">去掉页面下方的分享按钮</h2><p>在<code>themes/light/_config.yml</code>配置里，把<code>addthis</code>的enable值改为false就可以。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">addthis:</span><br><span class="line">  <span class="built_in">enable</span>: <span class="literal">false</span>  //这里的<span class="literal">true</span>改为<span class="literal">false</span></span><br><span class="line">  pubid:</span><br><span class="line">  facebook: <span class="literal">true</span></span><br><span class="line">  twitter: <span class="literal">true</span></span><br><span class="line">  google: <span class="literal">true</span></span><br><span class="line">  pinterest: <span class="literal">true</span></span><br></pre></td></tr></table></figure></p>
+<p>–EOF–</p>
 
 	
 
@@ -120,24 +102,14 @@
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -150,9 +122,6 @@
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2013/06/04/add-comment-of-duoshuo/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -161,6 +130,7 @@
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

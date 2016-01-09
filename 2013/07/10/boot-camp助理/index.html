@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">Boot Camp助理</div> 
 		<small>
-		    <time datetime="2013-07-09T16:42:27.000Z" itemprop="datePublished">July 10th 2013</time>
+		    <time datetime="2013-07-09T16:42:27.000Z" itemprop="datePublished">July 10 2013</time>
 		</small>
 	    </div>
 	</header>
@@ -56,27 +62,8 @@
 <p>让我觉得很有意思的是，Boot Camp助理在上面第2功能中帮我们下载了Win7所需要的所有驱动，win7安装后（u盘到此刻还一直没拔出），<br>进入到u盘，有一个叫BootCamp的目录，点击setup.exe开始安装win7的启动。<br>驱动安装之后重启，按住<strong>option</strong>键，选择windows盘符，进入win7，至此全部完成。  </p>
 <p>bootcamp驱动默认是64位的，所以win7系统对应最好是64位，以达到最好的兼容性。<br>况且mac的硬件里一般是4G以上内存，64位的系统才能使用上全部内存。  </p>
 <p>64位的win7安装后会占用20G＋的空间，bootcamp只能从硬盘划分出一个分区给到win7，所以我划分了40G，这样才大概有15G的空间来保存我的数据，游戏足够了。  </p>
-<p>u盘里的文件列表：  </p>
-<pre><code class="plain">popozhu /Volumes/WININSTALL$ ls -lrt
-total 2368
-drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 upgrade
-drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 support
-drwxrwxrwx  1 popozhu  staff   12288 11 22  2010 sources
--rwxrwxrwx  1 popozhu  staff  106768 11 22  2010 setup.exe
-drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 efi
--rwxrwxrwx  1 popozhu  staff  669568 11 22  2010 bootmgr.efi
--rwxrwxrwx  1 popozhu  staff  383786 11 22  2010 bootmgr
-drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 boot
--rwxrwxrwx  1 popozhu  staff     122 11 22  2010 autorun.inf
--rwxrwxrwx  1 popozhu  staff    2719  1 17 09:41 AutoUnattend.xml
-drwxrwxrwx  1 popozhu  staff    4096  1 17 10:08 $WinPEDriver$
-drwxrwxrwx  1 popozhu  staff    4096  1 26 02:38 BootCamp
-</code></pre>
-<p>最后2个目录是bootcamp下载的驱动，大小为：</p>
-<pre><code class="plain">popozhu /Volumes/WININSTALL$ du -sh BootCamp/ \$WinPEDriver\$/
-484M    BootCamp/
-339M    $WinPEDriver$/
-</code></pre>
+<p>u盘里的文件列表：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">popozhu /Volumes/WININSTALL$ ls -lrt&#10;total 2368&#10;drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 upgrade&#10;drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 support&#10;drwxrwxrwx  1 popozhu  staff   12288 11 22  2010 sources&#10;-rwxrwxrwx  1 popozhu  staff  106768 11 22  2010 setup.exe&#10;drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 efi&#10;-rwxrwxrwx  1 popozhu  staff  669568 11 22  2010 bootmgr.efi&#10;-rwxrwxrwx  1 popozhu  staff  383786 11 22  2010 bootmgr&#10;drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 boot&#10;-rwxrwxrwx  1 popozhu  staff     122 11 22  2010 autorun.inf&#10;-rwxrwxrwx  1 popozhu  staff    2719  1 17 09:41 AutoUnattend.xml&#10;drwxrwxrwx  1 popozhu  staff    4096  1 17 10:08 $WinPEDriver$&#10;drwxrwxrwx  1 popozhu  staff    4096  1 26 02:38 BootCamp</span><br></pre></td></tr></table></figure></p>
+<p>最后2个目录是bootcamp下载的驱动，大小为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">popozhu /Volumes/WININSTALL$ du -sh BootCamp/ \$WinPEDriver\$/&#10;484M&#9;BootCamp/&#10;339M&#9;$WinPEDriver$/</span><br></pre></td></tr></table></figure></p>
 <p>驱动是需要联网下载的，网速慢的话，吃个苹果先吧……</p>
 <p>另，win7下mbp的触摸板漂移很严重！！！驱动问题。  </p>
 <p><br><br>– EOF –</p>
@@ -123,24 +110,14 @@ drwxrwxrwx  1 popozhu  staff    4096  1 26 02:38 BootCamp
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -153,9 +130,6 @@ drwxrwxrwx  1 popozhu  staff    4096  1 26 02:38 BootCamp
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2013/07/10/boot-camp助理/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -164,6 +138,7 @@ drwxrwxrwx  1 popozhu  staff    4096  1 26 02:38 BootCamp
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
 
@@ -17,11 +18,16 @@
     <body>
 	<div class="container">
 	    <div class="banner">
-    <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
 
-    
-    <span class="site-subtitle"> do not go gentle into that good night </span>
-    
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
 </div>
 
 
@@ -32,7 +38,7 @@
 	    <div class="article-title">
 		<div class="title">ios消息推送的优化</div> 
 		<small>
-		    <time datetime="2014-12-27T15:44:09.000Z" itemprop="datePublished">December 27th 2014</time>
+		    <time datetime="2014-12-27T15:44:09.000Z" itemprop="datePublished">December 27 2014</time>
 		</small>
 	    </div>
 	</header>
@@ -70,224 +76,224 @@
 
 <ol>
 <li><p>ssl 连接</p>
-<pre><code> int do_ssl_connect_blocking(SSL *ssl, int fd)
- {
-     int flags, ret;
+<pre><code><span class="function"><span class="keyword">int</span> <span class="title">do_ssl_connect_blocking</span><span class="params">(SSL *ssl, <span class="keyword">int</span> fd)</span>
+</span>{
+    <span class="keyword">int</span> flags, ret;
 
-     SSL_set_mode(ssl, SSL_MODE_AUTO_RETRY);
+    SSL_set_mode(ssl, SSL_MODE_AUTO_RETRY);
 
-     flags = fcntl(fd, F_GETFL, 0);
-     flags &amp;= ~O_NONBLOCK;
-     fcntl(fd, F_SETFL, flags);
+    flags = fcntl(fd, F_GETFL, <span class="number">0</span>);
+    flags &amp;= ~O_NONBLOCK;
+    fcntl(fd, F_SETFL, flags);
 
-     ret = SSL_set_fd(ssl, fd);
-     if (ret != 1) {
-         return -1;
-     }
+    ret = SSL_set_fd(ssl, fd);
+    <span class="keyword">if</span> (ret != <span class="number">1</span>) {
+        <span class="keyword">return</span> -<span class="number">1</span>;
+    }
 
-     ret = SSL_connect(ssl);     
-     if (ret != 1) {
-         return -1;
-     }
+    ret = SSL_connect(ssl);     
+    <span class="keyword">if</span> (ret != <span class="number">1</span>) {
+        <span class="keyword">return</span> -<span class="number">1</span>;
+    }
 
-     return 0;    
- }
+    <span class="keyword">return</span> <span class="number">0</span>;    
+}
 </code></pre></li>
 <li><p>设置非阻塞</p>
-<pre><code> int my_ssl_set_non_blocking(SSL *ssl)
- {
-     int fd = SSL_get_fd(ssl);
-     if (fd &lt; 0) {
-         return -1;
-     }
+<pre><code><span class="function"><span class="keyword">int</span> <span class="title">my_ssl_set_non_blocking</span><span class="params">(SSL *ssl)</span>
+</span>{
+    <span class="keyword">int</span> fd = SSL_get_fd(ssl);
+    <span class="keyword">if</span> (fd &lt; <span class="number">0</span>) {
+        <span class="keyword">return</span> -<span class="number">1</span>;
+    }
 
-     // remove auto-retry from ssl
-     long mode;
-     mode = SSL_get_mode(ssl);
-     mode &amp;= ~SSL_MODE_AUTO_RETRY;
-     SSL_set_mode(ssl, mode);
+    <span class="comment">// remove auto-retry from ssl</span>
+    <span class="keyword">long</span> mode;
+    mode = SSL_get_mode(ssl);
+    mode &amp;= ~SSL_MODE_AUTO_RETRY;
+    SSL_set_mode(ssl, mode);
 
-     // set no-blocking for socket fd
-     int flags;
-     flags = fcntl(fd, F_GETFL, 0);
-     flags |= O_NONBLOCK;
-     fcntl(fd, F_SETFL, flags);
+    <span class="comment">// set no-blocking for socket fd</span>
+    <span class="keyword">int</span> flags;
+    flags = fcntl(fd, F_GETFL, <span class="number">0</span>);
+    flags |= O_NONBLOCK;
+    fcntl(fd, F_SETFL, flags);
 
-     return 0;
- }
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
 </code></pre></li>
 <li><p>通过 select 检查可读写</p>
-<pre><code> int check_availability(int sockfd, unsigned int *can_read, unsigned int *can_write)
- {
-     *can_read = 0;
-     *can_write = 0;
+<pre><code><span class="function"><span class="keyword">int</span> <span class="title">check_availability</span><span class="params">(<span class="keyword">int</span> sockfd, <span class="keyword">unsigned</span> <span class="keyword">int</span> *can_read, <span class="keyword">unsigned</span> <span class="keyword">int</span> *can_write)</span>
+</span>{
+    *can_read = <span class="number">0</span>;
+    *can_write = <span class="number">0</span>;
 
-     fd_set rset;
-     fd_set wset;
-     struct timeval timeout = {60, 0};
-     int n;
+    fd_set rset;
+    fd_set wset;
+    <span class="keyword">struct</span> timeval timeout = {<span class="number">60</span>, <span class="number">0</span>};
+    <span class="keyword">int</span> n;
 
-     FD_ZERO(&amp;rset);
-     FD_ZERO(&amp;wset);
-     FD_SET(sockfd, &amp;rset);
-     FD_SET(sockfd, &amp;wset);
+    FD_ZERO(&amp;rset);
+    FD_ZERO(&amp;wset);
+    FD_SET(sockfd, &amp;rset);
+    FD_SET(sockfd, &amp;wset);
 
-     n = select(sockfd+1, &amp;rset, &amp;wset, NULL, &amp;timeout);
-     if (n == -1) {
-         return -1;
-     }
-     else if (n) {
-         if (FD_ISSET(sockfd, &amp;rset))
-             *can_read = 1;
-         if (FD_ISSET(sockfd, &amp;wset))
-             *can_write = 1;
-         return 1;
-     }
-     else {
-         // timeout
-         return 0;
-     }
- }
+    n = select(sockfd+<span class="number">1</span>, &amp;rset, &amp;wset, <span class="literal">NULL</span>, &amp;timeout);
+    <span class="keyword">if</span> (n == -<span class="number">1</span>) {
+        <span class="keyword">return</span> -<span class="number">1</span>;
+    }
+    <span class="keyword">else</span> <span class="keyword">if</span> (n) {
+        <span class="keyword">if</span> (FD_ISSET(sockfd, &amp;rset))
+            *can_read = <span class="number">1</span>;
+        <span class="keyword">if</span> (FD_ISSET(sockfd, &amp;wset))
+            *can_write = <span class="number">1</span>;
+        <span class="keyword">return</span> <span class="number">1</span>;
+    }
+    <span class="keyword">else</span> {
+        <span class="comment">// timeout</span>
+        <span class="keyword">return</span> <span class="number">0</span>;
+    }
+}
 </code></pre></li>
 <li><p>ssl 读写，消息数据的格式、token 队列的实现，这里就不展开了，替换为<code>... ...</code></p>
-<pre><code> int data_transfer(SSL *ssl, int send_cnt)
- {
-     // set non-blocking for socket and ssl
-     my_ssl_set_non_blocking(ssl);
+<pre><code><span class="function"><span class="keyword">int</span> <span class="title">data_transfer</span><span class="params">(SSL *ssl, <span class="keyword">int</span> send_cnt)</span>
+</span>{
+    <span class="comment">// set non-blocking for socket and ssl</span>
+    my_ssl_set_non_blocking(ssl);
 
-     int sockfd = SSL_get_fd(ssl);
+    <span class="keyword">int</span> sockfd = SSL_get_fd(ssl);
 
-     // ssl_read
-     unsigned int can_read = 0;
-     // ssl read retry flag
-     unsigned int read_waiton_read = 0;
-     unsigned int read_waiton_write = 0;
+    <span class="comment">// ssl_read</span>
+    <span class="keyword">unsigned</span> <span class="keyword">int</span> can_read = <span class="number">0</span>;
+    <span class="comment">// ssl read retry flag</span>
+    <span class="keyword">unsigned</span> <span class="keyword">int</span> read_waiton_read = <span class="number">0</span>;
+    <span class="keyword">unsigned</span> <span class="keyword">int</span> read_waiton_write = <span class="number">0</span>;
 
-     // ssl_write
-     unsigned int can_write = 0;
-     // ssl write retry flag
-     unsigned int write_waiton_read = 0;
-     unsigned int write_waiton_write = 0;
+    <span class="comment">// ssl_write</span>
+    <span class="keyword">unsigned</span> <span class="keyword">int</span> can_write = <span class="number">0</span>;
+    <span class="comment">// ssl write retry flag</span>
+    <span class="keyword">unsigned</span> <span class="keyword">int</span> write_waiton_read = <span class="number">0</span>;
+    <span class="keyword">unsigned</span> <span class="keyword">int</span> write_waiton_write = <span class="number">0</span>;
 
-     // read buffer
-     int len_rd = 0;
-     char buf_rd[MAX_BUFF_SIZE];
-     // write buffer
-     int len_wr = 0;
-     char buf_wr[MAX_BUFF_SIZE];
+    <span class="comment">// read buffer</span>
+    <span class="keyword">int</span> len_rd = <span class="number">0</span>;
+    <span class="keyword">char</span> buf_rd[MAX_BUFF_SIZE];
+    <span class="comment">// write buffer</span>
+    <span class="keyword">int</span> len_wr = <span class="number">0</span>;
+    <span class="keyword">char</span> buf_wr[MAX_BUFF_SIZE];
 
-     int ret_val = -1;
-     int ret, sslerrno;
-     int timeout_cnt = 0;
-     while (send_cnt &gt;= 0) {
-         // get socket I/O event flag: can_read or can_write or both
-         ret = check_availability(sockfd, &amp;can_read, &amp;can_write); 
-         if (ret &lt; 0) {
-             return -1;
-         }
-         else if (ret == 0) {
-             // bad network condition
-             timeout_cnt ++;
-             if (timeout_cnt &gt;= 3) {
-                 goto end;
-             }
-         }
-         else {
-             timeout_cnt = 0;
-         }
+    <span class="keyword">int</span> ret_val = -<span class="number">1</span>;
+    <span class="keyword">int</span> ret, sslerrno;
+    <span class="keyword">int</span> timeout_cnt = <span class="number">0</span>;
+    <span class="keyword">while</span> (send_cnt &gt;= <span class="number">0</span>) {
+        <span class="comment">// get socket I/O event flag: can_read or can_write or both</span>
+        ret = check_availability(sockfd, &amp;can_read, &amp;can_write); 
+        <span class="keyword">if</span> (ret &lt; <span class="number">0</span>) {
+            <span class="keyword">return</span> -<span class="number">1</span>;
+        }
+        <span class="keyword">else</span> <span class="keyword">if</span> (ret == <span class="number">0</span>) {
+            <span class="comment">// bad network condition</span>
+            timeout_cnt ++;
+            <span class="keyword">if</span> (timeout_cnt &gt;= <span class="number">3</span>) {
+                <span class="keyword">goto</span> end;
+            }
+        }
+        <span class="keyword">else</span> {
+            timeout_cnt = <span class="number">0</span>;
+        }
 
-         // ssl read
-         // try ssl read first if can both read and write
-         //if (!(write_waiton_read || write_waiton_write) 
-         //        &amp;&amp; (can_read || (can_write &amp;&amp; read_waiton_read))
-         //        &amp;&amp; len_rd &lt; MAX_BUFF_SIZE) 
-         if (can_read || (can_write &amp;&amp; read_waiton_read))
-         {
-             // clear ssl_read retry flag
-             read_waiton_read = 0;
-             read_waiton_write = 0;
+        <span class="comment">// ssl read</span>
+        <span class="comment">// try ssl read first if can both read and write</span>
+        <span class="comment">//if (!(write_waiton_read || write_waiton_write) </span>
+        <span class="comment">//        &amp;&amp; (can_read || (can_write &amp;&amp; read_waiton_read))</span>
+        <span class="comment">//        &amp;&amp; len_rd &lt; MAX_BUFF_SIZE) </span>
+        <span class="keyword">if</span> (can_read || (can_write &amp;&amp; read_waiton_read))
+        {
+            <span class="comment">// clear ssl_read retry flag</span>
+            read_waiton_read = <span class="number">0</span>;
+            read_waiton_write = <span class="number">0</span>;
 
-             ret = SSL_read(ssl, buf_rd + len_rd, MAX_BUFF_SIZE - len_rd);
-             sslerrno = SSL_get_error(ssl, ret);
-             switch (sslerrno) {
-                 case SSL_ERROR_NONE:
-                     len_rd += ret;
-                     if (len_rd &gt;= RSP_MSG_LEN) {
-                         // parse and consume RSP_MSG_LEN
-                         // ... ...    
+            ret = SSL_read(ssl, buf_rd + len_rd, MAX_BUFF_SIZE - len_rd);
+            sslerrno = SSL_get_error(ssl, ret);
+            <span class="keyword">switch</span> (sslerrno) {
+                <span class="keyword">case</span> SSL_ERROR_NONE:
+                    len_rd += ret;
+                    <span class="keyword">if</span> (len_rd &gt;= RSP_MSG_LEN) {
+                        <span class="comment">// parse and consume RSP_MSG_LEN</span>
+                        <span class="comment">// ... ...    </span>
 
-                         // get rsp id to reset token queue
-                         // ... ...
+                        <span class="comment">// get rsp id to reset token queue</span>
+                        <span class="comment">// ... ...</span>
 
-                         len_rd -= RSP_MSG_LEN;
-                     }
-                     goto end;
-                 case SSL_ERROR_WANT_WRITE:
-                     read_waiton_write = 1;
-                     goto end;
-                 case SSL_ERROR_WANT_READ:
-                     read_waiton_read = 1;
-                     goto end;
-                 case SSL_ERROR_ZERO_RETURN:
-                     // connection closed
-                     goto end;
-                 default:
-                     goto end;
-             }
+                        len_rd -= RSP_MSG_LEN;
+                    }
+                    <span class="keyword">goto</span> end;
+                <span class="keyword">case</span> SSL_ERROR_WANT_WRITE:
+                    read_waiton_write = <span class="number">1</span>;
+                    <span class="keyword">goto</span> end;
+                <span class="keyword">case</span> SSL_ERROR_WANT_READ:
+                    read_waiton_read = <span class="number">1</span>;
+                    <span class="keyword">goto</span> end;
+                <span class="keyword">case</span> SSL_ERROR_ZERO_RETURN:
+                    <span class="comment">// connection closed</span>
+                    <span class="keyword">goto</span> end;
+                <span class="keyword">default</span>:
+                    <span class="keyword">goto</span> end;
+            }
 
-         } // ssl read
+        } <span class="comment">// ssl read</span>
 
-         // ssl write
-         if (!(read_waiton_read || read_waiton_write) 
-                 &amp;&amp; (can_write || (can_read &amp;&amp; write_waiton_write))) 
-         {
-             // clear ssl_write retry flag
-             write_waiton_read = 0;
-             write_waiton_write = 0;
+        <span class="comment">// ssl write</span>
+        <span class="keyword">if</span> (!(read_waiton_read || read_waiton_write) 
+                &amp;&amp; (can_write || (can_read &amp;&amp; write_waiton_write))) 
+        {
+            <span class="comment">// clear ssl_write retry flag</span>
+            write_waiton_read = <span class="number">0</span>;
+            write_waiton_write = <span class="number">0</span>;
 
-             if (len_wr == 0) {
-                 // get next token from token queue
-                 // create push msg, set to buf_wr
-                 // ... ... 
-             }
+            <span class="keyword">if</span> (len_wr == <span class="number">0</span>) {
+                <span class="comment">// get next token from token queue</span>
+                <span class="comment">// create push msg, set to buf_wr</span>
+                <span class="comment">// ... ... </span>
+            }
 
-             ret = SSL_write(ssl, buf_wr, len_wr);
-             sslerrno = SSL_get_error(ssl, ret);
-             switch (sslerrno) {
-                 /* We wrote something*/
-                 case SSL_ERROR_NONE:
-                     len_wr -= ret;
-                     if (len_wr == 0) {
-                         send_cnt --;
-                     }
-                     else {
-                         memmove(buf_wr, buf_wr + ret, len_wr);
-                     }
-                     break;
-                 case SSL_ERROR_WANT_WRITE:
-                     write_waiton_write = 1;
-                     break;
-                 case SSL_ERROR_WANT_READ:
-                     write_waiton_read = 1;
-                     break;
-                 case SSL_ERROR_ZERO_RETURN:
-                     //rollback token, resend token
-                     // ... ...
-                     goto end;
-                 default:          
-                     //rollback token, resend token
-                     // ... ...
-                     goto end;
-             }
+            ret = SSL_write(ssl, buf_wr, len_wr);
+            sslerrno = SSL_get_error(ssl, ret);
+            <span class="keyword">switch</span> (sslerrno) {
+                <span class="comment">/* We wrote something*/</span>
+                <span class="keyword">case</span> SSL_ERROR_NONE:
+                    len_wr -= ret;
+                    <span class="keyword">if</span> (len_wr == <span class="number">0</span>) {
+                        send_cnt --;
+                    }
+                    <span class="keyword">else</span> {
+                        memmove(buf_wr, buf_wr + ret, len_wr);
+                    }
+                    <span class="keyword">break</span>;
+                <span class="keyword">case</span> SSL_ERROR_WANT_WRITE:
+                    write_waiton_write = <span class="number">1</span>;
+                    <span class="keyword">break</span>;
+                <span class="keyword">case</span> SSL_ERROR_WANT_READ:
+                    write_waiton_read = <span class="number">1</span>;
+                    <span class="keyword">break</span>;
+                <span class="keyword">case</span> SSL_ERROR_ZERO_RETURN:
+                    <span class="comment">//rollback token, resend token</span>
+                    <span class="comment">// ... ...</span>
+                    <span class="keyword">goto</span> end;
+                <span class="keyword">default</span>:          
+                    <span class="comment">//rollback token, resend token</span>
+                    <span class="comment">// ... ...</span>
+                    <span class="keyword">goto</span> end;
+            }
 
-         } // ssl write
-     } // while
+        } <span class="comment">// ssl write</span>
+    } <span class="comment">// while</span>
 
- end:
-     SSL_shutdown(ssl);
-     close(sockfd);
-     return ret_val;
- }
+end:
+    SSL_shutdown(ssl);
+    close(sockfd);
+    <span class="keyword">return</span> ret_val;
+}
 </code></pre></li>
 </ol>
 <p>当前的性能上还是不够好，有文档上提到：</p>
@@ -345,24 +351,14 @@
 
 
 <section id="comments">
-  <div id="disqus_thread">
-    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  </div>
+  <div id="disqus_thread"> </div>
 </section>
 
 
 </section>
 
 	    <footer id="footer">
-    <span> <a href="/about"> About </a> </span>
-    <span> <a href="/archives"> Misc </a> </span>
-
-    <span>
-	<a href="http://hexo.io/" title="Hexo">Hexo</a>
-    </span>
-    <span>
-	&copy; popozhu 2015 
-    </span>
+    popozhu &copy; 2016 
 </footer>
 
 	</div>
@@ -375,9 +371,6 @@
 
 <script>
   var disqus_shortname = 'popozhu';
-  
-  var disqus_url = 'http://popozhu.github.io/2014/12/27/ios消息推送的优化/';
-  
   (function(){
     var dsq = document.createElement('script');
     dsq.type = 'text/javascript';
@@ -386,6 +379,7 @@
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
 </script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
 <script src="/js/script.js" type="text/javascript"></script>

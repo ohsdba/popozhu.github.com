@@ -2,14 +2,13 @@
   margin-top: 3rem;
 }
 .article-entry {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
 }
 .article-header {
   border-left: 0.3rem solid color-meta;
   margin: 20px 0 10px;
   padding: 0 0 0 13px;
   text-align: left;
-  color: color-meta;
 }
 .article-header .title {
   font-size: 2rem;
