@@ -50,7 +50,16 @@
 	    
 
 	    <p>最近有个事情，统计站上所有视频文件的md5，导出的待分析的数据有28G，需要去重。我用perl的hash来处理，可以简单快速完成。但考虑到perl会使用较多内存，担心影响机器其他进程，根据一篇wiki，在perl中使用一个dbm来帮助管理内存，大概如下：</p>
-<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> KyotoCabinet;</span><br><span class="line"></span><br><span class="line"><span class="keyword">my</span> <span class="variable">$db</span> = <span class="keyword">tie</span>(<span class="keyword">my</span> <span class="variable">%db</span>, <span class="string">'KyotoCabinet::DB'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment"># use the $db, such as:</span></span><br><span class="line"><span class="comment"># $db&#123;$key&#125; = $value;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">undef</span>(<span class="variable">$db</span>);</span><br><span class="line"><span class="keyword">untie</span>(<span class="variable">%db</span>);</span><br></pre></td></tr></table></figure>
+<pre><code class="perl">use KyotoCabinet;
+
+my $db = tie(my %db, &#39;KyotoCabinet::DB&#39;);
+
+# use the $db, such as:
+# $db{$key} = $value;
+
+undef($db);
+untie(%db);
+</code></pre>
 <p>参考wiki的介绍内容如下2点：  </p>
 <ol>
 <li>KyotoCabinet(简称kc)是一种轻量级的数据库，把它当做DBM，跟perl里面的tie结合，可以使用哈希结构来达到我们的计算目的。  </li>
@@ -59,11 +68,11 @@
 <p>kc是一个key－value的数据库，这里应用到perl脚本里当成hash来保存我的处理数据，最后再把数据写到结果文件里。实际情况中，直接用perl的hash，使用内存达到5G，而用了kc，内存使用约为2.5G－2.8G左右（机器上有32G内存），结果文件为2.1G。当然，使用kc后perl的处理速度，相比直接使用perl的hash，相对要慢了。    </p>
 <p>在perl中使用kc，需要先安装kc，再安装kc的perl模块：  </p>
 <ol>
-<li>kc的核心库: <a href="http://fallabs.com/kyotocabinet/pkg/" target="_blank" rel="external">Source Packages of the core library (C/C++)</a><pre><code>./configure --prefix=/<span class="keyword">opt</span>/local
-<span class="keyword">make</span> &amp;&amp; <span class="keyword">make</span> install
+<li>kc的核心库: <a href="http://fallabs.com/kyotocabinet/pkg/" target="_blank" rel="external">Source Packages of the core library (C/C++)</a><pre><code> ./configure --prefix=/opt/local
+ make &amp;&amp; make install
 </code></pre></li>
-<li>kc的perl模块，<strong>不能指定安装目录</strong>: <a href="http://fallabs.com/kyotocabinet/perlpkg/" target="_blank" rel="external">Source Packages for Perl</a><pre><code><span class="keyword">perl</span> Makefile.PL
-<span class="keyword">make</span> &amp;&amp; <span class="keyword">make</span> install
+<li>kc的perl模块，<strong>不能指定安装目录</strong>: <a href="http://fallabs.com/kyotocabinet/perlpkg/" target="_blank" rel="external">Source Packages for Perl</a><pre><code> perl Makefile.PL
+ make &amp;&amp; make install
 </code></pre></li>
 </ol>
 <p><hr><br>如果真的在只有2G内存的机器上处理100G的数据，假如结果文件的大小超过内存，其效果又如何，实在好奇。因为我使用的机器内存有32G，待处理文件也只有28G，暂时无法验证kc是否能解决这个假定，后续有机会的话找个2G内存的普通笔记本再试试，目前虚拟机也没有linux（太不专业了）。  </p>

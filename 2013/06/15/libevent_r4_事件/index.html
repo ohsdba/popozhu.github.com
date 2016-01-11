@@ -64,13 +64,58 @@
 </ol>
 <p>事件有相似的生命周期。调用Libevent的函数来创建一个事件并把该事件关联到一个event_base上，这个事件就是<strong>初始化</strong>的状态。在这个时候点，你可以调用<code>add</code>，让它在base中变成<strong>等待</strong>状态。在事件等待过程中，如果符合触发事件的条件满足，事件就变成<strong>激活</strong>状态，比如文件描述符改变了状态，或者超时条件。事件激活后，它的（或者用户提供的）回调函数开始执行。如果事件被设置<strong>持续等待</strong>，那它继续保持等待状态，否则当它的回调函数执行完毕后，事件就停止等待。你也可以<strong>删除</strong>一个等待事件来取消等待。</p>
 <p><br></p>
-<h2 id="创建一个事件">创建一个事件</h2><p>创建一个新的事件，使用<code>event_new()</code>这个接口：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EV_TIMEOUT      <span class="number">0x01</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EV_READ         <span class="number">0x02</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EV_WRITE        <span class="number">0x04</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EV_SIGNAL       <span class="number">0x08</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EV_PERSIST      <span class="number">0x10</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EV_ET           <span class="number">0x20</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*event_callback_fn)</span><span class="params">(evutil_socket_t, <span class="keyword">short</span>, <span class="keyword">void</span> *)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">struct</span> event *<span class="title">event_new</span><span class="params">(<span class="keyword">struct</span> event_base *base, evutil_socket_t fd,</span><br><span class="line">    <span class="keyword">short</span> what, event_callback_fn cb,</span><br><span class="line">    <span class="keyword">void</span> *arg)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">event_free</span><span class="params">(<span class="keyword">struct</span> event *event)</span></span>;</span><br></pre></td></tr></table></figure></p>
-<p><code>event_new()</code>函数尝试分配内存和创建一个新的事件以给base使用。参数<code>what</code>包含上面列出的一个或多个标识。如果<code>fd</code>为非负数，那它就是一个事件监听读写事件的文件。当事件激活后，Libevent将会调用回调函数<code>cb</code>，传给这个回调函数3个参数：a)文件描述符<code>fd</code>，b)触发的事件标识，c)原本传给<code>event_new()</code>的最后一个参数<code>arg</code>。  </p>
+<h2 id="创建一个事件">创建一个事件</h2><p>创建一个新的事件，使用<code>event_new()</code>这个接口：  </p>
+<pre><code>#define EV_TIMEOUT      0x01
+#define EV_READ         0x02
+#define EV_WRITE        0x04
+#define EV_SIGNAL       0x08
+#define EV_PERSIST      0x10
+#define EV_ET           0x20
+
+typedef void (*event_callback_fn)(evutil_socket_t, short, void *);
+
+struct event *event_new(struct event_base *base, evutil_socket_t fd,
+    short what, event_callback_fn cb,
+    void *arg);
+
+void event_free(struct event *event);
+</code></pre><p><code>event_new()</code>函数尝试分配内存和创建一个新的事件以给base使用。参数<code>what</code>包含上面列出的一个或多个标识。如果<code>fd</code>为非负数，那它就是一个事件监听读写事件的文件。当事件激活后，Libevent将会调用回调函数<code>cb</code>，传给这个回调函数3个参数：a)文件描述符<code>fd</code>，b)触发的事件标识，c)原本传给<code>event_new()</code>的最后一个参数<code>arg</code>。  </p>
 <p>如果出现内部错误，或者遇到无效的参数，<code>event_new()</code>返回NULL指针。  </p>
 <p>一个新事件初始化之后，还是非等待状态。调用<code>event_add()</code>来让事件变成等待状态（下面讲到）。  </p>
 <p>调用<code>event_free()</code>来释放事件。释放一个等待或激活状态的事件是安全的：它会先让事件停止等待，或者让它变成非激活状态，再释放它。  </p>
-<h4 id="Example">Example</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">cb_func</span><span class="params">(evutil_socket_t fd, <span class="keyword">short</span> what, <span class="keyword">void</span> *arg)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">        <span class="keyword">const</span> <span class="keyword">char</span> *data = arg;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"Got an event on socket %d:%s%s%s%s [%s]"</span>,</span><br><span class="line">            (<span class="keyword">int</span>) fd,</span><br><span class="line">            (what&amp;EV_TIMEOUT) ? <span class="string">" timeout"</span> : <span class="string">""</span>,</span><br><span class="line">            (what&amp;EV_READ)    ? <span class="string">" read"</span> : <span class="string">""</span>,</span><br><span class="line">            (what&amp;EV_WRITE)   ? <span class="string">" write"</span> : <span class="string">""</span>,</span><br><span class="line">            (what&amp;EV_SIGNAL)  ? <span class="string">" signal"</span> : <span class="string">""</span>,</span><br><span class="line">            data);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main_loop</span><span class="params">(evutil_socket_t fd1, evutil_socket_t fd2)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">        <span class="keyword">struct</span> event *ev1, *ev2;</span><br><span class="line">        <span class="keyword">struct</span> timeval five_seconds = &#123;<span class="number">5</span>,<span class="number">0</span>&#125;;</span><br><span class="line">        <span class="keyword">struct</span> event_base *base = event_base_new();</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* The caller has already set up fd1, fd2 somehow, and make them</span><br><span class="line">           nonblocking. */</span></span><br><span class="line"></span><br><span class="line">        ev1 = event_new(base, fd1, EV_TIMEOUT|EV_READ|EV_PERSIST, cb_func,</span><br><span class="line">           (<span class="keyword">char</span>*)<span class="string">"Reading event"</span>);</span><br><span class="line">        ev2 = event_new(base, fd2, EV_WRITE|EV_PERSIST, cb_func,</span><br><span class="line">           (<span class="keyword">char</span>*)<span class="string">"Writing event"</span>);</span><br><span class="line"></span><br><span class="line">        event_add(ev1, &amp;five_seconds);</span><br><span class="line">        event_add(ev2, <span class="literal">NULL</span>);</span><br><span class="line">        event_base_dispatch(base);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="事件标识">事件标识</h3><ol>
+<h4 id="Example">Example</h4><pre><code>#include &lt;event2/event.h&gt;
+
+void cb_func(evutil_socket_t fd, short what, void *arg)
+{
+        const char *data = arg;
+        printf(&quot;Got an event on socket %d:%s%s%s%s [%s]&quot;,
+            (int) fd,
+            (what&amp;EV_TIMEOUT) ? &quot; timeout&quot; : &quot;&quot;,
+            (what&amp;EV_READ)    ? &quot; read&quot; : &quot;&quot;,
+            (what&amp;EV_WRITE)   ? &quot; write&quot; : &quot;&quot;,
+            (what&amp;EV_SIGNAL)  ? &quot; signal&quot; : &quot;&quot;,
+            data);
+}
+
+void main_loop(evutil_socket_t fd1, evutil_socket_t fd2)
+{
+        struct event *ev1, *ev2;
+        struct timeval five_seconds = {5,0};
+        struct event_base *base = event_base_new();
+
+        /* The caller has already set up fd1, fd2 somehow, and make them
+           nonblocking. */
+
+        ev1 = event_new(base, fd1, EV_TIMEOUT|EV_READ|EV_PERSIST, cb_func,
+           (char*)&quot;Reading event&quot;);
+        ev2 = event_new(base, fd2, EV_WRITE|EV_PERSIST, cb_func,
+           (char*)&quot;Writing event&quot;);
+
+        event_add(ev1, &amp;five_seconds);
+        event_add(ev2, NULL);
+        event_base_dispatch(base);
+}
+</code></pre><h3 id="事件标识">事件标识</h3><ol>
 <li>EV_TIMEOUT<br> 表示在一个超时时间之后，事件会变成激活状态。<br> EV_TIMEOUT标识在事件创建时是被忽略的：你在添加事件时也可以不设置这个标识。当超时的回调函数执行前，这个标识会被设置到参数<code>what</code>中，再传给回调函数。  </li>
 <li>EV_READ<br> 当提供的文件描述符可读时激活事件。  </li>
 <li>EV_WRITE<br> 当提供的文件描述符可写时激活事件。  </li>
@@ -86,17 +131,60 @@
 <li>上次事件激活之后的5秒之后，事件再次被激活  </li>
 </ol>
 <h3 id="创建一个默认回调函数的事件">创建一个默认回调函数的事件</h3><p>你可能经常需要创建一个回调它自身的事件，你不能传一个event的指针给<code>event_new()</code>，因为该事件还未存在。为了解决这个问题，你可以使用<code>event_self_cbarg()</code>。  </p>
-<h4 id="Interface">Interface</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">event_self_cbarg</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
-<p>该函数返回一个神奇的指针，当该指针作为<code>arg</code>参数传给<code>event_new()</code>时，<code>event_new()</code>将创建一个回调它自身的事件。  </p>
-<h4 id="Example-1">Example</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> n_calls = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">cb_func</span><span class="params">(evutil_socket_t fd, <span class="keyword">short</span> what, <span class="keyword">void</span> *arg)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> event *me = arg;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"cb_func called %d times so far.\n"</span>, ++n_calls);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (n_calls &gt; <span class="number">100</span>)</span><br><span class="line">       event_del(me);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">(<span class="keyword">struct</span> event_base *base)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> timeval one_sec = &#123; <span class="number">1</span>, <span class="number">0</span> &#125;;</span><br><span class="line">    <span class="keyword">struct</span> event *ev;</span><br><span class="line">    <span class="comment">/* We're going to set up a repeating timer to get called called 100</span><br><span class="line">       times. */</span></span><br><span class="line">    ev = event_new(base, -<span class="number">1</span>, EV_PERSIST, cb_func, event_self_cbarg());</span><br><span class="line">    event_add(ev, &amp;one_sec);</span><br><span class="line">    event_base_dispatch(base);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个函数也可以跟<code>event_new()</code>，<code>evtimer_new()</code>，<code>evsignal_new()</code>，<code>event_assign()</code>，<code>evtimer_assign()</code>，<code>evsignal_assign()</code>使用。  </p>
-<h4 id="只有超时的事件">只有超时的事件</h4><p>为了方便，有一组以<code>evtimer_</code>为前缀的宏来支持只做超时的事件。使用这些宏可让你的代码更清晰。<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evtimer_new</span><span class="params">(base, callback, arg)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_new</span><span class="params">((base)</span></span>, -<span class="number">1</span>, <span class="number">0</span>, (callback), (arg))</span><br><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evtimer_add</span><span class="params">(ev, tv)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_add</span><span class="params">((ev)</span></span>,(tv))</span><br><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evtimer_del</span><span class="params">(ev)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_del</span><span class="params">(ev)</span></span></span><br><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evtimer_pending</span><span class="params">(ev, tv_out)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_pending</span><span class="params">((ev)</span></span>, EV_TIMEOUT, (tv_out))</span><br></pre></td></tr></table></figure></p>
-<h4 id="创建信号事件">创建信号事件</h4><p>Libevent也能检测POSIX-style的信号，使用下面函数来创建一个信号处理函数：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evsignal_new</span><span class="params">(base, signum, callback, arg)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_new</span><span class="params">(base, signum, EV_SIGNAL|EV_PERSIST, cb, arg)</span></span></span><br></pre></td></tr></table></figure></p>
-<p>参数跟<code>event_new</code>一样， 除了第2个参数，这里提供的是信号，而不是文件描述符。  </p>
-<h4 id="Example-2">Example</h4><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="keyword">event</span> *hup_event;</span><br><span class="line"><span class="keyword">struct</span> event_base *<span class="keyword">base</span> = event_base_new();</span><br><span class="line"></span><br><span class="line"><span class="comment">/* call sighup_function on a HUP signal */</span></span><br><span class="line">hup_event = evsignal_new(<span class="keyword">base</span>, SIGHUP, sighup_function, NULL);</span><br></pre></td></tr></table></figure>
-<p>注意，当信号出现后，信号回调函数是在事件轮询时执行的，所以可以安全调用一些函数，那些在POSIX信号处理函数里可能不推荐调用的函数。  </p>
-<p>也有对应的用于信号事件的一些宏：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evsignal_add</span><span class="params">(ev, tv)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_add</span><span class="params">((ev)</span></span>,(tv))</span><br><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evsignal_del</span><span class="params">(ev)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_del</span><span class="params">(ev)</span></span></span><br><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evsignal_pending</span><span class="params">(ev, what, tv_out)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_pending</span><span class="params">((ev)</span></span>, (what), (tv_out))</span><br></pre></td></tr></table></figure></p>
-<p>在当前版本的Libevent中，对于多数后端实现，一个进程只能有一个event_base来监听信号。如果你同时往2个event_base中添加信号事件，即使是不同信号的事件，当信号到来时，也只有一个event_base会收到信号。<br>kqueue这个后端则没有这个限制（苹果的队列啊）。  </p>
+<h4 id="Interface">Interface</h4><pre><code>void *event_self_cbarg();
+</code></pre><p>该函数返回一个神奇的指针，当该指针作为<code>arg</code>参数传给<code>event_new()</code>时，<code>event_new()</code>将创建一个回调它自身的事件。  </p>
+<h4 id="Example-1">Example</h4><pre><code>#include &lt;event2/event.h&gt;
+
+static int n_calls = 0;
+
+void cb_func(evutil_socket_t fd, short what, void *arg)
+{
+    struct event *me = arg;
+
+    printf(&quot;cb_func called %d times so far.\n&quot;, ++n_calls);
+
+    if (n_calls &gt; 100)
+       event_del(me);
+}
+
+void run(struct event_base *base)
+{
+    struct timeval one_sec = { 1, 0 };
+    struct event *ev;
+    /* We&#39;re going to set up a repeating timer to get called called 100
+       times. */
+    ev = event_new(base, -1, EV_PERSIST, cb_func, event_self_cbarg());
+    event_add(ev, &amp;one_sec);
+    event_base_dispatch(base);
+}
+</code></pre><p>这个函数也可以跟<code>event_new()</code>，<code>evtimer_new()</code>，<code>evsignal_new()</code>，<code>event_assign()</code>，<code>evtimer_assign()</code>，<code>evsignal_assign()</code>使用。  </p>
+<h4 id="只有超时的事件">只有超时的事件</h4><p>为了方便，有一组以<code>evtimer_</code>为前缀的宏来支持只做超时的事件。使用这些宏可让你的代码更清晰。  </p>
+<pre><code>#define evtimer_new(base, callback, arg) \
+    event_new((base), -1, 0, (callback), (arg))
+#define evtimer_add(ev, tv) \
+    event_add((ev),(tv))
+#define evtimer_del(ev) \
+    event_del(ev)
+#define evtimer_pending(ev, tv_out) \
+    event_pending((ev), EV_TIMEOUT, (tv_out))
+</code></pre><h4 id="创建信号事件">创建信号事件</h4><p>Libevent也能检测POSIX-style的信号，使用下面函数来创建一个信号处理函数：  </p>
+<pre><code>#define evsignal_new(base, signum, callback, arg) \
+    event_new(base, signum, EV_SIGNAL|EV_PERSIST, cb, arg)
+</code></pre><p>参数跟<code>event_new</code>一样， 除了第2个参数，这里提供的是信号，而不是文件描述符。  </p>
+<h4 id="Example-2">Example</h4><pre><code>struct event *hup_event;
+struct event_base *base = event_base_new();
+
+/* call sighup_function on a HUP signal */
+hup_event = evsignal_new(base, SIGHUP, sighup_function, NULL);
+</code></pre><p>注意，当信号出现后，信号回调函数是在事件轮询时执行的，所以可以安全调用一些函数，那些在POSIX信号处理函数里可能不推荐调用的函数。  </p>
+<p>也有对应的用于信号事件的一些宏：</p>
+<pre><code>#define evsignal_add(ev, tv) \
+    event_add((ev),(tv))
+#define evsignal_del(ev) \
+    event_del(ev)
+#define evsignal_pending(ev, what, tv_out) \
+    event_pending((ev), (what), (tv_out))
+</code></pre><p>在当前版本的Libevent中，对于多数后端实现，一个进程只能有一个event_base来监听信号。如果你同时往2个event_base中添加信号事件，即使是不同信号的事件，当信号到来时，也只有一个event_base会收到信号。<br>kqueue这个后端则没有这个限制（苹果的队列啊）。  </p>
 <h4 id="没有使用堆来分配和创建事件">没有使用堆来分配和创建事件</h4><p>为了性能和其他原因，一些人喜欢在一个大数据结构体中分配事件使用的内存，这样使用，他们可以节省：  </p>
 <ol>
 <li>内存分配器在堆上分配小对象内存的开销  </li>
@@ -105,51 +193,208 @@
 </ol>
 <p>这样使用会带来跟其他Libevent版本的二进制兼容问题，因为可能存在不同长度的event数据结构。  </p>
 <p>这些都是非常小的开销，一般不影响程序。 你应该坚持使用<code>event_new()</code>，除非你在堆上分配事件而遇到非常明显的性能问题。使用<code>event_assign()</code>会在未来的Libevent版本遇到难以定位的问题，如果未来Libevent使用一个比你使用的数据结构更大的大数据结构。  </p>
-<h4 id="Interface-1">Interface</h4><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_assign</span>(<span class="params"><span class="keyword">struct</span> <span class="keyword">event</span> *<span class="keyword">event</span>, <span class="keyword">struct</span> event_base *<span class="keyword">base</span>,</span><br><span class="line">    evutil_socket_t fd, <span class="keyword">short</span> what,</span><br><span class="line">    <span class="keyword">void</span> (*callback</span>)(<span class="params">evutil_socket_t, <span class="keyword">short</span>, <span class="keyword">void</span> *</span>), <span class="keyword">void</span> *arg)</span>;</span><br></pre></td></tr></table></figure>
-<p>除了<code>event</code>这个参数，其他参数跟<code>event_new()</code>一样，参数<code>event</code>必须指向一个未初始化的事件，成功返回0，如果出现内部错误或者遇到错误参数，返回-1。  </p>
-<h4 id="Example-3">Example</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span></span><br><span class="line"><span class="comment">/* Watch out!  Including event_struct.h means that your code will not</span><br><span class="line"> * be binary-compatible with future versions of Libevent. */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event_struct.h&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> event_pair &#123;</span><br><span class="line">         <span class="keyword">evutil_socket_t</span> fd;</span><br><span class="line">         <span class="keyword">struct</span> event read_event;</span><br><span class="line">         <span class="keyword">struct</span> event write_event;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">readcb</span><span class="params">(evutil_socket_t, <span class="keyword">short</span>, <span class="keyword">void</span> *)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">writecb</span><span class="params">(evutil_socket_t, <span class="keyword">short</span>, <span class="keyword">void</span> *)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">struct</span> event_pair *<span class="title">event_pair_new</span><span class="params">(<span class="keyword">struct</span> event_base *base, evutil_socket_t fd)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">        <span class="keyword">struct</span> event_pair *p = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> event_pair));</span><br><span class="line">        <span class="keyword">if</span> (!p) <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">        p-&gt;fd = fd;</span><br><span class="line">        event_assign(&amp;p-&gt;read_event, base, fd, EV_READ|EV_PERSIST, readcb, p);</span><br><span class="line">        event_assign(&amp;p-&gt;write_event, base, fd, EV_WRITE|EV_PERSIST, writecb, p);</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>你也能使用<code>event_assign()</code>来初始化栈上分配的或静态分配的事件。  </p>
+<h4 id="Interface-1">Interface</h4><pre><code>int event_assign(struct event *event, struct event_base *base,
+    evutil_socket_t fd, short what,
+    void (*callback)(evutil_socket_t, short, void *), void *arg);
+</code></pre><p>除了<code>event</code>这个参数，其他参数跟<code>event_new()</code>一样，参数<code>event</code>必须指向一个未初始化的事件，成功返回0，如果出现内部错误或者遇到错误参数，返回-1。  </p>
+<h4 id="Example-3">Example</h4><pre><code>#include &lt;event2/event.h&gt;
+/* Watch out!  Including event_struct.h means that your code will not
+ * be binary-compatible with future versions of Libevent. */
+#include &lt;event2/event_struct.h&gt;
+#include &lt;stdlib.h&gt;
+
+struct event_pair {
+         evutil_socket_t fd;
+         struct event read_event;
+         struct event write_event;
+};
+void readcb(evutil_socket_t, short, void *);
+void writecb(evutil_socket_t, short, void *);
+struct event_pair *event_pair_new(struct event_base *base, evutil_socket_t fd)
+{
+        struct event_pair *p = malloc(sizeof(struct event_pair));
+        if (!p) return NULL;
+        p-&gt;fd = fd;
+        event_assign(&amp;p-&gt;read_event, base, fd, EV_READ|EV_PERSIST, readcb, p);
+        event_assign(&amp;p-&gt;write_event, base, fd, EV_WRITE|EV_PERSIST, writecb, p);
+        return p;
+}
+</code></pre><p>你也能使用<code>event_assign()</code>来初始化栈上分配的或静态分配的事件。  </p>
 <p><em>警告</em><br>不要对一个已经在event_base里的且已经开始等待的事件调用<code>event_assign()</code>。否则会带来及其难以定位的错误。如果事件已经初始化或正处于等待，在你调用<code>event_assing()</code>之前先调用<code>event_del()</code>。  </p>
-<p>对于<code>event_assign()</code>也有对应的方便使用的宏：<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evtimer_assign</span><span class="params">(event, base, callback, arg)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_assign</span><span class="params">(event, base, -<span class="number">1</span>, <span class="number">0</span>, callback, arg)</span></span></span><br><span class="line"><span class="hexcolor">#def</span>ine <span class="function"><span class="title">evsignal_assign</span><span class="params">(event, base, signum, callback, arg)</span></span> \</span><br><span class="line">    <span class="function"><span class="title">event_assign</span><span class="params">(event, base, signum, EV_SIGNAL|EV_PERSIST, callback, arg)</span></span></span><br></pre></td></tr></table></figure></p>
-<p>如果你需要使用<code>event_assign()</code>并且想跟未来的Libevent版本保持二进制兼容，你可以在程序运行时让Libevent告诉你一个event数据结构需要多少空间：   </p>
-<h4 id="Inteface">Inteface</h4><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">size_t <span class="title">event_get_struct_event_size</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>这个函数返回event数据结构需要多少字节。跟之前说的，除非你知道你的程序在堆上分配内存会带来非常严重的性能问题，否则不要使用这个函数，因为它会让你的代码难以阅读和编写。  </p>
+<p>对于<code>event_assign()</code>也有对应的方便使用的宏：  </p>
+<pre><code>#define evtimer_assign(event, base, callback, arg) \
+    event_assign(event, base, -1, 0, callback, arg)
+#define evsignal_assign(event, base, signum, callback, arg) \
+    event_assign(event, base, signum, EV_SIGNAL|EV_PERSIST, callback, arg)
+</code></pre><p>如果你需要使用<code>event_assign()</code>并且想跟未来的Libevent版本保持二进制兼容，你可以在程序运行时让Libevent告诉你一个event数据结构需要多少空间：   </p>
+<h4 id="Inteface">Inteface</h4><pre><code>size_t event_get_struct_event_size(void);
+</code></pre><p>这个函数返回event数据结构需要多少字节。跟之前说的，除非你知道你的程序在堆上分配内存会带来非常严重的性能问题，否则不要使用这个函数，因为它会让你的代码难以阅读和编写。  </p>
 <p>注意，未来版本里的<code>event_get_struct_event_size()</code>返回的字节数值可能比<code>sizeof(struct event)</code>要少，如果发生了，那意味着struct event末端的额外字节只是填充，在Libevent版本中使用。  </p>
 <p>这里也有对应的例子，但不是依赖头文件event_struct.h里定义的event数据结构的长度，而是使用<code>event_get_struct_size()</code>在运行时决定event的长度。  </p>
-<h4 id="EXample">EXample</h4><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#include &lt;event2/event.h&gt;</span></span><br><span class="line"><span class="preprocessor">#include &lt;stdlib.h&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* When we allocate an event_pair in memory, we'll actually allocate</span><br><span class="line"> * more space at the end of the structure.  We define some macros</span><br><span class="line"> * to make accessing those events less error-prone. */</span></span><br><span class="line"><span class="keyword">struct</span> event_pair &#123;</span><br><span class="line">         evutil_socket_t fd;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Macro: yield the struct event 'offset' bytes from the start of 'p' */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EVENT_AT_OFFSET(p, offset) \</span></span><br><span class="line">            ((<span class="keyword">struct</span> <span class="keyword">event</span>*) ( ((<span class="keyword">char</span>*)(p)) + (offset) ))</span><br><span class="line"><span class="comment">/* Macro: yield the read event of an event_pair */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> READEV_PTR(pair) \</span></span><br><span class="line">            EVENT_AT_OFFSET((pair), <span class="keyword">sizeof</span>(<span class="keyword">struct</span> event_pair))</span><br><span class="line"><span class="comment">/* Macro: yield the write event of an event_pair */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> WRITEEV_PTR(pair) \</span></span><br><span class="line">            EVENT_AT_OFFSET((pair), \</span><br><span class="line">                <span class="keyword">sizeof</span>(<span class="keyword">struct</span> event_pair)+event_get_struct_event_size())</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Macro: yield the actual size to allocate for an event_pair */</span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EVENT_PAIR_SIZE() \</span></span><br><span class="line">            (<span class="keyword">sizeof</span>(<span class="keyword">struct</span> event_pair)+<span class="number">2</span>*event_get_struct_event_size())</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">readcb</span>(<span class="params">evutil_socket_t, <span class="keyword">short</span>, <span class="keyword">void</span> *</span>)</span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">writecb</span>(<span class="params">evutil_socket_t, <span class="keyword">short</span>, <span class="keyword">void</span> *</span>)</span>;</span><br><span class="line"><span class="keyword">struct</span> event_pair *event_pair_new(<span class="keyword">struct</span> event_base *<span class="keyword">base</span>, evutil_socket_t fd)</span><br><span class="line">&#123;</span><br><span class="line">        <span class="keyword">struct</span> event_pair *p = malloc(EVENT_PAIR_SIZE());</span><br><span class="line">        <span class="keyword">if</span> (!p) <span class="keyword">return</span> NULL;</span><br><span class="line">        p-&gt;fd = fd;</span><br><span class="line">        event_assign(READEV_PTR(p), <span class="keyword">base</span>, fd, EV_READ|EV_PERSIST, readcb, p);</span><br><span class="line">        event_assign(WRITEEV_PTR(p), <span class="keyword">base</span>, fd, EV_WRITE|EV_PERSIST, writecb, p);</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><br></p>
-<h2 id="让事件等待或取消等待">让事件等待或取消等待</h2><p>创建了一个事件之后，你会调用<code>event_add()</code>让事件开始等待：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_add</span>(<span class="params"><span class="keyword">struct</span> <span class="keyword">event</span> *ev, <span class="keyword">const</span> <span class="keyword">struct</span> timeval *tv</span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>成功返回0，失败返回-1。如果参数<code>tv</code>为NULL， 事件没有超时条件，否则，<code>tv</code>就是超时的秒数和微秒。  </p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_del</span>(<span class="params"><span class="keyword">struct</span> <span class="keyword">event</span> *ev</span>)</span>;</span><br></pre></td></tr></table></figure>
-<p>对一个初始化的事件调用<code>event_del</code>让事件停止等待，也让它变成非激活状态。 如果事件不是处于等待或激活状态，调用这个函数没有效果。成功返回0，失败返回-1。<br>注意：在事件被激活之后，且在回调函数开始执行之前，若删除了事件，那回调函数不会执行。  </p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_remove_timer</span>(<span class="params"><span class="keyword">struct</span> <span class="keyword">event</span> *ev</span>)</span>;</span><br></pre></td></tr></table></figure>
-<p>最后，你可以删除一个等待事件的超时条件，而不需要删除它的IO或者信号条件。如果事件没有等待的超时条件，这个函数没有效果。如果事件只有超时条件，这个函数等同<code>event_del</code>。成功返回0，失败返回-1。  </p>
+<h4 id="EXample">EXample</h4><pre><code>#include &lt;event2/event.h&gt;
+#include &lt;stdlib.h&gt;
+
+/* When we allocate an event_pair in memory, we&#39;ll actually allocate
+ * more space at the end of the structure.  We define some macros
+ * to make accessing those events less error-prone. */
+struct event_pair {
+         evutil_socket_t fd;
+};
+
+/* Macro: yield the struct event &#39;offset&#39; bytes from the start of &#39;p&#39; */
+#define EVENT_AT_OFFSET(p, offset) \
+            ((struct event*) ( ((char*)(p)) + (offset) ))
+/* Macro: yield the read event of an event_pair */
+#define READEV_PTR(pair) \
+            EVENT_AT_OFFSET((pair), sizeof(struct event_pair))
+/* Macro: yield the write event of an event_pair */
+#define WRITEEV_PTR(pair) \
+            EVENT_AT_OFFSET((pair), \
+                sizeof(struct event_pair)+event_get_struct_event_size())
+
+/* Macro: yield the actual size to allocate for an event_pair */
+#define EVENT_PAIR_SIZE() \
+            (sizeof(struct event_pair)+2*event_get_struct_event_size())
+
+void readcb(evutil_socket_t, short, void *);
+void writecb(evutil_socket_t, short, void *);
+struct event_pair *event_pair_new(struct event_base *base, evutil_socket_t fd)
+{
+        struct event_pair *p = malloc(EVENT_PAIR_SIZE());
+        if (!p) return NULL;
+        p-&gt;fd = fd;
+        event_assign(READEV_PTR(p), base, fd, EV_READ|EV_PERSIST, readcb, p);
+        event_assign(WRITEEV_PTR(p), base, fd, EV_WRITE|EV_PERSIST, writecb, p);
+        return p;
+}
+</code></pre><p><br></p>
+<h2 id="让事件等待或取消等待">让事件等待或取消等待</h2><p>创建了一个事件之后，你会调用<code>event_add()</code>让事件开始等待：   </p>
+<pre><code>int event_add(struct event *ev, const struct timeval *tv);
+</code></pre><p>成功返回0，失败返回-1。如果参数<code>tv</code>为NULL， 事件没有超时条件，否则，<code>tv</code>就是超时的秒数和微秒。  </p>
+<pre><code>int event_del(struct event *ev);
+</code></pre><p>对一个初始化的事件调用<code>event_del</code>让事件停止等待，也让它变成非激活状态。 如果事件不是处于等待或激活状态，调用这个函数没有效果。成功返回0，失败返回-1。<br>注意：在事件被激活之后，且在回调函数开始执行之前，若删除了事件，那回调函数不会执行。  </p>
+<pre><code>int event_remove_timer(struct event *ev);
+</code></pre><p>最后，你可以删除一个等待事件的超时条件，而不需要删除它的IO或者信号条件。如果事件没有等待的超时条件，这个函数没有效果。如果事件只有超时条件，这个函数等同<code>event_del</code>。成功返回0，失败返回-1。  </p>
 <p><br></p>
 <h2 id="事件的优先顺序">事件的优先顺序</h2><p>当多个事件同时被触发，Libevent并没有定义他们回调函数的执行顺序。你可以使用他们的优先顺序来让一些事件变得更为重要。  </p>
-<p>前一章里提到，每个event_base有一个或多个优先顺序的值。事件初始化之后，在添加到event_base之前，你可以设置事件的优先顺序。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_priority_set</span>(<span class="params"><span class="keyword">struct</span> <span class="keyword">event</span> *<span class="keyword">event</span>, <span class="keyword">int</span> priority</span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>第2个参数<code>priority</code>的值最小为0，最大为event_base的优先值-1，成功返回0，失败返回-1。  </p>
+<p>前一章里提到，每个event_base有一个或多个优先顺序的值。事件初始化之后，在添加到event_base之前，你可以设置事件的优先顺序。  </p>
+<pre><code>int event_priority_set(struct event *event, int priority);
+</code></pre><p>第2个参数<code>priority</code>的值最小为0，最大为event_base的优先值-1，成功返回0，失败返回-1。  </p>
 <p>当多个事件同时激活，低优先级的事件没有执行，Libevent先执行高优先级的事件，然后再检查事件。 只有当没有高级别的事件激活，低级别的事件才被执行。  </p>
-<h3 id="Example-4">Example</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">read_cb</span><span class="params">(evutil_socket_t, <span class="keyword">short</span>, <span class="keyword">void</span> *)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">write_cb</span><span class="params">(evutil_socket_t, <span class="keyword">short</span>, <span class="keyword">void</span> *)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main_loop</span><span class="params">(evutil_socket_t fd)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">  <span class="keyword">struct</span> event *important, *unimportant;</span><br><span class="line">  <span class="keyword">struct</span> event_base *base;</span><br><span class="line"></span><br><span class="line">  base = event_base_new();</span><br><span class="line">  event_base_priority_init(base, <span class="number">2</span>);</span><br><span class="line">  <span class="comment">/* Now base has priority 0, and priority 1 */</span></span><br><span class="line">  important = event_new(base, fd, EV_WRITE|EV_PERSIST, write_cb, <span class="literal">NULL</span>);</span><br><span class="line">  unimportant = event_new(base, fd, EV_READ|EV_PERSIST, read_cb, <span class="literal">NULL</span>);</span><br><span class="line">  event_priority_set(important, <span class="number">0</span>);</span><br><span class="line">  event_priority_set(unimportant, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Now, whenever the fd is ready for writing, the write callback will</span><br><span class="line">     happen before the read callback.  The read callback won't happen at</span><br><span class="line">     all until the write callback is no longer active. */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如果你没有设置事件的优先等级，那事件的默认优先等级为event_base的一半。  </p>
+<h3 id="Example-4">Example</h3><pre><code>#include &lt;event2/event.h&gt;
+
+void read_cb(evutil_socket_t, short, void *);
+void write_cb(evutil_socket_t, short, void *);
+
+void main_loop(evutil_socket_t fd)
+{
+  struct event *important, *unimportant;
+  struct event_base *base;
+
+  base = event_base_new();
+  event_base_priority_init(base, 2);
+  /* Now base has priority 0, and priority 1 */
+  important = event_new(base, fd, EV_WRITE|EV_PERSIST, write_cb, NULL);
+  unimportant = event_new(base, fd, EV_READ|EV_PERSIST, read_cb, NULL);
+  event_priority_set(important, 0);
+  event_priority_set(unimportant, 1);
+
+  /* Now, whenever the fd is ready for writing, the write callback will
+     happen before the read callback.  The read callback won&#39;t happen at
+     all until the write callback is no longer active. */
+}
+</code></pre><p>如果你没有设置事件的优先等级，那事件的默认优先等级为event_base的一半。  </p>
 <p><br></p>
-<h2 id="检查事件状态">检查事件状态</h2><p>有时候你想检查一个事件是否已经被添加。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_pending</span>(<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *ev, <span class="keyword">short</span> what, <span class="keyword">struct</span> timeval *tv_out</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> event_get_signal(ev) /* ... */</span></span><br><span class="line"><span class="function">evutil_socket_t <span class="title">event_get_fd</span>(<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *ev</span>)</span>;</span><br><span class="line"><span class="keyword">struct</span> event_base *event_get_base(<span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *ev);</span><br><span class="line"><span class="function"><span class="keyword">short</span> <span class="title">event_get_events</span>(<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *ev</span>)</span>;</span><br><span class="line"><span class="function">event_callback_fn <span class="title">event_get_callback</span>(<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *ev</span>)</span>;</span><br><span class="line"><span class="keyword">void</span> *event_get_callback_arg(<span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *ev);</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_get_priority</span>(<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *ev</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">event_get_assignment</span>(<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *<span class="keyword">event</span>,</span><br><span class="line">        <span class="keyword">struct</span> event_base **base_out,</span><br><span class="line">        evutil_socket_t *fd_out,</span><br><span class="line">        <span class="keyword">short</span> *events_out,</span><br><span class="line">        event_callback_fn *callback_out,</span><br><span class="line">        <span class="keyword">void</span> **arg_out</span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>函数<code>event_pending</code>检测给出的事件是等待状态还是激活状态。如果是这两个状态，而且<code>what</code>设置了<code>EV_READ, EV_WRITE, EV_SIGNAL, EV_TIMEOUT</code>中的一个或多个标识，那这个函数返回当前是否有标识对应的等待或激活的事件类型。如果提供了参数<code>tv_out</code>，参数<code>what</code>也设置了EV_TIMEOUT，则如果事件当前是等待超时状态或超时后被激活状态，那超时的时间点通过<code>tv_out</code>返回。  </p>
+<h2 id="检查事件状态">检查事件状态</h2><p>有时候你想检查一个事件是否已经被添加。  </p>
+<pre><code>int event_pending(const struct event *ev, short what, struct timeval *tv_out);
+
+#define event_get_signal(ev) /* ... */
+evutil_socket_t event_get_fd(const struct event *ev);
+struct event_base *event_get_base(const struct event *ev);
+short event_get_events(const struct event *ev);
+event_callback_fn event_get_callback(const struct event *ev);
+void *event_get_callback_arg(const struct event *ev);
+int event_get_priority(const struct event *ev);
+
+void event_get_assignment(const struct event *event,
+        struct event_base **base_out,
+        evutil_socket_t *fd_out,
+        short *events_out,
+        event_callback_fn *callback_out,
+        void **arg_out);
+</code></pre><p>函数<code>event_pending</code>检测给出的事件是等待状态还是激活状态。如果是这两个状态，而且<code>what</code>设置了<code>EV_READ, EV_WRITE, EV_SIGNAL, EV_TIMEOUT</code>中的一个或多个标识，那这个函数返回当前是否有标识对应的等待或激活的事件类型。如果提供了参数<code>tv_out</code>，参数<code>what</code>也设置了EV_TIMEOUT，则如果事件当前是等待超时状态或超时后被激活状态，那超时的时间点通过<code>tv_out</code>返回。  </p>
 <p>函数<code>event_get_fd()</code>和<code>event_get_signal()</code>返回事件的文件描述符或信号号码。<br>函数<code>The event_get_base()</code>返回event_base。<br>函数<code>event_get_events()</code>返回事件标识（EV_READ, EV_WRITE等）。<br>函数<code>event_get_callback()</code>和<code>event_get_callback_arg()</code>返回事件的回调函数和参数指针。<br>函数<code>event_get_priority()</code>返回事件当前的优先等级。  </p>
 <p>函数<code>event_get_assignment()</code> 复制事件分配的所有字段到指定的指针里。如果指针为NULL，则忽略。  </p>
-<h4 id="Example-5">Example</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Change the callback and callback_arg of 'ev', which must not be</span><br><span class="line"> * pending. */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">replace_callback</span><span class="params">(<span class="keyword">struct</span> event *ev, event_callback_fn new_callback,</span><br><span class="line">    <span class="keyword">void</span> *new_callback_arg)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> event_base *base;</span><br><span class="line">    <span class="keyword">evutil_socket_t</span> fd;</span><br><span class="line">    <span class="keyword">short</span> events;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> pending;</span><br><span class="line"></span><br><span class="line">    pending = event_pending(ev, EV_READ|EV_WRITE|EV_SIGNAL|EV_TIMEOUT,</span><br><span class="line">                            <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span> (pending) &#123;</span><br><span class="line">        <span class="comment">/* We want to catch this here so that we do not re-assign a</span><br><span class="line">         * pending event.  That would be very very bad. */</span></span><br><span class="line">        <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>,</span><br><span class="line">                <span class="string">"Error! replace_callback called on a pending event!\n"</span>);</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    event_get_assignment(ev, &amp;base, &amp;fd, &amp;events,</span><br><span class="line">                         <span class="literal">NULL</span> <span class="comment">/* ignore old callback */</span> ,</span><br><span class="line">                         <span class="literal">NULL</span> <span class="comment">/* ignore old callback argument */</span>);</span><br><span class="line"></span><br><span class="line">    event_assign(ev, base, fd, events, new_callback, new_callback_arg);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Example-5">Example</h4><pre><code>#include &lt;event2/event.h&gt;
+#include &lt;stdio.h&gt;
+
+/* Change the callback and callback_arg of &#39;ev&#39;, which must not be
+ * pending. */
+int replace_callback(struct event *ev, event_callback_fn new_callback,
+    void *new_callback_arg)
+{
+    struct event_base *base;
+    evutil_socket_t fd;
+    short events;
+
+    int pending;
+
+    pending = event_pending(ev, EV_READ|EV_WRITE|EV_SIGNAL|EV_TIMEOUT,
+                            NULL);
+    if (pending) {
+        /* We want to catch this here so that we do not re-assign a
+         * pending event.  That would be very very bad. */
+        fprintf(stderr,
+                &quot;Error! replace_callback called on a pending event!\n&quot;);
+        return -1;
+    }
+
+    event_get_assignment(ev, &amp;base, &amp;fd, &amp;events,
+                         NULL /* ignore old callback */ ,
+                         NULL /* ignore old callback argument */);
+
+    event_assign(ev, base, fd, events, new_callback, new_callback_arg);
+    return 0;
+}
+</code></pre><p><br></p>
+<h2 id="获取当前正在执行的事件">获取当前正在执行的事件</h2><p>为了调试或其他原因，你可以获得一个指针，指向当前正在执行的事件。  </p>
+<pre><code>struct event *event_base_get_running_event(struct event_base *base);
+</code></pre><p>注意，只有在提供的event_base的循环里调用这个函数才能让这个函数正确执行。 不支持在另外线程中调用这个函数，将导致为定义的行为。  </p>
 <p><br></p>
-<h2 id="获取当前正在执行的事件">获取当前正在执行的事件</h2><p>为了调试或其他原因，你可以获得一个指针，指向当前正在执行的事件。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="keyword">event</span> *event_base_get_running_event(<span class="keyword">struct</span> event_base *<span class="keyword">base</span>);</span><br></pre></td></tr></table></figure></p>
-<p>注意，只有在提供的event_base的循环里调用这个函数才能让这个函数正确执行。 不支持在另外线程中调用这个函数，将导致为定义的行为。  </p>
-<p><br></p>
-<h2 id="一次性事件">一次性事件</h2><p>如果你不需要多次添加事件，或者在添加之后会马上删除它，也不需要让它持续等待，你可以使用<code>event_base_once()</code>：<br><figure class="highlight delphi"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">int event_base_once(struct event_base *, evutil_socket_t, short,</span><br><span class="line">  void <span class="comment">(*)(evutil_socket_t, short, void *)</span>, void *, <span class="keyword">const</span> struct timeval *);</span><br></pre></td></tr></table></figure></p>
-<p>这个接口跟<code>event_new()</code>类似，除了它不支持标识<code>EV_SIGNAL</code>和<code>EV_PERSIST</code>。这个事件以默认的优先等级开始执行，当它的回调函数执行完毕后，Libevent释放它内部的event数据结构。成功返回0，失败返回-1。  </p>
+<h2 id="一次性事件">一次性事件</h2><p>如果你不需要多次添加事件，或者在添加之后会马上删除它，也不需要让它持续等待，你可以使用<code>event_base_once()</code>：  </p>
+<pre><code>int event_base_once(struct event_base *, evutil_socket_t, short,
+  void (*)(evutil_socket_t, short, void *), void *, const struct timeval *);
+</code></pre><p>这个接口跟<code>event_new()</code>类似，除了它不支持标识<code>EV_SIGNAL</code>和<code>EV_PERSIST</code>。这个事件以默认的优先等级开始执行，当它的回调函数执行完毕后，Libevent释放它内部的event数据结构。成功返回0，失败返回-1。  </p>
 <p>这种一次性事件不能被删除或手工激活：如果你需要能够取消一个事件，你只能用常规的方式<code>event_new()</code>或<code>event_assign()</code>.  </p>
 <p><br></p>
-<h2 id="手工激活事件">手工激活事件</h2><p>比较少见，但你可以手工激活一个还未被触发的事件。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">event_active</span>(<span class="params"><span class="keyword">struct</span> <span class="keyword">event</span> *ev, <span class="keyword">int</span> what, <span class="keyword">short</span> ncalls</span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>这个函数让事件<code>ev</code>激活，跟随标识<code>what</code>。在调用之前，事件不需要已经处于等待状态，激活之后也不会让它变成等待状态。  </p>
+<h2 id="手工激活事件">手工激活事件</h2><p>比较少见，但你可以手工激活一个还未被触发的事件。  </p>
+<pre><code>void event_active(struct event *ev, int what, short ncalls);
+</code></pre><p>这个函数让事件<code>ev</code>激活，跟随标识<code>what</code>。在调用之前，事件不需要已经处于等待状态，激活之后也不会让它变成等待状态。  </p>
 <p>警告：对同个事件不断重复调用<code>event_active()</code>可能回耗尽资源。下面是一个错误使用的例子。  </p>
-<h4 id="Bad_Example:_making_an_infinite_loop_with_event_active()">Bad Example: making an infinite loop with event_active()</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> event *ev;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">cb</span><span class="params">(<span class="keyword">int</span> sock, <span class="keyword">short</span> which, <span class="keyword">void</span> *arg)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/* Whoops: Calling event_active on the same event unconditionally</span><br><span class="line">           from within its callback means that no other events might not get</span><br><span class="line">           run! */</span></span><br><span class="line"></span><br><span class="line">        event_active(ev, EV_WRITE, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> **argv)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">struct</span> event_base *base = event_base_new();</span><br><span class="line"></span><br><span class="line">        ev = event_new(base, -<span class="number">1</span>, EV_PERSIST | EV_READ, cb, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        event_add(ev, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        event_active(ev, EV_WRITE, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        event_base_loop(base, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>例子中只有一次事件轮询，但是不断循环调用<code>cb</code>。  </p>
+<h4 id="Bad_Example:_making_an_infinite_loop_with_event_active()">Bad Example: making an infinite loop with event_active()</h4><pre><code>struct event *ev;
+
+static void cb(int sock, short which, void *arg) {
+        /* Whoops: Calling event_active on the same event unconditionally
+           from within its callback means that no other events might not get
+           run! */
+
+        event_active(ev, EV_WRITE, 0);
+}
+
+int main(int argc, char **argv) {
+        struct event_base *base = event_base_new();
+
+        ev = event_new(base, -1, EV_PERSIST | EV_READ, cb, NULL);
+
+        event_add(ev, NULL);
+
+        event_active(ev, EV_WRITE, 0);
+
+        event_base_loop(base, 0);
+
+        return 0;
+}
+</code></pre><p>例子中只有一次事件轮询，但是不断循环调用<code>cb</code>。  </p>
 <p><br></p>
 <h2 id="优化超时时间">优化超时时间</h2><p>略。大意是当你需要同时设置数以千万个超时事件时，可以 让Libevent给你一个优化后的超时时间值，以优化性能。  </p>
 <p><br></p>

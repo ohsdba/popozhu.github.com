@@ -51,15 +51,87 @@
 
 	    <p>后台的C程序通过socket发给前台的消息包含了中文，前台接收后出现了乱码，有人提出让我把消息编码成unicode格式(\uxxxx)，虽然参考了一个C库做了实现，但当时的思路并不是很清晰，回来做下归纳。  </p>
 <p>包含中文字符的消息，记为msg，假若msg包含中文、英文和数字：msg = “abc我是def中文123字符”，于是需要把msg编码成unicode格式，编码后的内容保存到C的char数组里，记为unicode_str，则最终想要得到的unicode_str = “abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26”。  </p>
-<p>在c代码里，先用宽字符类型wchar_t保存msg，这个宽字符的长度可以用函数wcslen来计算，然后遍历每个宽字符，把宽字符转换成unicode格式。对每个宽字符的转换，参考了<a href="http://www.cprogramming.com/tutorial/unicode.html" target="_blank" rel="external">Unicode in C and C++: What You Can Do About It Today</a>这里提供的一个函数: u8_escape_wchar。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">u8_escape_wchar</span><span class="params">(<span class="keyword">char</span> *buf, <span class="keyword">int</span> sz, uint32_t ch)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (ch == L<span class="string">'\n'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\n"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch == L<span class="string">'\t'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\t"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch == L<span class="string">'\r'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\r"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch == L<span class="string">'\b'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\b"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch == L<span class="string">'\f'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\f"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch == L<span class="string">'\v'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\v"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch == L<span class="string">'\a'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\a"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch == L<span class="string">'\\'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\\\"</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch &lt; <span class="number">32</span> || ch == <span class="number">0x7f</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\x%hhX"</span>, (<span class="keyword">unsigned</span> <span class="keyword">char</span>)ch);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch &gt; <span class="number">0xFFFF</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\U%.8X"</span>, (<span class="keyword">uint32_t</span>)ch);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ch &gt;= <span class="number">0x80</span> &amp;&amp; ch &lt;= <span class="number">0xFFFF</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"\\u%.4hX"</span>, (<span class="keyword">unsigned</span> <span class="keyword">short</span>)ch);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">snprintf</span>(buf, sz, <span class="string">"%c"</span>, (<span class="keyword">char</span>)ch);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>每个宽字符先转换为unsigned int，也就是wchar_t到unsigned int。 demo大概如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    setlocale(LC_ALL, <span class="string">"zh_CN.UTF-8"</span>); </span><br><span class="line">    <span class="keyword">wchar_t</span> *input = <span class="string">L"abc我是def中文123字符"</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">int</span> len = wcslen(input);</span><br><span class="line">    <span class="keyword">wchar_t</span> *p = input;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">2048</span>] = &#123;<span class="number">0x0</span>&#125;;</span><br><span class="line">    <span class="keyword">char</span> *pbuf = buf;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ret;</span><br><span class="line">    <span class="keyword">int</span> i; <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        ret = u8_escape_wchar(pbuf, <span class="keyword">sizeof</span>(buf), (<span class="keyword">uint32_t</span>)*p);</span><br><span class="line">        pbuf += ret; </span><br><span class="line">        p++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"buf[%s]\n"</span>, buf);</span><br><span class="line"></span><br><span class="line">    setlocale(LC_ALL, <span class="string">"C"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在c代码里，先用宽字符类型wchar_t保存msg，这个宽字符的长度可以用函数wcslen来计算，然后遍历每个宽字符，把宽字符转换成unicode格式。对每个宽字符的转换，参考了<a href="http://www.cprogramming.com/tutorial/unicode.html" target="_blank" rel="external">Unicode in C and C++: What You Can Do About It Today</a>这里提供的一个函数: u8_escape_wchar。</p>
+<pre><code class="cpp">int u8_escape_wchar(char *buf, int sz, uint32_t ch)
+{
+    if (ch == L&#39;\n&#39;)
+        return snprintf(buf, sz, &quot;\\n&quot;);
+    else if (ch == L&#39;\t&#39;)
+        return snprintf(buf, sz, &quot;\\t&quot;);
+    else if (ch == L&#39;\r&#39;)
+        return snprintf(buf, sz, &quot;\\r&quot;);
+    else if (ch == L&#39;\b&#39;)
+        return snprintf(buf, sz, &quot;\\b&quot;);
+    else if (ch == L&#39;\f&#39;)
+        return snprintf(buf, sz, &quot;\\f&quot;);
+    else if (ch == L&#39;\v&#39;)
+        return snprintf(buf, sz, &quot;\\v&quot;);
+    else if (ch == L&#39;\a&#39;)
+        return snprintf(buf, sz, &quot;\\a&quot;);
+    else if (ch == L&#39;\\&#39;)
+        return snprintf(buf, sz, &quot;\\\\&quot;);
+    else if (ch &lt; 32 || ch == 0x7f)
+        return snprintf(buf, sz, &quot;\\x%hhX&quot;, (unsigned char)ch);
+    else if (ch &gt; 0xFFFF)
+        return snprintf(buf, sz, &quot;\\U%.8X&quot;, (uint32_t)ch);
+    else if (ch &gt;= 0x80 &amp;&amp; ch &lt;= 0xFFFF)
+        return snprintf(buf, sz, &quot;\\u%.4hX&quot;, (unsigned short)ch);
+
+    return snprintf(buf, sz, &quot;%c&quot;, (char)ch);
+}
+</code></pre>
+<p>每个宽字符先转换为unsigned int，也就是wchar_t到unsigned int。 demo大概如下：  </p>
+<pre><code class="cpp">int main()
+{
+    setlocale(LC_ALL, &quot;zh_CN.UTF-8&quot;); 
+    wchar_t *input = L&quot;abc我是def中文123字符&quot;;
+
+    int len = wcslen(input);
+    wchar_t *p = input;
+
+    char buf[2048] = {0x0};
+    char *pbuf = buf;
+
+    int ret;
+    int i; for (i = 0; i &lt; len; i++)
+    {
+        ret = u8_escape_wchar(pbuf, sizeof(buf), (uint32_t)*p);
+        pbuf += ret; 
+        p++;
+    }
+    printf(&quot;buf[%s]\n&quot;, buf);
+
+    setlocale(LC_ALL, &quot;C&quot;);
+    return 0;
+}
+</code></pre>
 <p>demo的输出为: abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26</p>
-<p>而通过gdb查看buf的内容，可以看到每个中文字符unicode前会多一个转义的’\’:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(gdb) p buf</span><br><span class="line">$<span class="number">1</span> = <span class="string">"abc\\u6211\\u662Fdef\\u4E2D\\u6587123\\u5B57\\u7B26"</span>, <span class="string">'\0'</span> &lt;repeats <span class="number">2002</span> times&gt;</span><br></pre></td></tr></table></figure></p>
+<p>而通过gdb查看buf的内容，可以看到每个中文字符unicode前会多一个转义的’\’:</p>
+<pre><code class="cpp">(gdb) p buf
+$1 = &quot;abc\\u6211\\u662Fdef\\u4E2D\\u6587123\\u5B57\\u7B26&quot;, &#39;\0&#39; &lt;repeats 2002 times&gt;
+</code></pre>
 <p>可以看到，对于英文字符和数字，并没有做转换。  </p>
-<p>前台的js拿到unicode之后的内容”abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26”，可以简单转换回中文字符，js的转换思路，先用JSON.stringify把源内容序列化，再用正则替换unicode码：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">JSON_stringify</span>(<span class="params">s, emit_unicode</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">   <span class="keyword">var</span> json = <span class="built_in">JSON</span>.stringify(s);</span><br><span class="line">   <span class="keyword">return</span> emit_unicode ? json : json.replace(<span class="regexp">/[\u007f-\uffff]/g</span>,</span><br><span class="line">      <span class="function"><span class="keyword">function</span>(<span class="params">c</span>) </span>&#123; </span><br><span class="line">        <span class="keyword">return</span> <span class="string">'\\u'</span>+(<span class="string">'0000'</span>+c.charCodeAt(<span class="number">0</span>).toString(<span class="number">16</span>)).slice(-<span class="number">4</span>);</span><br><span class="line">      &#125;</span><br><span class="line">   );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> s = <span class="string">"abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26"</span>;</span><br><span class="line">JSON_stringify(s, <span class="literal">true</span>);</span><br></pre></td></tr></table></figure></p>
+<p>前台的js拿到unicode之后的内容”abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26”，可以简单转换回中文字符，js的转换思路，先用JSON.stringify把源内容序列化，再用正则替换unicode码：</p>
+<pre><code class="js">function JSON_stringify(s, emit_unicode)
+{
+   var json = JSON.stringify(s);
+   return emit_unicode ? json : json.replace(/[\u007f-\uffff]/g,
+      function(c) { 
+        return &#39;\\u&#39;+(&#39;0000&#39;+c.charCodeAt(0).toString(16)).slice(-4);
+      }
+   );
+}
+
+var s = &quot;abc\u6211\u662Fdef\u4E2D\u6587123\u5B57\u7B26&quot;;
+JSON_stringify(s, true);
+</code></pre>
 <p>输出为：abc我是def中文123字符   </p>
-<p>当然，上面的C库也提供了unicode到C-string的转换，转换的函数为：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">u8_unescape</span><span class="params">(<span class="keyword">char</span> *buf, <span class="keyword">int</span> sz, <span class="keyword">char</span> *src)</span></span>;</span><br></pre></td></tr></table></figure></p>
-<p>第3个参数是要转换的unicode码，例如:<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">u8_unescape(mybuf, <span class="number">256</span>, <span class="string">"hello\\u220e"</span>)</span><br></pre></td></tr></table></figure></p>
+<p>当然，上面的C库也提供了unicode到C-string的转换，转换的函数为：</p>
+<pre><code class="cpp">int u8_unescape(char *buf, int sz, char *src);
+</code></pre>
+<p>第3个参数是要转换的unicode码，例如: </p>
+<pre><code class="cpp">u8_unescape(mybuf, 256, &quot;hello\\u220e&quot;)
+</code></pre>
 <p><br><br>ref:  </p>
 <ol>
 <li>这个C库的代码：<br><a href="http://www.cprogramming.com/tutorial/utf8.h" target="_blank" rel="external">utf8.h  (http://www.cprogramming.com/tutorial/utf8.h)</a><br><a href="http://www.cprogramming.com/tutorial/utf8.c" target="_blank" rel="external">utf8.c  (http://www.cprogramming.com/tutorial/utf8.c)</a>  </li>

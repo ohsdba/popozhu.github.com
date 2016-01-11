@@ -52,19 +52,105 @@
 	    
 
 	    <p>pnp4nagios依赖rrdtool，把数据写入RRD文件，同时需要一个web服务器来托管pnp4nagios的php页面，因为需要安装rrdtool、pnp4nagios、php、nginx。  </p>
-<h3 id="安装rrdtool">安装rrdtool</h3><p>在系统CentOS 5.9上，我通过rpm安装rrdtool以及它的perl模块，版本为1.4.7。其他版本可以在<code>http://pkgs.repoforge.org/rrdtool/</code>下载。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">cd /tmp</span><br><span class="line">wget http:<span class="comment">//pkgs.repoforge.org/rrdtool/perl-rrdtool-1.4.7-1.el5.rf.x86_64.rpm</span></span><br><span class="line">wget http:<span class="comment">//pkgs.repoforge.org/rrdtool/rrdtool-1.4.7-1.el5.rf.x86_64.rpm</span></span><br><span class="line"></span><br><span class="line"><span class="preprocessor"># 删除已有版本<span class="number">1.2</span><span class="number">.7</span></span></span><br><span class="line">yum remove rrdtool</span><br><span class="line"></span><br><span class="line">rpm -ivh perl-rrdtool-<span class="number">1.4</span><span class="number">.7</span>-<span class="number">1.</span>el5.rf.x86_64.rpm rrdtool-<span class="number">1.4</span><span class="number">.7</span>-<span class="number">1.</span>el5.rf.x86_64.rpm</span><br></pre></td></tr></table></figure></p>
-<p><br></p>
-<h3 id="安装pnp4nagios">安装pnp4nagios</h3><p>pnp4nagios从sourceforge上下载最新版本，configure时配置<code>rrd文件路径perfdata</code>、<code>文件池目录spool</code>、<code>日志文件目录</code>，其他配置项可通过<code>./configure --help</code>查看<br><figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">cd /tmp</span><br><span class="line">wget http://sourceforge.net/projects/pnp4nagios/files/PNP-0.6/pnp4nagios-0.6.21.tar.gz/download</span><br><span class="line">cd pnp4nagios-0.6.21</span><br><span class="line">./configure\</span><br><span class="line">  -<span class="ruby">-prefix=<span class="regexp">/home/pnp</span>4nagios \</span><br><span class="line"></span>  -<span class="ruby">-with-nagios-user=nagios \</span><br><span class="line"></span>  -<span class="ruby">-with-nagios-group=nagios \</span><br><span class="line"></span>  -<span class="ruby">-with-rrdtool=<span class="regexp">/usr/bin</span><span class="regexp">/rrdtool  \</span><br><span class="line"></span></span>  -<span class="ruby"><span class="regexp">-with-perfdata-dir=/diska</span><span class="regexp">/pnp4nagios/perfdata</span> \</span><br><span class="line"></span>  -<span class="ruby">-with-perfdata-spool-dir=<span class="regexp">/diska/pnp</span>4nagios/spool \</span><br><span class="line"></span>  -<span class="ruby">-with-perfdata-logfile=<span class="regexp">/diska/pnp</span>4nagios/perf_logs</span></span><br></pre></td></tr></table></figure></p>
-<p>configure后的信息如下：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">*** Configuration summary <span class="keyword">for</span> pnp4nagios-<span class="number">0.6</span><span class="number">.21</span> <span class="number">03</span>-<span class="number">24</span>-<span class="number">2013</span> ***</span><br><span class="line"></span><br><span class="line">  General <span class="string">Options:</span></span><br><span class="line">  -------------------------         -------------------</span><br><span class="line">  Nagios user/<span class="string">group:</span>                nagios nagios</span><br><span class="line">  Install <span class="string">directory:</span>                <span class="regexp">/home/</span>pnp4nagios</span><br><span class="line">  HTML <span class="string">Dir:</span>                         <span class="regexp">/home/</span>pnp4nagios/share</span><br><span class="line">  Config <span class="string">Dir:</span>                       <span class="regexp">/home/</span>pnp4nagios/etc</span><br><span class="line">  Location of rrdtool <span class="string">binary:</span>       <span class="regexp">/usr/</span>bin/rrdtool Version <span class="number">1.4</span><span class="number">.7</span></span><br><span class="line">  RRDs Perl <span class="string">Modules:</span>                FOUND (Version <span class="number">1.4007</span>)</span><br><span class="line">  RRD Files stored <span class="string">in:</span>              <span class="regexp">/diska/</span>pnp4nagios/perfdata</span><br><span class="line">  process_perfdata.pl <span class="string">Logfile:</span>      <span class="regexp">/diska/</span>pnp4nagios/perf_logs</span><br><span class="line">  Perfdata files (NPCD) stored <span class="string">in:</span>  <span class="regexp">/diska/</span>pnp4nagios/spool</span><br><span class="line"></span><br><span class="line">  Web Interface <span class="string">Options:</span></span><br><span class="line">  -------------------------         -------------------</span><br><span class="line">  HTML <span class="string">URL:</span>                         <span class="string">http:</span><span class="comment">//localhost/pnp4nagios</span></span><br><span class="line">  Apache Config <span class="string">File:</span>               <span class="regexp">/etc/</span>httpd<span class="regexp">/conf.d/</span>pnp4nagios.conf</span><br></pre></td></tr></table></figure></p>
-<p>再接着编译安装<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">make</span> <span class="keyword">all</span>  </span><br><span class="line"><span class="keyword">make</span> fullinstall</span><br></pre></td></tr></table></figure></p>
-<p>一开始我采用pnp4nagios的<code>npcd</code>来读取数据，启动npcd，npcd进程会扫描spool目录<code>/diska/pnp4nagios/spool</code>(spool目录在configure时配置，或者在配置文件/home/pnp4nagios/etc/npcd.cfg进行修改)<br><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/etc/init.d/npcd <span class="built_in">start</span></span><br></pre></td></tr></table></figure></p>
-<p>同时我在<code>/home/pnp4nagios/etc/npcd.cfg</code>配置了npcd的日志也输出到<code>/diska/pnp4nagios/perf_logs</code>中，本意打算把各种日志都存入这个目录，方便查看。  </p>
-<h3 id="安装php和php-fpm">安装php和php-fpm</h3><figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">.</span><span class="comment">/configure</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">prefix=/home/pnp</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">enable</span><span class="literal">-</span><span class="comment">fpm</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">with</span><span class="literal">-</span><span class="comment">gd</span> <span class="literal">-</span><span class="literal">-</span><span class="comment">with</span><span class="literal">-</span><span class="comment">zlib</span></span><br><span class="line"><span class="comment">make</span></span><br><span class="line"><span class="comment">make</span> <span class="comment">install</span></span><br></pre></td></tr></table></figure>
-<p>修改配置/home/php/etc/php-fpm.conf，监听socket修改为: <code>listen = /home/php/php-fastcgi.sock</code>，打开pid文件路径，然后启动php-fpm<br><figure class="highlight vala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor"># 启动</span></span><br><span class="line">/home/pnp/sbin/php-fpm</span><br><span class="line"><span class="preprocessor"># 重启，发送INT信号</span></span><br><span class="line">cat /home/php/<span class="keyword">var</span>/run/php-fpm.pid | xargs kill -INT</span><br><span class="line"><span class="preprocessor"># 重启，发送USR2信号</span></span><br><span class="line">cat /home/php/<span class="keyword">var</span>/run/php-fpm.pid | xargs kill -USR2</span><br></pre></td></tr></table></figure></p>
-<p><br></p>
-<h3 id="配置nginx">配置nginx</h3><p>安装略，主要是配置，在nginx的配置文件中，引入pnp4nagios的配置模板内容，<code>/home/nginx/conf/nginx.conf</code>截取如下<br><figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml"># ... </span><br><span class="line">http </span><span class="expression">&#123;</span><br><span class="line">    <span class="begin-block"># ... </span></span><br><span class="line">    <span class="variable">server</span> &#123;</span><br><span class="line">        <span class="variable">listen</span>       80; </span><br><span class="line"></span><br><span class="line">        <span class="variable">location</span> <span class="end-block">/pnp</span>4<span class="variable">nagios</span> &#123;</span><br><span class="line">            <span class="variable">alias</span> <span class="end-block">/home</span><span class="end-block">/pnp</span>4<span class="variable">nagios</span><span class="end-block">/share</span>;</span><br><span class="line">            <span class="variable">index</span> <span class="variable">index.php</span>;</span><br><span class="line"></span><br><span class="line">            <span class="begin-block">#auth</span>_<span class="variable">basic</span> <span class="string">"Nagios Access"</span>;</span><br><span class="line">            <span class="begin-block">#auth</span>_<span class="variable">basic</span>_<span class="variable">user</span>_<span class="variable">file</span> <span class="end-block">/usr</span><span class="end-block">/local</span><span class="end-block">/nagios</span><span class="end-block">/etc</span><span class="end-block">/htpasswd.users</span>;</span><br><span class="line"></span><br><span class="line">            <span class="begin-block"># <span class="keyword">if</span> we have e.g. </span><span class="end-block">/pnp</span>4<span class="variable">nagios</span><span class="end-block">/media</span><span class="end-block">/css</span><span class="end-block">/common.css</span></span><br><span class="line">            <span class="begin-block"># nginx will check</span></span><br><span class="line">            <span class="begin-block"># </span><span class="end-block">/usr</span><span class="end-block">/local</span><span class="end-block">/png</span>4<span class="variable">nagios</span><span class="end-block">/share</span><span class="end-block">/media</span><span class="end-block">/css</span><span class="end-block">/common</span><span class="end-block">/css</span></span><br><span class="line">            <span class="begin-block"># and return it <span class="keyword">if</span> it</span>'<span class="variable">s</span> <span class="variable">found</span></span><br><span class="line">            <span class="begin-block"># <span class="keyword">if</span> it can</span>'<span class="variable">t</span> <span class="variable">find</span> <span class="variable">a</span> <span class="variable">matching</span> <span class="variable">file</span> <span class="variable">even</span> <span class="variable">adding</span> <span class="variable">a</span> <span class="variable">trailing</span> /</span><br><span class="line">            <span class="begin-block"># the request is handled to the </span>@<span class="variable">pnp</span>4<span class="variable">nagios</span> <span class="variable">location</span></span><br><span class="line">            <span class="variable">try</span>_<span class="variable">files</span> $<span class="variable">uri</span> $<span class="variable">uri</span><span class="end-block">/ </span>@<span class="variable">pnp</span>4<span class="variable">nagios</span>;</span><br><span class="line">        &#125;</span><span class="xml">   </span><br><span class="line"></span><br><span class="line">        location @pnp4nagios </span><span class="expression">&#123;</span><br><span class="line">            <span class="variable">fastcgi</span>_<span class="variable">pass</span> <span class="variable">unix</span>:<span class="end-block">/home</span><span class="end-block">/php</span><span class="end-block">/php-fastcgi.sock</span>;</span><br><span class="line">            <span class="variable">fastcgi</span>_<span class="variable">index</span> <span class="variable">index.php</span>;</span><br><span class="line"></span><br><span class="line">            <span class="begin-block"># implies an external file</span>, <span class="variable">but</span> <span class="variable">this</span> <span class="variable">is</span> <span class="variable">common</span> <span class="variable">nginx</span> <span class="variable">practice</span></span><br><span class="line">            <span class="variable">include</span> <span class="variable">fastcgi</span>_<span class="variable">params</span>;</span><br><span class="line"></span><br><span class="line">            <span class="begin-block"># this splits out the trailing path</span></span><br><span class="line">            <span class="begin-block"># eg index.php</span>?<span class="variable">host</span> <span class="variable">-</span>&gt; $<span class="variable">fastcgi</span>_<span class="variable">path</span>_<span class="variable">info</span> == '<span class="variable">host</span>'</span><br><span class="line">            <span class="variable">fastcgi</span>_<span class="variable">split</span>_<span class="variable">path</span>_<span class="variable">info</span> ^(<span class="variable">.</span>+\<span class="variable">.php</span>)(<span class="variable">.</span>*)$;</span><br><span class="line">            <span class="variable">fastcgi</span>_<span class="variable">param</span> <span class="variable">PATH</span>_<span class="variable">INFO</span> $<span class="variable">fastcgi</span>_<span class="variable">path</span>_<span class="variable">info</span>;</span><br><span class="line">            <span class="variable">fastcgi</span>_<span class="variable">param</span> <span class="variable">SCRIPT</span>_<span class="variable">FILENAME</span> <span class="end-block">/home</span><span class="end-block">/pnp</span>4<span class="variable">nagios</span><span class="end-block">/share</span><span class="end-block">/index.php</span>;</span><br><span class="line">        &#125;</span><span class="xml">   </span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure></p>
-<p>在<code>alias</code>配置php4nagios的目录，在<code>fastcgi_pass</code>配置php-fpm的socket文件，启动nginx后，通过<code>http://localhost/pnp4nagios/index.php</code>后会跳转到pnp4nagios的「配置测试页面」，包含<code>PNP4Nagios Environment Tests</code>和<code>Kohana Environment Tests</code>，测试正常的话，页面底部会提示：<br><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Your environment passed all requirements. Remove <span class="operator">or</span> <span class="built_in">rename</span> <span class="operator">the</span> /home/pnp4nagios/share/install.php <span class="built_in">file</span> now.</span><br></pre></td></tr></table></figure></p>
-<p>若测试异常，页面上会给出红色说明，若一切都ok，则把/home/pnp4nagiosn/share/install.php删除或rename。</p>
+<h3 id="安装rrdtool">安装rrdtool</h3><p>在系统CentOS 5.9上，我通过rpm安装rrdtool以及它的perl模块，版本为1.4.7。其他版本可以在<code>http://pkgs.repoforge.org/rrdtool/</code>下载。</p>
+<pre><code>cd /tmp
+wget http://pkgs.repoforge.org/rrdtool/perl-rrdtool-1.4.7-1.el5.rf.x86_64.rpm
+wget http://pkgs.repoforge.org/rrdtool/rrdtool-1.4.7-1.el5.rf.x86_64.rpm
+
+# 删除已有版本1.2.7
+yum remove rrdtool
+
+rpm -ivh perl-rrdtool-1.4.7-1.el5.rf.x86_64.rpm rrdtool-1.4.7-1.el5.rf.x86_64.rpm
+</code></pre><p><br></p>
+<h3 id="安装pnp4nagios">安装pnp4nagios</h3><p>pnp4nagios从sourceforge上下载最新版本，configure时配置<code>rrd文件路径perfdata</code>、<code>文件池目录spool</code>、<code>日志文件目录</code>，其他配置项可通过<code>./configure --help</code>查看</p>
+<pre><code>cd /tmp
+wget http://sourceforge.net/projects/pnp4nagios/files/PNP-0.6/pnp4nagios-0.6.21.tar.gz/download
+cd pnp4nagios-0.6.21
+./configure\
+  --prefix=/home/pnp4nagios \
+  --with-nagios-user=nagios \
+  --with-nagios-group=nagios \
+  --with-rrdtool=/usr/bin/rrdtool  \
+  --with-perfdata-dir=/diska/pnp4nagios/perfdata \
+  --with-perfdata-spool-dir=/diska/pnp4nagios/spool \
+  --with-perfdata-logfile=/diska/pnp4nagios/perf_logs
+</code></pre><p>configure后的信息如下：</p>
+<pre><code>*** Configuration summary for pnp4nagios-0.6.21 03-24-2013 ***
+
+  General Options:
+  -------------------------         -------------------
+  Nagios user/group:                nagios nagios
+  Install directory:                /home/pnp4nagios
+  HTML Dir:                         /home/pnp4nagios/share
+  Config Dir:                       /home/pnp4nagios/etc
+  Location of rrdtool binary:       /usr/bin/rrdtool Version 1.4.7
+  RRDs Perl Modules:                FOUND (Version 1.4007)
+  RRD Files stored in:              /diska/pnp4nagios/perfdata
+  process_perfdata.pl Logfile:      /diska/pnp4nagios/perf_logs
+  Perfdata files (NPCD) stored in:  /diska/pnp4nagios/spool
+
+  Web Interface Options:
+  -------------------------         -------------------
+  HTML URL:                         http://localhost/pnp4nagios
+  Apache Config File:               /etc/httpd/conf.d/pnp4nagios.conf
+</code></pre><p>再接着编译安装</p>
+<pre><code>make all  
+make fullinstall
+</code></pre><p>一开始我采用pnp4nagios的<code>npcd</code>来读取数据，启动npcd，npcd进程会扫描spool目录<code>/diska/pnp4nagios/spool</code>(spool目录在configure时配置，或者在配置文件/home/pnp4nagios/etc/npcd.cfg进行修改)  </p>
+<pre><code>/etc/init.d/npcd start
+</code></pre><p>同时我在<code>/home/pnp4nagios/etc/npcd.cfg</code>配置了npcd的日志也输出到<code>/diska/pnp4nagios/perf_logs</code>中，本意打算把各种日志都存入这个目录，方便查看。  </p>
+<h3 id="安装php和php-fpm">安装php和php-fpm</h3><pre><code>./configure --prefix=/home/pnp --enable-fpm --with-gd --with-zlib
+make
+make install
+</code></pre><p>修改配置/home/php/etc/php-fpm.conf，监听socket修改为: <code>listen = /home/php/php-fastcgi.sock</code>，打开pid文件路径，然后启动php-fpm  </p>
+<pre><code># 启动
+/home/pnp/sbin/php-fpm
+# 重启，发送INT信号
+cat /home/php/var/run/php-fpm.pid | xargs kill -INT
+# 重启，发送USR2信号
+cat /home/php/var/run/php-fpm.pid | xargs kill -USR2
+</code></pre><p><br></p>
+<h3 id="配置nginx">配置nginx</h3><p>安装略，主要是配置，在nginx的配置文件中，引入pnp4nagios的配置模板内容，<code>/home/nginx/conf/nginx.conf</code>截取如下</p>
+<pre><code># ... 
+http {
+    # ... 
+    server {
+        listen       80; 
+
+        location /pnp4nagios {
+            alias /home/pnp4nagios/share;
+            index index.php;
+
+            #auth_basic &quot;Nagios Access&quot;;
+            #auth_basic_user_file /usr/local/nagios/etc/htpasswd.users;
+
+            # if we have e.g. /pnp4nagios/media/css/common.css
+            # nginx will check
+            # /usr/local/png4nagios/share/media/css/common/css
+            # and return it if it&#39;s found
+            # if it can&#39;t find a matching file even adding a trailing /
+            # the request is handled to the @pnp4nagios location
+            try_files $uri $uri/ @pnp4nagios;
+        }   
+
+        location @pnp4nagios {
+            fastcgi_pass unix:/home/php/php-fastcgi.sock;
+            fastcgi_index index.php;
+
+            # implies an external file, but this is common nginx practice
+            include fastcgi_params;
+
+            # this splits out the trailing path
+            # eg index.php?host -&gt; $fastcgi_path_info == &#39;host&#39;
+            fastcgi_split_path_info ^(.+\.php)(.*)$;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
+            fastcgi_param SCRIPT_FILENAME /home/pnp4nagios/share/index.php;
+        }   
+    }   
+}
+</code></pre><p>在<code>alias</code>配置php4nagios的目录，在<code>fastcgi_pass</code>配置php-fpm的socket文件，启动nginx后，通过<code>http://localhost/pnp4nagios/index.php</code>后会跳转到pnp4nagios的「配置测试页面」，包含<code>PNP4Nagios Environment Tests</code>和<code>Kohana Environment Tests</code>，测试正常的话，页面底部会提示：</p>
+<pre><code>Your environment passed all requirements. Remove or rename the /home/pnp4nagios/share/install.php file now.
+</code></pre><p>若测试异常，页面上会给出红色说明，若一切都ok，则把/home/pnp4nagiosn/share/install.php删除或rename。</p>
 <p>后续就是在<code>http://localhost/pnp4nagios/index.php</code>加上参数hostname和serv来访问某个机器的数据。</p>
 <p>pnp4nagios的模板配置另外整理。</p>
 <p><br><br>– EOF –</p>

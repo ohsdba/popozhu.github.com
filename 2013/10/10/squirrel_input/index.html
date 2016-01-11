@@ -64,8 +64,13 @@
 <li>translator/enable_user_dict，设置true或false。<br>这才是正确的参数，设置为false，表示不使用用户的字典文件。 输入法默认会记录用户的自定义词语，保存到一个用户字典文件中。 关闭这个功能后，输入法显示的词语，则是我所期望的：固定位置。  </li>
 </ol>
 <p>当然，知道了参数，也得理解如何配置。  </p>
-<p>默认使用的是luna_pinyin这个输入模型，新建一个patch文件来保存用户自定义选项（我喜欢这种追加配置的方式：patch）：<br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">popozhu ~<span class="regexp">/Library/</span><span class="constant">Rime</span><span class="variable">$ </span>cat ~<span class="regexp">/Library/</span><span class="constant">Rime</span>/luna_pinyin.custom.yaml</span><br><span class="line"><span class="comment"># luna_pinyin.custom.yaml</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="symbol">patch:</span></span><br><span class="line">  translator/<span class="symbol">enable_user_dict:</span> <span class="keyword">false</span></span><br></pre></td></tr></table></figure></p>
-<p>luna_pinyin这个模式的使用的默认配置文件是：<code>~/Library/Rime/luna_pinyin.schema.yaml</code>，新建一个配置文件：<code>~/Library/Rime/luna_pinyin.custom.yaml</code>，追加配置项目<code>translator/enable_user_dict: false</code>。  </p>
+<p>默认使用的是luna_pinyin这个输入模型，新建一个patch文件来保存用户自定义选项（我喜欢这种追加配置的方式：patch）：</p>
+<pre><code>popozhu ~/Library/Rime$ cat ~/Library/Rime/luna_pinyin.custom.yaml
+# luna_pinyin.custom.yaml
+#
+patch:
+  translator/enable_user_dict: false
+</code></pre><p>luna_pinyin这个模式的使用的默认配置文件是：<code>~/Library/Rime/luna_pinyin.schema.yaml</code>，新建一个配置文件：<code>~/Library/Rime/luna_pinyin.custom.yaml</code>，追加配置项目<code>translator/enable_user_dict: false</code>。  </p>
 <p>至此，已经满足我的使用需求了。  </p>
 <p>总的来说，这个输入法由于没有图形配置界面，修改配置文件，需要知道：1. 使用哪个参数能达到定制的功能， 2. 修改哪个配置文件， 3. 最好的教程当然是google code上的wiki。  </p>
 <p>非常nice的一点是，修改配置时不是直接在自带的原配置上开刀，而是patch的方式进行追加和覆盖，因为后续升级或重新安装，自带的原配置文件会被还原，用户的个性化配置就会丢失；另外也支持把配置文件同步到指定的目录（当然是丢到dropbox目录下），确保配置文件不会丢失。  </p>

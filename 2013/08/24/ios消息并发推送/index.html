@@ -71,8 +71,89 @@
 <li>多线程里使用openssl，使用锁吧：<a href="http://popozhu.github.io/2013/08/15/openssl%E5%92%8C%E5%A4%9A%E7%BA%BF%E7%A8%8B/">openssl和多线程</a></li>
 </ol>
 <p>最新的一次推送，给21w个token推送消息，看日志，大约用了7分钟，暂时效率上还能被接受（起15个线程，服务器cpu为：Intel(R) Xeon(R) CPU E5606 @2.13GHz）。</p>
-<p>每个ios设备有一个唯一的mac地址，根据该mac地址可以从苹果获得一个唯一的token，token目前的长度为64字节，按苹果的协议，需要把该64字节转成32字节的二进制格式，转换的demo如下（长度硬编码了）：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_device_token_binary</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *token, <span class="keyword">char</span> *binary)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">uint8_t</span> value;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">char</span> *p = (<span class="keyword">char</span>*)token;</span><br><span class="line">    <span class="keyword">char</span> *r = binary;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span> high, low;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">64</span>; i += <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="comment">// big endian, get high first</span></span><br><span class="line">        high = *(p+i);</span><br><span class="line">        low = *(p+i+<span class="number">1</span>);</span><br><span class="line">        <span class="comment">//printf("[%c][%c] ", high, low);</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (high &gt;= <span class="string">'0'</span> &amp;&amp; high &lt;= <span class="string">'9'</span>)&#123;</span><br><span class="line">            high -= <span class="string">'0'</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (high &gt;= <span class="string">'a'</span> &amp;&amp; high &lt;= <span class="string">'f'</span>)&#123;</span><br><span class="line">            high -= (<span class="string">'a'</span> - <span class="number">10</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (low &gt;= <span class="string">'0'</span> &amp;&amp; low &lt;= <span class="string">'9'</span>)&#123;</span><br><span class="line">            low -= <span class="string">'0'</span>;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (low &gt;= <span class="string">'a'</span> &amp;&amp; low &lt;= <span class="string">'f'</span>)&#123;</span><br><span class="line">            low -= (<span class="string">'a'</span> - <span class="number">10</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        value = (high &lt;&lt; <span class="number">4</span>) | (low &lt;&lt; <span class="number">0</span>);</span><br><span class="line">        <span class="comment">//printf("value[%d]\n", value);</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">memcpy</span>(r++, &amp;value, <span class="keyword">sizeof</span>(<span class="keyword">uint8_t</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>ssl的读写大概为：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">顶部reconnect: 建立ssl长连接;</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (还有token没发送)</span><br><span class="line">&#123;</span><br><span class="line">    组装消息包;</span><br><span class="line">    ret = ssl_write(消息)</span><br><span class="line">    sslerrno = SSL_get_error(ssl, ret);</span><br><span class="line">    <span class="keyword">switch</span>(sslerrno)&#123;</span><br><span class="line">        <span class="keyword">case</span> SSL_ERROR_NONE:</span><br><span class="line">            <span class="comment">// 发送成功</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> SSL_ERROR_WANT_WRITE:</span><br><span class="line">            重新发送;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> SSL_ERROR_WANT_READ:</span><br><span class="line">            重新发送;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:	      </span><br><span class="line">            遇到ssl错误，回到顶部，重新连接，再重新发送</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    select 最多等待<span class="number">25</span>ms;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (有消息返回)</span><br><span class="line">    &#123;</span><br><span class="line">        ret = SSL_read(ssl, s2c, MAX_BUFF_SIZE);</span><br><span class="line">        <span class="keyword">if</span> (ret &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            读到回复消息，解包，获取id；然后回到顶部，重新连接ssl，id之后的token重新发送</span><br><span class="line">        &#125;</span><br><span class="line">        sslerrno = SSL_get_error(ssl, ret);</span><br><span class="line">        <span class="keyword">switch</span>(sslerrno)&#123;</span><br><span class="line">            <span class="keyword">case</span> SSL_ERROR_ZERO_RETURN:</span><br><span class="line">                连接已断开，回到顶部重连;</span><br><span class="line">            <span class="keyword">case</span> SSL_ERROR_WANT_READ:</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">case</span> SSL_ERROR_WANT_WRITE:</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                遇到ssl错误，回到顶部，重新连接</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>每个ios设备有一个唯一的mac地址，根据该mac地址可以从苹果获得一个唯一的token，token目前的长度为64字节，按苹果的协议，需要把该64字节转成32字节的二进制格式，转换的demo如下（长度硬编码了）：</p>
+<pre><code class="cpp">int get_device_token_binary(const char *token, char *binary)
+{
+    uint8_t value;
+
+    char *p = (char*)token;
+    char *r = binary;
+
+    char high, low;
+
+    int i;
+    for(i = 0; i &lt; 64; i += 2) {
+        // big endian, get high first
+        high = *(p+i);
+        low = *(p+i+1);
+        //printf(&quot;[%c][%c] &quot;, high, low);
+
+        if (high &gt;= &#39;0&#39; &amp;&amp; high &lt;= &#39;9&#39;){
+            high -= &#39;0&#39;;
+        }else if (high &gt;= &#39;a&#39; &amp;&amp; high &lt;= &#39;f&#39;){
+            high -= (&#39;a&#39; - 10);
+        }
+
+        if (low &gt;= &#39;0&#39; &amp;&amp; low &lt;= &#39;9&#39;){
+            low -= &#39;0&#39;;
+        }else if (low &gt;= &#39;a&#39; &amp;&amp; low &lt;= &#39;f&#39;){
+            low -= (&#39;a&#39; - 10);
+        }
+
+        value = (high &lt;&lt; 4) | (low &lt;&lt; 0);
+        //printf(&quot;value[%d]\n&quot;, value);
+
+        memcpy(r++, &amp;value, sizeof(uint8_t));
+    }
+
+    return 0;
+}
+</code></pre>
+<p>ssl的读写大概为：</p>
+<pre><code class="cpp">顶部reconnect: 建立ssl长连接;
+
+while (还有token没发送)
+{
+    组装消息包;
+    ret = ssl_write(消息)
+    sslerrno = SSL_get_error(ssl, ret);
+    switch(sslerrno){
+        case SSL_ERROR_NONE:
+            // 发送成功
+            break;
+        case SSL_ERROR_WANT_WRITE:
+            重新发送;
+            break;
+        case SSL_ERROR_WANT_READ:
+            重新发送;
+            break;
+        default:          
+            遇到ssl错误，回到顶部，重新连接，再重新发送
+    }
+
+    select 最多等待25ms;
+
+    if (有消息返回)
+    {
+        ret = SSL_read(ssl, s2c, MAX_BUFF_SIZE);
+        if (ret &gt; 0)
+        {
+            读到回复消息，解包，获取id；然后回到顶部，重新连接ssl，id之后的token重新发送
+        }
+        sslerrno = SSL_get_error(ssl, ret);
+        switch(sslerrno){
+            case SSL_ERROR_ZERO_RETURN:
+                连接已断开，回到顶部重连;
+            case SSL_ERROR_WANT_READ:
+                continue;
+            case SSL_ERROR_WANT_WRITE:
+                continue;
+            default:
+                遇到ssl错误，回到顶部，重新连接
+        }
+    }
+}
+</code></pre>
 <p>是的，如果读的时候遇到ssl错误，导致读取失败，那就麻烦了，这时候不知道是哪个id发送失败！！！</p>
 <p>目前影响效率的因素有3个：</p>
 <ol>

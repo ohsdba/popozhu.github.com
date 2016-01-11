@@ -91,20 +91,73 @@
 </ol>
 <p><br></p>
 <h3 id="hbase_的_row_key_考虑">hbase 的 row key 考虑</h3><p>hbase 里的数据表预先创建好，设置了 TTL， 暂时日志保存3天，后续根据需要再做调整，减轻人工维护存储成本。</p>
-<pre><code>hbase(main):<span class="number">001</span>:<span class="number">0</span>&gt; describe <span class="string">'table_name_xxx'</span>
+<pre><code>hbase(main):001:0&gt; describe &#39;table_name_xxx&#39;
 DESCRIPTION                                                                                       ENABLED
- <span class="string">'table_name_xxx'</span>, {NAME =&gt; <span class="string">'l'</span>, DATA_BLOCK_ENCODING =&gt; <span class="string">'NONE'</span>, BLOOMFILTER =&gt; <span class="string">'ROW'</span>, REPLICATION_ <span class="keyword">true</span>
- SCOPE =&gt; <span class="string">'0'</span>, VERSIONS =&gt; <span class="string">'1'</span>, COMPRESSION =&gt; <span class="string">'SNAPPY'</span>, MIN_VERSIONS =&gt; <span class="string">'0'</span>, TTL =&gt; <span class="string">'259200 SECO
- NDS (3 DAYS)'</span>, KEEP_DELETED_CELLS =&gt; <span class="string">'false'</span>, BLOCKSIZE =&gt; <span class="string">'65536'</span>, IN_MEMORY =&gt; <span class="string">'false'</span>, BLOCKC
- ACHE =&gt; <span class="string">'true'</span>}
+ &#39;table_name_xxx&#39;, {NAME =&gt; &#39;l&#39;, DATA_BLOCK_ENCODING =&gt; &#39;NONE&#39;, BLOOMFILTER =&gt; &#39;ROW&#39;, REPLICATION_ true
+ SCOPE =&gt; &#39;0&#39;, VERSIONS =&gt; &#39;1&#39;, COMPRESSION =&gt; &#39;SNAPPY&#39;, MIN_VERSIONS =&gt; &#39;0&#39;, TTL =&gt; &#39;259200 SECO
+ NDS (3 DAYS)&#39;, KEEP_DELETED_CELLS =&gt; &#39;false&#39;, BLOCKSIZE =&gt; &#39;65536&#39;, IN_MEMORY =&gt; &#39;false&#39;, BLOCKC
+ ACHE =&gt; &#39;true&#39;}
 </code></pre><p>在 row key 的固定位置，保存有上面提到的各个分析器生成的字符串，以及毫秒级别的时间戳，为了避免相同时间戳，还有固定长度的 index 最为整个 row key 的后缀，目的就是为了保证 row key 的唯一。</p>
 <p>row key 的开始部分，则根据业务情况，让连续的日志尽可能多的连续写在一块，但不同的日志，则尽可能地分散到各个 region。</p>
 <p>而从 hbase 查询时，指定 start row 提供给到 hbase 一个开始查询的位置，再通过前缀匹配过滤，比如，按我的row key 设计，对于字符串<code>810552074_29_0</code>，表示某个服务器上的某种日志（这个串是属于已有的配置信息，查询之前是已知的），那我要查询这种日志在某个时间点之后的日志，就很简单了：</p>
-<pre><code>scan <span class="string">'table_name_xxx'</span>, STARTROW=&gt;<span class="string">'810552074_29_0_1409296887375'</span>, FILTER=&gt;<span class="string">"PrefixFilter('810552074_29_0')"</span>, LIMIT=&gt;<span class="number">10</span>
+<pre><code>scan &#39;table_name_xxx&#39;, STARTROW=&gt;&#39;810552074_29_0_1409296887375&#39;, FILTER=&gt;&quot;PrefixFilter(&#39;810552074_29_0&#39;)&quot;, LIMIT=&gt;10
 </code></pre><p>查询后，记录下最后一行的 row key（完整的key，比如810552074_27_0_1409380765531_00000495），作为下次查询的start key， 第2、3、4…次查询所花费的时间，比第1次快了很多。</p>
 <p>因为有一个查询日志的页面给到其他团队的开发同学，他们在页面上可以实现类似<code>tail -f xx日志</code>或<code>tail -n 100 xx日志</code>的功能，无需登录服务器就可以看到他们项目的日志了（没权限…）</p>
-<p>查询样例:<br><figure class="highlight openscad"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">String query_demo<span class="params">(String startKey, String prefixFilter, String qualifier, int limit)</span></span><br><span class="line">&#123;</span><br><span class="line">    Scan scan = new Scan<span class="params">()</span>;</span><br><span class="line">    <span class="comment">// todo, tested later</span></span><br><span class="line">    scan.setCaching<span class="params">(<span class="number">100</span>)</span>;</span><br><span class="line">    scan.setBatch<span class="params">(<span class="number">1</span>)</span>;</span><br><span class="line"></span><br><span class="line">    String lastRowKey = null;</span><br><span class="line">    String rowValue;</span><br><span class="line">    try &#123;</span><br><span class="line">        <span class="comment">// start row key, important</span></span><br><span class="line">        scan.setStartRow<span class="params">(startKey.getBytes<span class="params">()</span>)</span>;</span><br><span class="line">        <span class="comment">// set filter as needed</span></span><br><span class="line">        FilterList filterList = new FilterList<span class="params">(FilterList.Operator.MUST_PASS_ALL)</span>;</span><br><span class="line">        filterList.addFilter<span class="params">(new PrefixFilter<span class="params">(prefixFilter.getBytes<span class="params">()</span>)</span>)</span>;</span><br><span class="line">        <span class="keyword">if</span> <span class="params">(qualifier != null &amp;&amp; !<span class="string">""</span>.equals<span class="params">(qualifier)</span>)</span> &#123;</span><br><span class="line">            filterList.addFilter<span class="params">(new QualifierFilter<span class="params">(</span><br><span class="line">                            CompareFilter.CompareOp.EQUAL,</span><br><span class="line">                            new BinaryComparator<span class="params">(qualifier.getBytes<span class="params">()</span>)</span>)</span></span><br><span class="line">            )</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        scan.setFilter<span class="params">(filterList)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// create a hbase connection</span></span><br><span class="line">        HTable htable = new HTable<span class="params">(XXXCLASS.getHbaseSharedConf<span class="params">()</span>, XXXCLASS.getTable_name<span class="params">()</span>)</span>;</span><br><span class="line">        ResultScanner rs = htable.getScanner<span class="params">(scan)</span>;</span><br><span class="line">        int cnt = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            <span class="keyword">for</span> <span class="params">(Result r = rs.next<span class="params">()</span>; r != null; r = rs.next<span class="params">()</span>)</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> <span class="params">(Cell cell : r.rawCells<span class="params">()</span>)</span> &#123;</span><br><span class="line">                    lastRowKey = new String<span class="params">(CellUtil.cloneRow<span class="params">(cell)</span>)</span>;</span><br><span class="line">                    rowValue = new String<span class="params">(CellUtil.cloneValue<span class="params">(cell)</span>)</span>;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// now we get a rowValue...</span></span><br><span class="line">                &#125;</span><br><span class="line">                cnt++;</span><br><span class="line">                <span class="keyword">if</span> <span class="params">(cnt &gt;= limit)</span> &#123;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch <span class="params">(Exception e)</span> &#123;</span><br><span class="line">            <span class="built_in">log</span>.error<span class="params">(<span class="string">"exp: "</span>, e)</span>;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            rs.close<span class="params">()</span>;</span><br><span class="line">            htable.close<span class="params">()</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch <span class="params">(Exception ex)</span> &#123;</span><br><span class="line">        <span class="built_in">log</span>.error<span class="params">(<span class="string">"exp"</span>, ex)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return lastRowKey;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p><br></p>
+<p>查询样例:</p>
+<pre><code>String query_demo(String startKey, String prefixFilter, String qualifier, int limit)
+{
+    Scan scan = new Scan();
+    // todo, tested later
+    scan.setCaching(100);
+    scan.setBatch(1);
+
+    String lastRowKey = null;
+    String rowValue;
+    try {
+        // start row key, important
+        scan.setStartRow(startKey.getBytes());
+        // set filter as needed
+        FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        filterList.addFilter(new PrefixFilter(prefixFilter.getBytes()));
+        if (qualifier != null &amp;&amp; !&quot;&quot;.equals(qualifier)) {
+            filterList.addFilter(new QualifierFilter(
+                            CompareFilter.CompareOp.EQUAL,
+                            new BinaryComparator(qualifier.getBytes()))
+            );
+        }
+        scan.setFilter(filterList);
+
+        // create a hbase connection
+        HTable htable = new HTable(XXXCLASS.getHbaseSharedConf(), XXXCLASS.getTable_name());
+        ResultScanner rs = htable.getScanner(scan);
+        int cnt = 0;
+
+        try {
+            for (Result r = rs.next(); r != null; r = rs.next()) {
+                for (Cell cell : r.rawCells()) {
+                    lastRowKey = new String(CellUtil.cloneRow(cell));
+                    rowValue = new String(CellUtil.cloneValue(cell));
+
+                    // now we get a rowValue...
+                }
+                cnt++;
+                if (cnt &gt;= limit) {
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            log.error(&quot;exp: &quot;, e);
+        } finally {
+            rs.close();
+            htable.close();
+        }
+    } catch (Exception ex) {
+        log.error(&quot;exp&quot;, ex);
+    }
+
+    return lastRowKey;
+}
+</code></pre><p><br></p>
 <h3 id="效率">效率</h3><ol>
 <li>导入 hbase 时，平均 ?KB/ms</li>
 <li>从 hbase 查询，第一次查询 ?ms，后续查询平均 ?ms</li>

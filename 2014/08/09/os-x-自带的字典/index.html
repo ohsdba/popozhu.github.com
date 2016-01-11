@@ -80,61 +80,61 @@
 <p>另外需要为该功能添加一个快捷键，通过另一个firefox扩展<code>keyconfig</code>，为上面的功能分配一个快捷键<code>⌂+⌘+d</code>，该快捷键不能跟系统/firefox已有的冲突。</p>
 <p><hr><br>第一步，在firefox地址栏里输入<code>about:support</code>打开support页面，在<code>Application Basics - Profile Folder</code>项目里，有一个<code>Show in Finder</code>的按钮，通过它打开firefox当前的配置文件夹。在extensions目录下可找到已安装的macosxdictionary扩展，复制到其他地方。</p>
 <pre><code>.
-└── uldw6wyn<span class="class">.default</span>
+└── uldw6wyn.default
    ├── extensions
-   │   ├── macosxdictionary@micheldalal<span class="class">.com</span><span class="class">.xpi</span>
+   │   ├── macosxdictionary@micheldalal.com.xpi
 </code></pre><p>把<code>macosxdictionary@micheldalal.com.xpi</code>的xpi后缀修改为zip，解压，按如下路径找到<code>macosxdictionary.js</code>，它里面包含了实现第一步的js代码，我直接拿来使用了。</p>
-<pre><code>macosxdictionary@micheldalal<span class="class">.com</span>
+<pre><code>macosxdictionary@micheldalal.com
 ├── defaults
 │   └── preferences
 │       └── macosxdictionary.js
 </code></pre><p>提取的js代码如下，在下一步的<code>keyconfig</code>中将会使用到它。</p>
-<pre><code><span class="function"><span class="keyword">function</span> <span class="title">getSelectedText</span><span class="params">()</span>
-{</span>
+<pre><code>function getSelectedText()
+{
     var node, focusedWindow;
     var selection;
 
-    selection = <span class="string">""</span>;
+    selection = &quot;&quot;;
     node = document.popupNode;
-    <span class="keyword">if</span> <span class="params">( <span class="params">( node instanceof HTMLTextAreaElement )</span> || <span class="params">( node instanceof HTMLInputElement &amp;&amp; node.nodeType == Node.TEXT_NODE )</span> )</span>
+    if ( ( node instanceof HTMLTextAreaElement ) || ( node instanceof HTMLInputElement &amp;&amp; node.nodeType == Node.TEXT_NODE ) )
     {
-        selection = node.value.substring<span class="params">( node.selectionStart, node.selectionEnd )</span>;
+        selection = node.value.substring( node.selectionStart, node.selectionEnd );
     }
-    <span class="keyword">else</span>
+    else
     {
-        focusedWindow = new XPCNativeWrapper<span class="params">( document.commandDispatcher.focusedWindow, 'document', 'getSelection<span class="params">()</span>' )</span>;
-        selection = focusedWindow.getSelection<span class="params">()</span>.toString<span class="params">()</span>;
+        focusedWindow = new XPCNativeWrapper( document.commandDispatcher.focusedWindow, &#39;document&#39;, &#39;getSelection()&#39; );
+        selection = focusedWindow.getSelection().toString();
     }
 
-    selection = selection.replace<span class="params">(/<span class="params">(\n|\r|\t|<span class="params">(\r\n)</span>)</span>+/g, <span class="string">" "</span>)</span>;
+    selection = selection.replace(/(\n|\r|\t|(\r\n))+/g, &quot; &quot;);
 
-    <span class="comment">// Trim the value(remove the space at the beginning and the end)</span>
-    selection = selection.replace<span class="params">(/<span class="params">(^\s+)</span>|<span class="params">(\s+$)</span>/g, <span class="string">""</span>)</span>;
-    selection = selection.split<span class="params">(<span class="string">" "</span>)</span>;
-    selection = selection.join<span class="params">(<span class="string">" "</span>)</span>;
+    // Trim the value(remove the space at the beginning and the end)
+    selection = selection.replace(/(^\s+)|(\s+$)/g, &quot;&quot;);
+    selection = selection.split(&quot; &quot;);
+    selection = selection.join(&quot; &quot;);
 
     return selection;
 }
 
-var selectedText = getSelectedText<span class="params">()</span>;
+var selectedText = getSelectedText();
 
-<span class="comment">// Open the dictionary application</span>
+// Open the dictionary application
 
-<span class="comment">// create an nsILocalFile for the executable</span>
-var file = Components.classes[ <span class="string">"@mozilla.org/file/local;1"</span> ].createInstance<span class="params">( Components.interfaces.nsILocalFile )</span>;
-file.initWithPath<span class="params">( <span class="string">"/usr/bin/open"</span> )</span>;
+// create an nsILocalFile for the executable
+var file = Components.classes[ &quot;@mozilla.org/file/local;1&quot; ].createInstance( Components.interfaces.nsILocalFile );
+file.initWithPath( &quot;/usr/bin/open&quot; );
 
-<span class="comment">// create an nsIProcess</span>
-var process = Components.classes[ <span class="string">"@mozilla.org/process/util;1"</span> ].createInstance<span class="params">( Components.interfaces.nsIProcess )</span>;
-process.init<span class="params">(file)</span>;
+// create an nsIProcess
+var process = Components.classes[ &quot;@mozilla.org/process/util;1&quot; ].createInstance( Components.interfaces.nsIProcess );
+process.init(file);
 
-<span class="comment">// Run the process.</span>
-<span class="comment">// If first param is true, calling thread will be blocked until</span>
-<span class="comment">// called process terminates.</span>
-<span class="comment">// Second and third params are used to pass command-line arguments</span>
-<span class="comment">// to the process.</span>
-var args = [ <span class="string">"dict:///"</span> + selectedText ];
-process.run<span class="params">(<span class="literal">false</span>, args, args.length)</span>;
+// Run the process.
+// If first param is true, calling thread will be blocked until
+// called process terminates.
+// Second and third params are used to pass command-line arguments
+// to the process.
+var args = [ &quot;dict:///&quot; + selectedText ];
+process.run(false, args, args.length);
 </code></pre><p>每种文件有一个默认的打开app，<code>/usr/bin/open</code>会调用默认的app来打开该文件。<code>&quot;dict:///&quot; + selectedText</code>则告诉系统「词典」要对selectedText进行翻译。</p>
 <p><hr><br>安装了<code>keyconfig</code>扩展后，打开它的配置。</p>
 <ol>

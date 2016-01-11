@@ -62,8 +62,27 @@
 <p>让我觉得很有意思的是，Boot Camp助理在上面第2功能中帮我们下载了Win7所需要的所有驱动，win7安装后（u盘到此刻还一直没拔出），<br>进入到u盘，有一个叫BootCamp的目录，点击setup.exe开始安装win7的启动。<br>驱动安装之后重启，按住<strong>option</strong>键，选择windows盘符，进入win7，至此全部完成。  </p>
 <p>bootcamp驱动默认是64位的，所以win7系统对应最好是64位，以达到最好的兼容性。<br>况且mac的硬件里一般是4G以上内存，64位的系统才能使用上全部内存。  </p>
 <p>64位的win7安装后会占用20G＋的空间，bootcamp只能从硬盘划分出一个分区给到win7，所以我划分了40G，这样才大概有15G的空间来保存我的数据，游戏足够了。  </p>
-<p>u盘里的文件列表：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">popozhu /Volumes/WININSTALL$ ls -lrt&#10;total 2368&#10;drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 upgrade&#10;drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 support&#10;drwxrwxrwx  1 popozhu  staff   12288 11 22  2010 sources&#10;-rwxrwxrwx  1 popozhu  staff  106768 11 22  2010 setup.exe&#10;drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 efi&#10;-rwxrwxrwx  1 popozhu  staff  669568 11 22  2010 bootmgr.efi&#10;-rwxrwxrwx  1 popozhu  staff  383786 11 22  2010 bootmgr&#10;drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 boot&#10;-rwxrwxrwx  1 popozhu  staff     122 11 22  2010 autorun.inf&#10;-rwxrwxrwx  1 popozhu  staff    2719  1 17 09:41 AutoUnattend.xml&#10;drwxrwxrwx  1 popozhu  staff    4096  1 17 10:08 $WinPEDriver$&#10;drwxrwxrwx  1 popozhu  staff    4096  1 26 02:38 BootCamp</span><br></pre></td></tr></table></figure></p>
-<p>最后2个目录是bootcamp下载的驱动，大小为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">popozhu /Volumes/WININSTALL$ du -sh BootCamp/ \$WinPEDriver\$/&#10;484M&#9;BootCamp/&#10;339M&#9;$WinPEDriver$/</span><br></pre></td></tr></table></figure></p>
+<p>u盘里的文件列表：  </p>
+<pre><code class="plain">popozhu /Volumes/WININSTALL$ ls -lrt
+total 2368
+drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 upgrade
+drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 support
+drwxrwxrwx  1 popozhu  staff   12288 11 22  2010 sources
+-rwxrwxrwx  1 popozhu  staff  106768 11 22  2010 setup.exe
+drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 efi
+-rwxrwxrwx  1 popozhu  staff  669568 11 22  2010 bootmgr.efi
+-rwxrwxrwx  1 popozhu  staff  383786 11 22  2010 bootmgr
+drwxrwxrwx  1 popozhu  staff    4096 11 22  2010 boot
+-rwxrwxrwx  1 popozhu  staff     122 11 22  2010 autorun.inf
+-rwxrwxrwx  1 popozhu  staff    2719  1 17 09:41 AutoUnattend.xml
+drwxrwxrwx  1 popozhu  staff    4096  1 17 10:08 $WinPEDriver$
+drwxrwxrwx  1 popozhu  staff    4096  1 26 02:38 BootCamp
+</code></pre>
+<p>最后2个目录是bootcamp下载的驱动，大小为：</p>
+<pre><code class="plain">popozhu /Volumes/WININSTALL$ du -sh BootCamp/ \$WinPEDriver\$/
+484M    BootCamp/
+339M    $WinPEDriver$/
+</code></pre>
 <p>驱动是需要联网下载的，网速慢的话，吃个苹果先吧……</p>
 <p>另，win7下mbp的触摸板漂移很严重！！！驱动问题。  </p>
 <p><br><br>– EOF –</p>

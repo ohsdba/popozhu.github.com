@@ -51,24 +51,59 @@
 
 	    <p>前2个星期使用hexo的<a href="http://zespia.tw/hexo/zh-CN/docs/tag-plugins.html" target="_blank" rel="external">标签插件</a>，在写文章内容，对于代码我都使用其中的<code>Code Block</code>来高亮显示。<br>Code Block在markdown中使用可以参考<a href="http://octopress.org/docs/plugins/codeblock/" target="_blank" rel="external">这里</a>，语法为：  </p>
 
-<!--￼0-->
-
+```
+{% codeblock [title] [lang:language] [url] [link text] %}
+code snippet
+{% endcodeblock %}
+```
 
 <p>最初我并没有在codeblock中指定<code>[lang:language]</code>：<br>
-<!--￼1-->
-
+```
+{% codeblock %}
+  my code here...
+  my code continue...
+  my code end...
+{% endcodeblock %}
+```
 </p>
 <p>于是代码高亮有时候不能正确显示，比如对于c的注释<code>/* some comment */</code>，单纯一行的注释是没问题的，但如果遇到多行的注释，则在注释开始<code>/*</code>之后的内容，甚至包括注释结尾<code>*/</code>之后的代码，就不能正常高亮显示，这困扰了我一个多星期。  </p>
 <p>今晚看了下hexo的<a href="https://github.com/tommy351/hexo/blob/master/lib/util/highlight.js" target="_blank" rel="external">highlight.js</a>这个js内容，它对代码高亮的语言类型做了点预处理和判断：在调用真实做代码高亮的脚本<a href="https://github.com/isagalaev/highlight.js" target="_blank" rel="external">in github</a>前，先判断codeblock是否带lang这个key，如果没有，就让highlight自动高亮代码，问题是这个<strong>自动</strong>不够智能。  </p>
 <p>于是手动在codeblock中增加<code>[lang:language]</code>来显式指定代码语言，问题是一开始我使用的是<code>lang:c++</code>，然而识别不到c++，代码高亮还是不正常，让我很迷惑。难道真的是highlight.js对于token的解析有错误吗？  </p>
-<p>后来，在highlight-&gt;github-&gt;readme中看到，如果要自定义高亮方案，说是参考文件<a href="https://github.com/isagalaev/highlight.js/blob/master/classref.txt" target="_blank" rel="external">classref.txt</a>，上面包含了它支持的语言的类型，其中：<br><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">C++ (<span class="string">"cpp"</span>):</span><br><span class="line">  keyword keyword</span><br><span class="line">  <span class="type">number</span> <span class="type">number</span></span><br><span class="line">  <span class="type">string</span> <span class="type">string</span> <span class="keyword">and</span> <span class="property">character</span></span><br><span class="line">  comment comment</span><br><span class="line">  preprocessor preprocessor directive</span><br><span class="line">  stl_container instantiation <span class="keyword">of</span> STL containers (<span class="string">"vector&lt;...&gt;"</span>)</span><br></pre></td></tr></table></figure></p>
-<p><hr><br>sigh…在codeblock中应该添加<code>lang:cpp</code>来指明要高亮的语言，而不是<code>lang:c++</code>，其他语言也类似参考这份定义。  </p>
+<p>后来，在highlight-&gt;github-&gt;readme中看到，如果要自定义高亮方案，说是参考文件<a href="https://github.com/isagalaev/highlight.js/blob/master/classref.txt" target="_blank" rel="external">classref.txt</a>，上面包含了它支持的语言的类型，其中：  </p>
+<pre><code>C++ (&quot;cpp&quot;):
+  keyword keyword
+  number number
+  string string and character
+  comment comment
+  preprocessor preprocessor directive
+  stl_container instantiation of STL containers (&quot;vector&lt;...&gt;&quot;)
+</code></pre><p><hr><br>sigh…在codeblock中应该添加<code>lang:cpp</code>来指明要高亮的语言，而不是<code>lang:c++</code>，其他语言也类似参考这份定义。  </p>
 <p>于是正常高亮代码。<br>
-<!--￼3-->
-
+```
+{% codeblock lang:cpp %}
+  my code here...  
+  my code continue...
+  my code end...
+{% endcodeblock %}
+```
 </p>
-<p>hexo的<a href="https://github.com/tommy351/hexo/blob/master/lib/util/highlight.js" target="_blank" rel="external">highlight.js</a>增加了<code>lang:plain</code>这个类型的支持：<br><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!options.lang)&#123;</span><br><span class="line">  <span class="variable"><span class="keyword">var</span> compiled</span> = hljs.highlightAuto(raw).value;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (options.lang === 'plain')&#123;</span><br><span class="line">  <span class="variable"><span class="keyword">var</span> compiled</span> = raw;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="variable"><span class="keyword">var</span> lang</span> = options.lang.toLowerCase();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (keys.indexOf(lang) !== -<span class="number">1</span>) lang = alias[lang];</span><br><span class="line"></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="variable"><span class="keyword">var</span> compiled</span> = hljs.highlight(lang, raw).value;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e)&#123;</span><br><span class="line">    <span class="variable"><span class="keyword">var</span> compiled</span> = hljs.highlightAuto(raw).value;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>可以用这个类型来屏蔽一些代码高亮，比如写一些伪代码时就可以用上了。   </p>
+<p>hexo的<a href="https://github.com/tommy351/hexo/blob/master/lib/util/highlight.js" target="_blank" rel="external">highlight.js</a>增加了<code>lang:plain</code>这个类型的支持：</p>
+<pre><code>  if (!options.lang){
+    var compiled = hljs.highlightAuto(raw).value;
+  } else if (options.lang === &#39;plain&#39;){
+    var compiled = raw;
+  } else {
+    var lang = options.lang.toLowerCase();
+
+    if (keys.indexOf(lang) !== -1) lang = alias[lang];
+
+    try {
+      var compiled = hljs.highlight(lang, raw).value;
+    } catch (e){
+      var compiled = hljs.highlightAuto(raw).value;
+    }
+  }
+</code></pre><p>可以用这个类型来屏蔽一些代码高亮，比如写一些伪代码时就可以用上了。   </p>
 <p>根据<a href="https://github.com/isagalaev/highlight.js/tree/master/src/styles" target="_blank" rel="external">styles</a>使用了几个高亮颜色方案，最后还是恢复hexo默认主题自带的颜色。  </p>
 <p><br><br>– EOF –</p>
 

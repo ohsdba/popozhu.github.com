@@ -55,37 +55,115 @@
 <p>原文：<a href="http://www.wangafu.net/~nickm/libevent-book/Ref3_eventloop.html" target="_blank" rel="external">R3: Running an event loop</a>  </p>
 </blockquote>
 <h2 id="开始轮询">开始轮询</h2><p>你创建了一个event_base，往它注册一些事件之后（下节会讲怎么注册事件），你接下来会让Libevent开始等待事件并通知到你。  </p>
-<h3 id="Interface">Interface</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EVLOOP_ONCE             <span class="number">0x01</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EVLOOP_NONBLOCK         <span class="number">0x02</span></span></span><br><span class="line"><span class="preprocessor">#<span class="keyword">define</span> EVLOOP_NO_EXIT_ON_EMPTY <span class="number">0x04</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_loop</span><span class="params">(<span class="keyword">struct</span> event_base *base, <span class="keyword">int</span> flags)</span></span>;</span><br></pre></td></tr></table></figure>
-<p>默认上<code>event_base_loop()</code>只运行一个event_base，也并没有注册的事件。它不断循环检查是否有注册的事件可以触发，比如一个socket已经可以进行读操作，或者某个事件已经超时了。 一旦有这样的事件，它激活这些事件，并开始执行对应的事件。<br>你可以设置它的第2个参数flag来改变<code>event_base_loop()</code>的默认行为。  </p>
+<h3 id="Interface">Interface</h3><pre><code>#define EVLOOP_ONCE             0x01
+#define EVLOOP_NONBLOCK         0x02
+#define EVLOOP_NO_EXIT_ON_EMPTY 0x04
+
+int event_base_loop(struct event_base *base, int flags);
+</code></pre><p>默认上<code>event_base_loop()</code>只运行一个event_base，也并没有注册的事件。它不断循环检查是否有注册的事件可以触发，比如一个socket已经可以进行读操作，或者某个事件已经超时了。 一旦有这样的事件，它激活这些事件，并开始执行对应的事件。<br>你可以设置它的第2个参数flag来改变<code>event_base_loop()</code>的默认行为。  </p>
 <ol>
 <li>如果设置了<code>EVLOOP_ONCE</code>，那这个函数会一直等待，直到有事件可以激活，激活并执行事件回调，然后才返回，即阻塞式</li>
 <li><code>EVLOOP_NONBLOCK</code>，非阻塞，做检查，有事件可以激活，则激活执行，否则就返回</li>
 <li>一般来说，当没有等待的事件轮询就退出了，但你可以传<code>EVLOOP_NO_EXIT_ON_EMPTY</code>给到flag来改变这一行为，比如，你打算在其他线程里添加事件。 这个值会让event_base_loop一直轮询，直到你调用<code>event_base_loopbreak()</code>或<code>event_base_loopexit()</code>来显式退出轮询。  </li>
 </ol>
-<p>这个函数<code>event_base_loop()</code>轮询完成之后，返回0表示成功，如果因为一些后端函数未能处理的错误而退出，则返回-1.<br>这里有一个简要算法（<strong>Pseudocode</strong>）来帮助理解：<br><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (any events are registered <span class="keyword">with</span> <span class="keyword">the</span> loop,</span><br><span class="line">        <span class="keyword">or</span> EVLOOP_NO_EXIT_ON_EMPTY was <span class="keyword">set</span>) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (EVLOOP_NONBLOCK was <span class="keyword">set</span>, <span class="keyword">or</span> any events are already active)</span><br><span class="line">        If any registered events have triggered, mark them active.</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        Wait <span class="keyword">until</span> <span class="keyword">at</span> least one event has triggered, <span class="keyword">and</span> mark <span class="keyword">it</span> active.</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (p = <span class="number">0</span>; p &lt; n_priorities; ++p &#123;</span><br><span class="line">       <span class="keyword">if</span> (any event <span class="keyword">with</span> priority <span class="keyword">of</span> p <span class="keyword">is</span> active) &#123;</span><br><span class="line">          Run all active events <span class="keyword">with</span> priority <span class="keyword">of</span> p.</span><br><span class="line">          break; /* Do <span class="keyword">not</span> <span class="command">run</span> any events <span class="keyword">of</span> a less important priority */</span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (EVLOOP_ONCE was <span class="keyword">set</span> <span class="keyword">or</span> EVLOOP_NONBLOCK was <span class="keyword">set</span>)</span><br><span class="line">       break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>为了方便，你也可以调用：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_dispatch</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>调用<code>event_base_dispatch()</code>跟调用<code>event_base_loop()</code>一样，不过不能设置flag。 所以，它会一直轮询，直到没有注册的事件，或者你调用了<code>event_base_loopbreak()</code>或者<code>event_base_loopexit()</code>。  </p>
+<p>这个函数<code>event_base_loop()</code>轮询完成之后，返回0表示成功，如果因为一些后端函数未能处理的错误而退出，则返回-1.<br>这里有一个简要算法（<strong>Pseudocode</strong>）来帮助理解：    </p>
+<pre><code>while (any events are registered with the loop,
+        or EVLOOP_NO_EXIT_ON_EMPTY was set) {
+
+    if (EVLOOP_NONBLOCK was set, or any events are already active)
+        If any registered events have triggered, mark them active.
+    else
+        Wait until at least one event has triggered, and mark it active.
+
+    for (p = 0; p &lt; n_priorities; ++p {
+       if (any event with priority of p is active) {
+          Run all active events with priority of p.
+          break; /* Do not run any events of a less important priority */
+       }
+    }
+
+    if (EVLOOP_ONCE was set or EVLOOP_NONBLOCK was set)
+       break;
+}
+</code></pre><p>为了方便，你也可以调用：  </p>
+<pre><code>int event_base_dispatch(struct event_base *base);
+</code></pre><p>调用<code>event_base_dispatch()</code>跟调用<code>event_base_loop()</code>一样，不过不能设置flag。 所以，它会一直轮询，直到没有注册的事件，或者你调用了<code>event_base_loopbreak()</code>或者<code>event_base_loopexit()</code>。  </p>
 <p><br></p>
-<h2 id="停止轮询">停止轮询</h2><p>在注册事件被删除之前，你想停止一个正在执行的轮询，2个有细微区别的函数可以实现：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_loopexit</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span>, <span class="keyword">const</span> <span class="keyword">struct</span> timeval *tv</span>)</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_loopbreak</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>函数<code>event_base_loopexit()</code>告诉event_base在一个时间阀值之后停止轮询。如果参数tv为NULL，则event_base的轮询会马上停止。 如果event_base当前已经开始某个事件的回调，那它会等当前的回调函数执行完毕之后再退出。<br>注意到当轮询正在执行时，<code>event_base_loopexit(base,NULL)</code>和<code>event_base_loopbreak(base)</code>的行为有点不一样。 <strong>loopexit</strong>是在下次轮询完毕之后才退出循环，效果等同使用了EVLOOP_ONCE标识；而<strong>loopbreak</strong>则只针对当前循环，所以如果调用的时间点不是在一个循环之内，它就没有效果。  </p>
+<h2 id="停止轮询">停止轮询</h2><p>在注册事件被删除之前，你想停止一个正在执行的轮询，2个有细微区别的函数可以实现：  </p>
+<pre><code>int event_base_loopexit(struct event_base *base, const struct timeval *tv);
+int event_base_loopbreak(struct event_base *base);
+</code></pre><p>函数<code>event_base_loopexit()</code>告诉event_base在一个时间阀值之后停止轮询。如果参数tv为NULL，则event_base的轮询会马上停止。 如果event_base当前已经开始某个事件的回调，那它会等当前的回调函数执行完毕之后再退出。<br>注意到当轮询正在执行时，<code>event_base_loopexit(base,NULL)</code>和<code>event_base_loopbreak(base)</code>的行为有点不一样。 <strong>loopexit</strong>是在下次轮询完毕之后才退出循环，效果等同使用了EVLOOP_ONCE标识；而<strong>loopbreak</strong>则只针对当前循环，所以如果调用的时间点不是在一个循环之内，它就没有效果。  </p>
 <p>这2个函数返回0表示成功，-1表示失败。  </p>
-<h3 id="Example:_Shut_down_immediately">Example: Shut down immediately</h3><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#include &lt;event2/event.h&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Here's a callback function that calls loopbreak */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">cb</span>(<span class="params"><span class="keyword">int</span> sock, <span class="keyword">short</span> what, <span class="keyword">void</span> *arg</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> event_base *<span class="keyword">base</span> = arg;</span><br><span class="line">    event_base_loopbreak(<span class="keyword">base</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main_loop</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span>, evutil_socket_t watchdog_fd</span>)</span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="keyword">event</span> *watchdog_event;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Construct a new event to trigger whenever there are any bytes to</span><br><span class="line">       read from a watchdog socket.  When that happens, we'll call the</span><br><span class="line">       cb function, which will make the loop exit immediately without</span><br><span class="line">       running any other active events at all.</span><br><span class="line">     */</span></span><br><span class="line">    watchdog_event = event_new(<span class="keyword">base</span>, watchdog_fd, EV_READ, cb, <span class="keyword">base</span>);</span><br><span class="line"></span><br><span class="line">    event_add(watchdog_event, NULL);</span><br><span class="line"></span><br><span class="line">    event_base_dispatch(<span class="keyword">base</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="Example:_Run_an_event_loop_for_10_seconds,_then_exit-">Example: Run an event loop for 10 seconds, then exit.</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;event2/event.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">run_base_with_ticks</span><span class="params">(<span class="keyword">struct</span> event_base *base)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">  <span class="keyword">struct</span> timeval ten_sec;</span><br><span class="line"></span><br><span class="line">  ten_sec.tv_sec = <span class="number">10</span>;</span><br><span class="line">  ten_sec.tv_usec = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Now we run the event_base for a series of 10-second intervals, printing</span><br><span class="line">     "Tick" after each.  For a much better way to implement a 10-second</span><br><span class="line">     timer, see the section below about persistent timer events. */</span></span><br><span class="line">  <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">     <span class="comment">/* This schedules an exit ten seconds from now. */</span></span><br><span class="line">     event_base_loopexit(base, &amp;ten_sec);</span><br><span class="line"></span><br><span class="line">     event_base_dispatch(base);</span><br><span class="line">     <span class="built_in">puts</span>(<span class="string">"Tick"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>有时候你想区分event_base的轮询是如何退出的：是调用了<code>event_base_dispatch()</code>或者<code>event_base_loop()</code>，还是调用了<code>event_base_loopexit()</code>或者<code>event_base_break()</code>。 你可以使用下面的函数：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_got_exit</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_got_break</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>如果是因为<code>event_base_loopexit()</code>退出的，函数<code>event_base_got_exit</code>返回true；而如果是因为<code>event_base_break()</code>退出的，函数<code>event_base_got_break</code>返回true，否则都返回false。在下次轮询开始时，结果会被重置。  </p>
+<h3 id="Example:_Shut_down_immediately">Example: Shut down immediately</h3><pre><code>#include &lt;event2/event.h&gt;
+
+/* Here&#39;s a callback function that calls loopbreak */
+void cb(int sock, short what, void *arg)
+{
+    struct event_base *base = arg;
+    event_base_loopbreak(base);
+}
+
+void main_loop(struct event_base *base, evutil_socket_t watchdog_fd)
+{
+    struct event *watchdog_event;
+
+    /* Construct a new event to trigger whenever there are any bytes to
+       read from a watchdog socket.  When that happens, we&#39;ll call the
+       cb function, which will make the loop exit immediately without
+       running any other active events at all.
+     */
+    watchdog_event = event_new(base, watchdog_fd, EV_READ, cb, base);
+
+    event_add(watchdog_event, NULL);
+
+    event_base_dispatch(base);
+}
+</code></pre><h3 id="Example:_Run_an_event_loop_for_10_seconds,_then_exit-">Example: Run an event loop for 10 seconds, then exit.</h3><pre><code>#include &lt;event2/event.h&gt;
+
+void run_base_with_ticks(struct event_base *base)
+{
+  struct timeval ten_sec;
+
+  ten_sec.tv_sec = 10;
+  ten_sec.tv_usec = 0;
+
+  /* Now we run the event_base for a series of 10-second intervals, printing
+     &quot;Tick&quot; after each.  For a much better way to implement a 10-second
+     timer, see the section below about persistent timer events. */
+  while (1) {
+     /* This schedules an exit ten seconds from now. */
+     event_base_loopexit(base, &amp;ten_sec);
+
+     event_base_dispatch(base);
+     puts(&quot;Tick&quot;);
+  }
+}
+</code></pre><p>有时候你想区分event_base的轮询是如何退出的：是调用了<code>event_base_dispatch()</code>或者<code>event_base_loop()</code>，还是调用了<code>event_base_loopexit()</code>或者<code>event_base_break()</code>。 你可以使用下面的函数：  </p>
+<pre><code>int event_base_got_exit(struct event_base *base);
+int event_base_got_break(struct event_base *base);
+</code></pre><p>如果是因为<code>event_base_loopexit()</code>退出的，函数<code>event_base_got_exit</code>返回true；而如果是因为<code>event_base_break()</code>退出的，函数<code>event_base_got_break</code>返回true，否则都返回false。在下次轮询开始时，结果会被重置。  </p>
 <p><br></p>
-<h2 id="重新检查事件">重新检查事件</h2><p>一般说来，Libevent检查事件，激活最高优先级的事件，然后再检查，如此反复。当有时在当前事件回调执行之后你想停止Libevent的轮询，再让它开始。跟<code>event_base_loopbreak()</code>类似，你可以使用：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_loopcontinue</span><span class="params">(<span class="keyword">struct</span> event_base *)</span></span>;</span><br></pre></td></tr></table></figure></p>
-<p>只有在你当前正在执行的事件回调函数中做这个调用才有效果。  </p>
+<h2 id="重新检查事件">重新检查事件</h2><p>一般说来，Libevent检查事件，激活最高优先级的事件，然后再检查，如此反复。当有时在当前事件回调执行之后你想停止Libevent的轮询，再让它开始。跟<code>event_base_loopbreak()</code>类似，你可以使用：  </p>
+<pre><code>int event_base_loopcontinue(struct event_base *);
+</code></pre><p>只有在你当前正在执行的事件回调函数中做这个调用才有效果。  </p>
 <p><br></p>
-<h2 id="检查缓存的时间间隔">检查缓存的时间间隔</h2><p>有时候你想在一个事件回调函数中查看当前时间，而你又不想调用<code>gettimeofday()</code>(假设这在你的系统中是一个系统调用而你不想做一次系统调用)。  在一个事件回调函数中，你可以通过Libevent的提供的这个函数来获取该次轮询开始的时间。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_gettimeofday_cached</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span>,</span><br><span class="line">    <span class="keyword">struct</span> timeval *tv_out</span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>如果当前event_base正在调用事件的回调函数，那函数<code>event_base_gettimeofday_cached()</code>会把缓存着的时间设置到参数tv_out返回， 否则它会调用<code>evutil_gettimeofday()</code>来获取当前时间（还是系统调用了）。成功返回0，失败返回负数.<br>注意到timeval是一个缓存的值，对应的是Libevent开始执行回调函数的时间点，所以它会有一点误差。如果你的回调函数执行了很长事件，那这个值的误差会更大。如果要强制更新这个缓存的时间值，你可以调用：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_update_cache_time</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span></span>)</span>;</span><br></pre></td></tr></table></figure></p>
-<p>成功返回0， 失败返回-1， 如果event_base当前不是在轮询，则调用这个函数也是没有效果。  </p>
+<h2 id="检查缓存的时间间隔">检查缓存的时间间隔</h2><p>有时候你想在一个事件回调函数中查看当前时间，而你又不想调用<code>gettimeofday()</code>(假设这在你的系统中是一个系统调用而你不想做一次系统调用)。  在一个事件回调函数中，你可以通过Libevent的提供的这个函数来获取该次轮询开始的时间。    </p>
+<pre><code>int event_base_gettimeofday_cached(struct event_base *base,
+    struct timeval *tv_out);
+</code></pre><p>如果当前event_base正在调用事件的回调函数，那函数<code>event_base_gettimeofday_cached()</code>会把缓存着的时间设置到参数tv_out返回， 否则它会调用<code>evutil_gettimeofday()</code>来获取当前时间（还是系统调用了）。成功返回0，失败返回负数.<br>注意到timeval是一个缓存的值，对应的是Libevent开始执行回调函数的时间点，所以它会有一点误差。如果你的回调函数执行了很长事件，那这个值的误差会更大。如果要强制更新这个缓存的时间值，你可以调用：  </p>
+<pre><code>int event_base_update_cache_time(struct event_base *base);
+</code></pre><p>成功返回0， 失败返回-1， 如果event_base当前不是在轮询，则调用这个函数也是没有效果。  </p>
 <p><br></p>
-<h2 id="获取event_base的状态">获取event_base的状态</h2><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">event_base_dump_events</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span>, FILE *f</span>)</span>;</span><br></pre></td></tr></table></figure>
-<p>为了调试你的程序或者调试Libevent，有时你可能想获取当前注册到event_base的事件以及它们的状态。调用<code>event_base_dump_events()</code>会把结果写入到你指定的文件流里。<br>结果列表有非常好的可读性，它的格式未来版本中可能会改变。  </p>
+<h2 id="获取event_base的状态">获取event_base的状态</h2><pre><code>void event_base_dump_events(struct event_base *base, FILE *f);
+</code></pre><p>为了调试你的程序或者调试Libevent，有时你可能想获取当前注册到event_base的事件以及它们的状态。调用<code>event_base_dump_events()</code>会把结果写入到你指定的文件流里。<br>结果列表有非常好的可读性，它的格式未来版本中可能会改变。  </p>
 <p><br></p>
-<h2 id="遍历event_base的每个事件">遍历event_base的每个事件</h2><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">typedef <span class="title">int</span> (<span class="params">*event_base_foreach_event_cb</span>)(<span class="params"><span class="keyword">const</span> <span class="keyword">struct</span> event_base *,</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">struct</span> <span class="keyword">event</span> *, <span class="keyword">void</span> *</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">event_base_foreach_event</span>(<span class="params"><span class="keyword">struct</span> event_base *<span class="keyword">base</span>,</span><br><span class="line">                             event_base_foreach_event_cb fn,</span><br><span class="line">                             <span class="keyword">void</span> *arg</span>)</span>;</span><br></pre></td></tr></table></figure>
-<p>你可以调用<code>event_base_foreach_event()</code>来遍历注册到event_base里的那些当前激活或等待的事件。对于每个事件，你提供的回调函数（第2个参数fn）会每次都会执行，但执行顺序是无序的。 第3个参数将传给你的回调函数。<br>你的回调函数返回0才会继续遍历，其他值则会中断。最后一个回调函数执行返回的结果，将会被<code>event_base_foreach_event()</code>返回。<br>你的回调函数不能修改它接收到的事件，也不能对event_base添加、修改或删除事件。 否则将会出现不可预测的情况。<br>当调用<code>event_base_foreach_event()</code>时，它会占用event_base持有的锁，所以调用期间其他线程就无法对这个event_base做其他事件了，你得确保这个遍历不会占用太多时间。  </p>
+<h2 id="遍历event_base的每个事件">遍历event_base的每个事件</h2><pre><code>typedef int (*event_base_foreach_event_cb)(const struct event_base *,
+    const struct event *, void *);
+
+int event_base_foreach_event(struct event_base *base,
+                             event_base_foreach_event_cb fn,
+                             void *arg);
+</code></pre><p>你可以调用<code>event_base_foreach_event()</code>来遍历注册到event_base里的那些当前激活或等待的事件。对于每个事件，你提供的回调函数（第2个参数fn）会每次都会执行，但执行顺序是无序的。 第3个参数将传给你的回调函数。<br>你的回调函数返回0才会继续遍历，其他值则会中断。最后一个回调函数执行返回的结果，将会被<code>event_base_foreach_event()</code>返回。<br>你的回调函数不能修改它接收到的事件，也不能对event_base添加、修改或删除事件。 否则将会出现不可预测的情况。<br>当调用<code>event_base_foreach_event()</code>时，它会占用event_base持有的锁，所以调用期间其他线程就无法对这个event_base做其他事件了，你得确保这个遍历不会占用太多时间。  </p>
 <p><br></p>
 <h2 id="废弃的轮询函数">废弃的轮询函数</h2><p>当前用的轮询相关函数是以<code>event_base_</code>为前缀的，而废弃的函数则是以<code>event_</code>为前缀，少了base。<br>其他略。</p>
 <p><br><br>– EOF –</p>
