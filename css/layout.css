@@ -2,6 +2,7 @@ html {
   font-size: 100%;
 }
 body {
+  font-size: 14px;
   color: color-font;
   font-family: font-default;
   text-shadow: 0 0 1px transparent;
