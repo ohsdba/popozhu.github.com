@@ -120,8 +120,18 @@ a:hover {
   content: ')';
 }
 .archive_title {
-  margin-top: 0.8rem;
+  margin-top: 1rem;
+  font-size: 2rem;
+}
+.archive_title_padding {
+  margin-top: -0.8rem;
+  font-size: 1rem;
+}
+.archive_title_padding .archive_title_split {
   font-size: 1.5rem;
+}
+.archive_title_padding .archive_title_padding_item {
+  margin-right: 0.5rem;
 }
 .archive_detail {
   display: -webkit-box;
@@ -149,8 +159,8 @@ a:hover {
 .extend,
 .page-number {
   font-size: 1.5rem;
-  margin-left: 0.3rem;
-  margin-right: 0.3rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
 }
 .archive_page {
   text-align: center;
@@ -161,10 +171,6 @@ a:hover {
 }
 .extend.next {
   float: right;
-}
-.tag-link,
-.category-link {
-  margin-left: 0.3rem;
 }
 .article-inner {
   margin-top: 3rem;
