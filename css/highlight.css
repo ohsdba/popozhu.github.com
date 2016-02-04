@@ -1,20 +1,19 @@
-table,
-tbody,
-tr {
-  width: 100%;
-}
-.highlight {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-pre code {
-  white-space: pre !important;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
 blockquote {
   border-left: 3px solid color-meta;
   margin: 20px 0 10px;
   padding: 0 0 0 13px;
   text-align: left;
+}
+code {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: color-code;
+  border-radius: 4px;
+  background-color: #f9f2f4;
+}
+pre code {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: color-font;
+  border-radius: 4px;
 }
