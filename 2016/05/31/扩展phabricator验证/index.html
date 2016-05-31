@@ -52,7 +52,7 @@
 		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#provider_和_adapter"><span class="toc-text">provider 和 adapter</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#provider"><span class="toc-text">provider</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#adapter"><span class="toc-text">adapter</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#过程和工具"><span class="toc-text">过程和工具</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#last"><span class="toc-text">last</span></a></li></ol> </div>
 	    
 
-	    <h1 id="背景">背景</h1><p>在团队中使用 phabricator 也有一段时间了，近期想让更多的人使用，需要修改验证方式，由默认的 <code>username/password</code> 修改为团队的统一登录接口，类似 <code>oauth</code> 的方式：</p>
+	    <h1 id="背景">背景</h1><p>在团队中使用 phabricator 也有一段时间了，近期想让更多的人使用，为了让大家能够使用现有的帐号来便捷地登录 phabricator，需要修改验证方式，由默认的 <code>username/password</code> 修改为团队已有的统一登录接口，类似 <code>oauth</code> 的方式：</p>
 <ul>
 <li>检验统一的帐号密码</li>
 <li>检验通过后获取到一个 ticket</li>
@@ -60,43 +60,49 @@
 <li>把用户信息按约定的接口，提交给 phabricator ，再由框架保存到 db、缓存等</li>
 <li>用户完成登录</li>
 </ul>
-<p>翻了一下源码，发现 phabricator 的扩展非常方便。其中一个点在于：phabricator 会把所有 src 源码都加载到框架中，然后在运行时 runtime 查找并决定使用哪个<strong>子类</strong>。</p>
-<p>依据 phabricator 的 <a href="https://secure.phabricator.com/book/phabcontrib/article/adding_new_classes/#fundamentals" target="_blank" rel="external">模块机制</a>，在扩展目录 <code>extensions</code> 中添加自己的类，继承指定的接口或类，phabricator 就能自动加载我们扩展的类，添加到 web 界面中作为新的可选项。</p>
-<p>由于 phabricator 有 3 个组件，因此有 3 个扩展目录: </p>
+<p>翻了一下源码，发现 phabricator 的扩展非常方便。其中一个出发点在于：phabricator 会把所有 src 源码都加载到框架中，在运行时由框架帮忙查找并决定使用哪个<strong>子类</strong>。</p>
+<p>依据 phabricator 的 <a href="https://secure.phabricator.com/book/phabcontrib/article/adding_new_classes/#fundamentals" target="_blank" rel="external">模块机制</a>，在扩展目录 <code>extensions</code> 中添加自己的类，继承指定的接口或类，phabricator 就能自动加载我们扩展的类，添加到 web 界面中作为新的可选项，迅速扩展功能。</p>
+<p>由于 phabricator 有 3 个部分，因此有 3 个扩展目录: </p>
 <ul>
 <li>phabricator/src/extensions/</li>
 <li>libphutil/src/extensions/</li>
 <li>arcanist/src/extensions/</li>
 </ul>
 <p>我本次扩展的功能需要用到前面两个目录。</p>
-<p>以下内容主要是记录结论性的文字，源码分析过程、框架实现细节并未涉及，若从没接触过 phabricator、从未分析过其源码，那可能不是很适合你。</p>
-<h1 id="provider_和_adapter">provider 和 adapter</h1><h2 id="provider">provider</h2><p>假设 phabricator 的 web server 域名为 <code>my.ph.com</code>， 那么首先需要在<code>my.ph.com/auth/config/new/</code> 中新增一个新的认证方式。</p>
+<p>以下内容主要是结论性的描述文字，至于我对源码分析过程、框架实现细节并未展开，因此这里的内容更适合已经接触过 phabricator、对其源码有一定了解的同学。</p>
+<p>开始之前，有如下假设：</p>
+<ul>
+<li>phabricator 的 web server 域名为 <code>my.ph.com</code></li>
+<li>团队现有的认证中心域名为 <code>my.auth.com</code></li>
+<li>假设认证中心 <code>my.auth.com</code> 包含了： a) 帐号的检验，b) ticket的分发，c) 通过 ticket 获取用户信息</li>
+</ul>
+<h1 id="provider_和_adapter">provider 和 adapter</h1><h2 id="provider">provider</h2><p>那么首先需要在<code>my.ph.com/auth/config/new/</code> 中新增一个新的认证方式，并启用它。</p>
 <p>从结论上来说，在目录 <code>phabricator/src/applications/auth/provider</code> 新增一个类 <code>PhabricatorMyAuthProvider</code>，继承类 <code>PhabricatorAuthProvider</code>，按需实现其约定的功能：</p>
 <ul>
 <li>构造登录的表单，供用户输入其用户名、密码，由约定的函数 <code>renderLoginForm</code> 完成</li>
-<li>表单处理逻辑，获取用户信息，提交到 phabricator 框架，由约定的函数 <code>processLoginRequest</code> 完成</li>
+<li>表单处理逻辑，提交用户帐号和密码到统一认证中心 <code>my.auth.com</code>，获取 ticket，根据 ticket 获取用户信息，用户信息经约定好的函数再由 phabricator 框架使用，完成用户的登录，由约定的函数 <code>processLoginRequest</code> 完成</li>
 </ul>
-<p>伪代码如下：</p>
-<pre><code class="php">&lt;?php
+<p>当然，这里的流程跟正规的 oauth 认证方式未必都一致，具体实现根据具体情况分析。伪代码如下：</p>
+<pre><code>&lt;?php
 
 final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
     private $adapter;
 
     // 名称，显示在「认证方式」列表中
     public function getProviderName() {
-        return pht(&#39;MYOAUTH&#39;);
+        return pht(&#39;MyAuth&#39;);
     }
 
     // 描述，显示在「认证方式」列表中
     public function getDescriptionForCreate() {
         return pht(
-            &#39;Configure to use the MYOAHTU account to log in to Phabricator&#39;);
+            &#39;Configure to use the MyAuth account to log in to Phabricator&#39;);
     }
 
-    // 使用另一个我们扩展的类 PhutilMyOAuthAdapter，后续继续说明
+    // 使用另一个我们扩展的类 PhutilMyAuthAdapter，后续继续说明
     public function getAdapter() {
         if (!$this-&gt;adapter) {
-            $this-&gt;adapter = id(new PhutilMyOAuthAdapter());
+            $this-&gt;adapter = id(new PhutilMyAuthAdapter());
         }
         return $this-&gt;adapter;
     }
@@ -134,7 +140,9 @@ final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
 
         // 表单提交 url
         $url = &#39;http://my.auth.com?action=signin&#39;;
-        // 校验后跳转的 uri，还是当前的 uri，校验成功后，uri 会附带上 ticket 作为参数
+        // 校验后重定向的 uri，还是当前的 uri
+        // 校验成功后，uri 会附带上 ticket 作为参数
+        // 此处重定向的实现细节是 my.auth.com 的校验逻辑
         $r_url = &#39;http://&#39; . $request-&gt;getHost() . $request-&gt;getPath();
 
         // 获取表单中填写的用户名、密码
@@ -153,7 +161,7 @@ final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_exec($ch);
-        // 获取检验后的跳转的 uri 
+        // 获取重定向的 uri 
         $last_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         curl_close($ch);
 
@@ -218,9 +226,8 @@ final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
         return $dialog;
     }
 }
-</code></pre>
-<h2 id="adapter">adapter</h2><p>adapter 的作用在于：把用户信息按约定的接口提供给 phabricator 框架。</p>
-<p>在目录 <code>libphutil/src/auth/</code> 新增一个类 <code>PhutilMyOAuthAdapter</code>，继承类 <code>PhutilAuthAdapter</code>，按需实现其约定的功能，功能如以下函数。</p>
+</code></pre><h2 id="adapter">adapter</h2><p>adapter 的作用在于：把用户信息按约定的接口提供给 phabricator 框架。框架用到几个几个字段如下代码所示。</p>
+<p>在目录 <code>libphutil/src/auth/</code> 新增一个类 <code>PhutilMyAuthAdapter</code>，继承类 <code>PhutilAuthAdapter</code>，按需实现其约定的功能，返回框架需要的各个用户信息字段。</p>
 <pre><code>&lt;?php
 
 final class PhutilMyAuthAdapter extends PhutilAuthAdapter {
@@ -264,13 +271,16 @@ final class PhutilMyAuthAdapter extends PhutilAuthAdapter {
 }
 </code></pre><h1 id="过程和工具">过程和工具</h1><ul>
 <li>web server 使用的是 nginx，根据 nginx 配置可找到入口 <code>phabricator/webroot/index.php</code></li>
-<li>借助 phabricator 自带的工具 <code>phabricator/scripts/aphront/aphrontpath.php</code> 可查询某个 uri 是由哪个 controller 处理的<pre><code>$ cd phabricator/scripts/aphront/
+<li>借助 phabricator 自带的工具 <code>phabricator/scripts/aphront/aphrontpath.php</code> 可查询某个 uri 是由哪个 controller 处理的，controller 的 <code>handleRequest</code> 函数就是逻辑入口：</li>
+</ul>
+<pre><code>$ cd phabricator/scripts/aphront/
+
 $ ./aphrontpath.php  /
 PhabricatorHomeMainController
+
 $ ./aphrontpath.php  /auth
 PhabricatorAuthListController
-</code></pre>有助分析源码或快速定位哪个类。</li>
-</ul>
+</code></pre><p>有助分析源码或快速定位哪个类。</p>
 <h1 id="last">last</h1><p>其他功能的扩展，也是类似的逻辑，比如按自己的方式发送邮件。</p>
 <p>– EOF –<br><br></p>
 
