@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+
+    <title>扩展phabricator验证 | popozhu</title>
+
+    
+
+    <!-- css -->
+    <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+
+    </head>
+
+    <body>
+	<div class="container">
+	    <div class="banner">
+    <div>
+        <span class="site-title"> <a href="/" id="logo">popozhu</a> </span>
+
+        
+    </div>
+
+    <div class="banner-right">
+        <span class="banner-item"> <a href="/archives"> Misc </a> </span>
+        <span class="banner-item"> <a href="/about"> About </a> </span>
+    </div>
+</div>
+
+
+	    <section id="main"><article class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+	<header class="article-header">
+	    <div class="article-title">
+		<div class="title">扩展phabricator验证</div> 
+		<small>
+		    <time datetime="2016-05-31T10:51:10.000Z" itemprop="datePublished">May 31 2016</time>
+		</small>
+	    </div>
+	</header>
+    
+
+    <div class="article-entry" itemprop="articleBody">
+	
+	    
+	    
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#provider_和_adapter"><span class="toc-text">provider 和 adapter</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#provider"><span class="toc-text">provider</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#adapter"><span class="toc-text">adapter</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#过程和工具"><span class="toc-text">过程和工具</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#last"><span class="toc-text">last</span></a></li></ol> </div>
+	    
+
+	    <h1 id="背景">背景</h1><p>在团队中使用 phabricator 也有一段时间了，近期想让更多的人使用，需要修改验证方式，由默认的 <code>username/password</code> 修改为团队的统一登录接口，类似 <code>oauth</code> 的方式：</p>
+<ul>
+<li>检验统一的帐号密码</li>
+<li>检验通过后获取到一个 ticket</li>
+<li>由 ticket 获取用户的具体信息</li>
+<li>把用户信息按约定的接口，提交给 phabricator ，再由框架保存到 db、缓存等</li>
+<li>用户完成登录</li>
+</ul>
+<p>翻了一下源码，发现 phabricator 的扩展非常方便。其中一个点在于：phabricator 会把所有 src 源码都加载到框架中，然后在运行时 runtime 查找并决定使用哪个<strong>子类</strong>。</p>
+<p>依据 phabricator 的 <a href="https://secure.phabricator.com/book/phabcontrib/article/adding_new_classes/#fundamentals" target="_blank" rel="external">模块机制</a>，在扩展目录 <code>extensions</code> 中添加自己的类，继承指定的接口或类，phabricator 就能自动加载我们扩展的类，添加到 web 界面中作为新的可选项。</p>
+<p>由于 phabricator 有 3 个组件，因此有 3 个扩展目录: </p>
+<ul>
+<li>phabricator/src/extensions/</li>
+<li>libphutil/src/extensions/</li>
+<li>arcanist/src/extensions/</li>
+</ul>
+<p>我本次扩展的功能需要用到前面两个目录。</p>
+<p>以下内容主要是记录结论性的文字，源码分析过程、框架实现细节并未涉及，若从没接触过 phabricator、从未分析过其源码，那可能不是很适合你。</p>
+<h1 id="provider_和_adapter">provider 和 adapter</h1><h2 id="provider">provider</h2><p>假设 phabricator 的 web server 域名为 <code>my.ph.com</code>， 那么首先需要在<code>my.ph.com/auth/config/new/</code> 中新增一个新的认证方式。</p>
+<p>从结论上来说，在目录 <code>phabricator/src/applications/auth/provider</code> 新增一个类 <code>PhabricatorMyAuthProvider</code>，继承类 <code>PhabricatorAuthProvider</code>，按需实现其约定的功能：</p>
+<ul>
+<li>构造登录的表单，供用户输入其用户名、密码，由约定的函数 <code>renderLoginForm</code> 完成</li>
+<li>表单处理逻辑，获取用户信息，提交到 phabricator 框架，由约定的函数 <code>processLoginRequest</code> 完成</li>
+</ul>
+<p>伪代码如下：</p>
+<pre><code class="php">&lt;?php
+
+final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
+    private $adapter;
+
+    // 名称，显示在「认证方式」列表中
+    public function getProviderName() {
+        return pht(&#39;MYOAUTH&#39;);
+    }
+
+    // 描述，显示在「认证方式」列表中
+    public function getDescriptionForCreate() {
+        return pht(
+            &#39;Configure to use the MYOAHTU account to log in to Phabricator&#39;);
+    }
+
+    // 使用另一个我们扩展的类 PhutilMyOAuthAdapter，后续继续说明
+    public function getAdapter() {
+        if (!$this-&gt;adapter) {
+            $this-&gt;adapter = id(new PhutilMyOAuthAdapter());
+        }
+        return $this-&gt;adapter;
+    }
+
+    // 表单处理逻辑，提交用户名、密码到认证中心
+    // 若是认证成功，获取到一个 ticket
+    // 由 ticket 获取用户信息
+    // 把用户信息提交到框架
+    public function processLoginRequest(PhabricatorAuthLoginController $controller) {
+        //var_dump(debug_print_backtrace());
+
+        // 获取 url 上携带的参数，判断是否有 ticket
+        $request = $controller-&gt;getRequest();
+        $ticket = $request-&gt;getStr(&#39;LoginTicket&#39;, null);
+        if ($ticket) {
+            // 由 ticket 获取用户信息
+            $url = &#39;http://my.auth.com/getUserInfo?LoginTicket=&#39; . $ticket;
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            curl_close($ch);
+            $user = json_decode($result, true);
+            print_r($user);
+
+            if ($user[&#39;returnCode&#39;] == 0) {
+                $adapter = $this-&gt;getAdapter();
+                // 保存用户信息
+                $adapter-&gt;setUserInfo($user[&#39;userInfo&#39;]);
+                // 提交到框架（判断是否已经 db 中，若没有，则创建一条记录，即为注册用户信息到 phabricator）
+                return array($this-&gt;loadOrCreateAccount($adapter-&gt;getAccountId()), null);
+            }
+        }
+
+        // 表单提交 url
+        $url = &#39;http://my.auth.com?action=signin&#39;;
+        // 校验后跳转的 uri，还是当前的 uri，校验成功后，uri 会附带上 ticket 作为参数
+        $r_url = &#39;http://&#39; . $request-&gt;getHost() . $request-&gt;getPath();
+
+        // 获取表单中填写的用户名、密码
+        $username = $request-&gt;getStr(&#39;userName&#39;);
+        $password = $request-&gt;getStr(&#39;userPwd&#39;);
+        $postData = array(
+            &#39;userName&#39; =&gt; $username,
+            &#39;userPwd&#39; =&gt; $password,
+            &#39;url&#39; =&gt; $r_url,
+        );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_exec($ch);
+        // 获取检验后的跳转的 uri 
+        $last_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        curl_close($ch);
+
+        // 简单判断是否携带有 ticket，若有，重新跳转到本函数，由 ticket 获取用户信息
+        $pos = strpos($last_url, &#39;LoginTicket&#39;);
+        if ($pos) {
+            // get the ticket
+            header(&#39;Location: &#39; . $last_url);
+            exit;
+        }
+
+        // 若检验失败，附带一个 errorMsg 到 url 中，跳转到表单输入界面
+        $request-&gt;setRequestData(array(&#39;errorMsg&#39; =&gt; &#39;用户名或密码错误&#39;));
+        $response = $controller-&gt;buildProviderPageResponse(
+                $this,
+                $this-&gt;renderLoginForm($request, &#39;login&#39;));
+        return array(null, $response);
+    }
+
+    // 构造一个表单，作为登录界面
+    // 当检验失败时，依然返回到此处
+    protected function renderLoginForm(AphrontRequest $request, $mode) {
+        //var_dump(debug_print_backtrace());
+
+        $viewer = $request-&gt;getUser();
+
+        $dialog = id(new AphrontDialogView())
+            -&gt;setSubmitURI($this-&gt;getLoginURI())
+            -&gt;setUser($viewer)
+
+            -&gt;setTitle(pht(&#39;Login with &#39; . $this-&gt;getProviderName()))
+            -&gt;addSubmitButton(pht(&#39;Login&#39;))
+            //-&gt;addCancelButton($this-&gt;getStartURI());
+            -&gt;addFooter(
+                phutil_tag(
+                    &#39;level&#39;,
+                    array(),
+                    &#39;my.auth.com统一登录&#39;
+                ));
+
+        // 是否已经失败过，显示错误消息
+        $errMsg = $request-&gt;getStr(&#39;errorMsg&#39;);
+        if (!empty($errMsg)) {
+            $dialog-&gt;appendChild(
+                id(new PHUIInfoView())-&gt;setErrors(array($errMsg))
+            );
+        }
+
+        $form = id(new PHUIFormLayoutView())
+            -&gt;setUser($viewer)
+            -&gt;setFullWidth(true)
+            -&gt;appendChild(
+                    id(new AphrontFormTextControl())
+                    -&gt;setLabel(pht(&#39;my.auth.com Username&#39;))
+                    -&gt;setName(&#39;userName&#39;))
+            -&gt;appendChild(
+                    id(new AphrontFormPasswordControl())
+                    -&gt;setLabel(pht(&#39;my.auth.com Password&#39;))
+                    -&gt;setName(&#39;userPwd&#39;));
+
+        $dialog-&gt;appendChild($form);
+        return $dialog;
+    }
+}
+</code></pre>
+<h2 id="adapter">adapter</h2><p>adapter 的作用在于：把用户信息按约定的接口提供给 phabricator 框架。</p>
+<p>在目录 <code>libphutil/src/auth/</code> 新增一个类 <code>PhutilMyOAuthAdapter</code>，继承类 <code>PhutilAuthAdapter</code>，按需实现其约定的功能，功能如以下函数。</p>
+<pre><code>&lt;?php
+
+final class PhutilMyAuthAdapter extends PhutilAuthAdapter {
+    private $userInfo;
+
+    public function getAdapterType() {
+        return &#39;MyAuth&#39;;
+    }
+
+    public function getAdapterDomain() {
+        return &#39;my.auth.com&#39;;
+    }
+
+    public function getAccountID() {
+        if ($this-&gt;userInfo === null) 
+            return null;
+        return idx($this-&gt;userInfo, &#39;userName&#39;);
+    }
+
+    public function getAccountName() {
+        if ($this-&gt;userInfo === null)
+            return null;
+        return $this-&gt;getAccountID();
+    }
+
+    public function getAccountRealName() {
+        if ($this-&gt;userInfo === null)
+            return null;
+        return idx($this-&gt;userInfo, &#39;chineseName&#39;);
+    }
+
+    public function getAccountEmail() { 
+        if ($this-&gt;userInfo === null)
+            return null;
+        return idx($this-&gt;userInfo, &#39;email&#39;);
+    }
+
+    public function setUserInfo($user) {
+        $this-&gt;userInfo = $user;
+    }
+}
+</code></pre><h1 id="过程和工具">过程和工具</h1><ul>
+<li>web server 使用的是 nginx，根据 nginx 配置可找到入口 <code>phabricator/webroot/index.php</code></li>
+<li>借助 phabricator 自带的工具 <code>phabricator/scripts/aphront/aphrontpath.php</code> 可查询某个 uri 是由哪个 controller 处理的<pre><code>$ cd phabricator/scripts/aphront/
+$ ./aphrontpath.php  /
+PhabricatorHomeMainController
+$ ./aphrontpath.php  /auth
+PhabricatorAuthListController
+</code></pre>有助分析源码或快速定位哪个类。</li>
+</ul>
+<h1 id="last">last</h1><p>其他功能的扩展，也是类似的逻辑，比如按自己的方式发送邮件。</p>
+<p>– EOF –<br><br></p>
+
+	
+
+	<div>
+	    <div>Categories: <a class="category-link" href="/categories/web/">web</a> </div>
+	    <div>Tags: <a class="tag-link" href="/tags/phabricator/">phabricator</a> </div>
+	</div>
+    </div>
+
+    <hr />
+    <footer class="article-footer">
+      
+        <a href="http://popozhu.github.io/2016/05/31/扩展phabricator验证/#disqus_thread" class="article-comment-link"></a>
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/02/26/surge-for-mac-快捷设置代理/" id="article-nav-older" class="article-nav-link-wrap">
+      <span class="article-nav-title">surge for mac 快捷设置代理</span>
+      <span class="article-nav-caption">&raquo;</span>
+    </a>
+  
+</nav>
+
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread"> </div>
+</section>
+
+
+</section>
+
+	    <footer id="footer">
+    popozhu &copy; 2016 
+</footer>
+
+	</div>
+
+	
+<!--
+<script src="//ajax.useso.com/ajax/libs/jquery/2.0.3/jquery.min.js" type="text/javascript"></script>
+-->
+
+
+<script>
+  var disqus_shortname = 'popozhu';
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+
+
+    </body>
+</html>
