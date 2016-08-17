@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -50,33 +50,33 @@
 	    
 	    
 
-	    <p>我用tmux有一段时间了，工作中会用到它的「会话保持」这一功能。在「跳板机」上建一个tmux会话，然后打开多个tmux window，在每个window下ssh连接到「开发机」，这是非常普遍的开发方式。下班时我只要按<code>bind-key + d</code>脱离会话，电脑盖子一合就可以走人，当前机器上的多个ssh连接、打开的文档、运行的程序，都毫无「违和感」地同步「下班」。   </p>
-<p>第二天上班，我连接到「跳板机」，简单地执行2个命令，就可以重新快速挂载到昨天的tmux会话，之前建立的多个ssh连接、打开的文档、运行地程序，又都毫无「违和感」地同步「上班」，保持着昨天的状态（当然，运行着的程序没有退出的意思）。建立tmux会话时我并没有指定名称，重新挂载到会话上非常简单：   </p>
-<pre><code>[xiaojie.zhang1@FS67 ~]$ tmux ls    // 列出当前的tmux会话， ls = list session
+	    <p>&#x6211;&#x7528;tmux&#x6709;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x4E86;&#xFF0C;&#x5DE5;&#x4F5C;&#x4E2D;&#x4F1A;&#x7528;&#x5230;&#x5B83;&#x7684;&#x300C;&#x4F1A;&#x8BDD;&#x4FDD;&#x6301;&#x300D;&#x8FD9;&#x4E00;&#x529F;&#x80FD;&#x3002;&#x5728;&#x300C;&#x8DF3;&#x677F;&#x673A;&#x300D;&#x4E0A;&#x5EFA;&#x4E00;&#x4E2A;tmux&#x4F1A;&#x8BDD;&#xFF0C;&#x7136;&#x540E;&#x6253;&#x5F00;&#x591A;&#x4E2A;tmux window&#xFF0C;&#x5728;&#x6BCF;&#x4E2A;window&#x4E0B;ssh&#x8FDE;&#x63A5;&#x5230;&#x300C;&#x5F00;&#x53D1;&#x673A;&#x300D;&#xFF0C;&#x8FD9;&#x662F;&#x975E;&#x5E38;&#x666E;&#x904D;&#x7684;&#x5F00;&#x53D1;&#x65B9;&#x5F0F;&#x3002;&#x4E0B;&#x73ED;&#x65F6;&#x6211;&#x53EA;&#x8981;&#x6309;<code>bind-key + d</code>&#x8131;&#x79BB;&#x4F1A;&#x8BDD;&#xFF0C;&#x7535;&#x8111;&#x76D6;&#x5B50;&#x4E00;&#x5408;&#x5C31;&#x53EF;&#x4EE5;&#x8D70;&#x4EBA;&#xFF0C;&#x5F53;&#x524D;&#x673A;&#x5668;&#x4E0A;&#x7684;&#x591A;&#x4E2A;ssh&#x8FDE;&#x63A5;&#x3001;&#x6253;&#x5F00;&#x7684;&#x6587;&#x6863;&#x3001;&#x8FD0;&#x884C;&#x7684;&#x7A0B;&#x5E8F;&#xFF0C;&#x90FD;&#x6BEB;&#x65E0;&#x300C;&#x8FDD;&#x548C;&#x611F;&#x300D;&#x5730;&#x540C;&#x6B65;&#x300C;&#x4E0B;&#x73ED;&#x300D;&#x3002;   </p>
+<p>&#x7B2C;&#x4E8C;&#x5929;&#x4E0A;&#x73ED;&#xFF0C;&#x6211;&#x8FDE;&#x63A5;&#x5230;&#x300C;&#x8DF3;&#x677F;&#x673A;&#x300D;&#xFF0C;&#x7B80;&#x5355;&#x5730;&#x6267;&#x884C;2&#x4E2A;&#x547D;&#x4EE4;&#xFF0C;&#x5C31;&#x53EF;&#x4EE5;&#x91CD;&#x65B0;&#x5FEB;&#x901F;&#x6302;&#x8F7D;&#x5230;&#x6628;&#x5929;&#x7684;tmux&#x4F1A;&#x8BDD;&#xFF0C;&#x4E4B;&#x524D;&#x5EFA;&#x7ACB;&#x7684;&#x591A;&#x4E2A;ssh&#x8FDE;&#x63A5;&#x3001;&#x6253;&#x5F00;&#x7684;&#x6587;&#x6863;&#x3001;&#x8FD0;&#x884C;&#x5730;&#x7A0B;&#x5E8F;&#xFF0C;&#x53C8;&#x90FD;&#x6BEB;&#x65E0;&#x300C;&#x8FDD;&#x548C;&#x611F;&#x300D;&#x5730;&#x540C;&#x6B65;&#x300C;&#x4E0A;&#x73ED;&#x300D;&#xFF0C;&#x4FDD;&#x6301;&#x7740;&#x6628;&#x5929;&#x7684;&#x72B6;&#x6001;&#xFF08;&#x5F53;&#x7136;&#xFF0C;&#x8FD0;&#x884C;&#x7740;&#x7684;&#x7A0B;&#x5E8F;&#x6CA1;&#x6709;&#x9000;&#x51FA;&#x7684;&#x610F;&#x601D;&#xFF09;&#x3002;&#x5EFA;&#x7ACB;tmux&#x4F1A;&#x8BDD;&#x65F6;&#x6211;&#x5E76;&#x6CA1;&#x6709;&#x6307;&#x5B9A;&#x540D;&#x79F0;&#xFF0C;&#x91CD;&#x65B0;&#x6302;&#x8F7D;&#x5230;&#x4F1A;&#x8BDD;&#x4E0A;&#x975E;&#x5E38;&#x7B80;&#x5355;&#xFF1A;   </p>
+<pre><code>[xiaojie.zhang1@FS67 ~]$ tmux ls    // &#x5217;&#x51FA;&#x5F53;&#x524D;&#x7684;tmux&#x4F1A;&#x8BDD;&#xFF0C; ls = list session
 0: 4 windows (created Wed Nov  6 18:37:38 2013) [181x50] (attached)
-[xiaojie.zhang1@FS67 ~]$ tmux attach -t 0    // 挂载到第一个会话， -t 0
-</code></pre><p>然而使用过程中遇到一个屏幕显示错乱的问题，在ssh连上「开发机」后，在「开发机」上用vim打开包含有中文的代码，就会出现：<br><img src="/img/2013/snapshot_2013-11-06_9.08.03.png" alt="显示错乱"></p>
-<p>万能的google会告诉我在tmux的配置文件中添加2个utf8的项： </p>
+[xiaojie.zhang1@FS67 ~]$ tmux attach -t 0    // &#x6302;&#x8F7D;&#x5230;&#x7B2C;&#x4E00;&#x4E2A;&#x4F1A;&#x8BDD;&#xFF0C; -t 0
+</code></pre><p>&#x7136;&#x800C;&#x4F7F;&#x7528;&#x8FC7;&#x7A0B;&#x4E2D;&#x9047;&#x5230;&#x4E00;&#x4E2A;&#x5C4F;&#x5E55;&#x663E;&#x793A;&#x9519;&#x4E71;&#x7684;&#x95EE;&#x9898;&#xFF0C;&#x5728;ssh&#x8FDE;&#x4E0A;&#x300C;&#x5F00;&#x53D1;&#x673A;&#x300D;&#x540E;&#xFF0C;&#x5728;&#x300C;&#x5F00;&#x53D1;&#x673A;&#x300D;&#x4E0A;&#x7528;vim&#x6253;&#x5F00;&#x5305;&#x542B;&#x6709;&#x4E2D;&#x6587;&#x7684;&#x4EE3;&#x7801;&#xFF0C;&#x5C31;&#x4F1A;&#x51FA;&#x73B0;&#xFF1A;<br><img src="/img/2013/snapshot_2013-11-06_9.08.03.png" alt="&#x663E;&#x793A;&#x9519;&#x4E71;"></p>
+<p>&#x4E07;&#x80FD;&#x7684;google&#x4F1A;&#x544A;&#x8BC9;&#x6211;&#x5728;tmux&#x7684;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x4E2D;&#x6DFB;&#x52A0;2&#x4E2A;utf8&#x7684;&#x9879;&#xFF1A; </p>
 <pre><code>[xiaojie.zhang1@FS67 ~]$ grep utf8 ~/.tmux.conf
 setw -g utf8 on
 set -g status-utf8 on
-</code></pre><p>添加了之后就出现了中文「乱码」。<br><img src="/img/2013/snapshot_2013-11-06_9.28.13.png" alt="中文乱码"></p>
-<p>这2个配置项是不能解决问题的，乱码的因素有多个的好吗！！！！   </p>
+</code></pre><p>&#x6DFB;&#x52A0;&#x4E86;&#x4E4B;&#x540E;&#x5C31;&#x51FA;&#x73B0;&#x4E86;&#x4E2D;&#x6587;&#x300C;&#x4E71;&#x7801;&#x300D;&#x3002;<br><img src="/img/2013/snapshot_2013-11-06_9.28.13.png" alt="&#x4E2D;&#x6587;&#x4E71;&#x7801;"></p>
+<p>&#x8FD9;2&#x4E2A;&#x914D;&#x7F6E;&#x9879;&#x662F;&#x4E0D;&#x80FD;&#x89E3;&#x51B3;&#x95EE;&#x9898;&#x7684;&#xFF0C;&#x4E71;&#x7801;&#x7684;&#x56E0;&#x7D20;&#x6709;&#x591A;&#x4E2A;&#x7684;&#x597D;&#x5417;&#xFF01;&#xFF01;&#xFF01;&#xFF01;   </p>
 <ol>
-<li>终端的编码</li>
-<li>vim的编码</li>
-<li>tmux的编码</li>
-<li>系统的locale</li>
+<li>&#x7EC8;&#x7AEF;&#x7684;&#x7F16;&#x7801;</li>
+<li>vim&#x7684;&#x7F16;&#x7801;</li>
+<li>tmux&#x7684;&#x7F16;&#x7801;</li>
+<li>&#x7CFB;&#x7EDF;&#x7684;locale</li>
 </ol>
-<p>对于第1点， 我使用的iterm2，使用的字符编码为<code>Unicode(UTF-8)</code>，嗯，已经是utf8了。  </p>
-<p>对于第2点，用vim的人都知道，vim读写一个文件时，使用设置项<code>fenc</code>配置的编码，比如utf8；而vim显示文件内容，使用的是另一个设置项<code>tenc</code>配置的编码，如果这2个配置的编码不一致，就能够看到vim的乱码。我先确认vim打开文件的编码和展示都用到utf8编码，两者编码一致：</p>
-<pre><code>:set fenc    // 在vim命令行下
-  fileencoding=utf-8    // vim命令行下的输出
-:set tenc    // 同上
+<p>&#x5BF9;&#x4E8E;&#x7B2C;1&#x70B9;&#xFF0C; &#x6211;&#x4F7F;&#x7528;&#x7684;iterm2&#xFF0C;&#x4F7F;&#x7528;&#x7684;&#x5B57;&#x7B26;&#x7F16;&#x7801;&#x4E3A;<code>Unicode(UTF-8)</code>&#xFF0C;&#x55EF;&#xFF0C;&#x5DF2;&#x7ECF;&#x662F;utf8&#x4E86;&#x3002;  </p>
+<p>&#x5BF9;&#x4E8E;&#x7B2C;2&#x70B9;&#xFF0C;&#x7528;vim&#x7684;&#x4EBA;&#x90FD;&#x77E5;&#x9053;&#xFF0C;vim&#x8BFB;&#x5199;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;&#x65F6;&#xFF0C;&#x4F7F;&#x7528;&#x8BBE;&#x7F6E;&#x9879;<code>fenc</code>&#x914D;&#x7F6E;&#x7684;&#x7F16;&#x7801;&#xFF0C;&#x6BD4;&#x5982;utf8&#xFF1B;&#x800C;vim&#x663E;&#x793A;&#x6587;&#x4EF6;&#x5185;&#x5BB9;&#xFF0C;&#x4F7F;&#x7528;&#x7684;&#x662F;&#x53E6;&#x4E00;&#x4E2A;&#x8BBE;&#x7F6E;&#x9879;<code>tenc</code>&#x914D;&#x7F6E;&#x7684;&#x7F16;&#x7801;&#xFF0C;&#x5982;&#x679C;&#x8FD9;2&#x4E2A;&#x914D;&#x7F6E;&#x7684;&#x7F16;&#x7801;&#x4E0D;&#x4E00;&#x81F4;&#xFF0C;&#x5C31;&#x80FD;&#x591F;&#x770B;&#x5230;vim&#x7684;&#x4E71;&#x7801;&#x3002;&#x6211;&#x5148;&#x786E;&#x8BA4;vim&#x6253;&#x5F00;&#x6587;&#x4EF6;&#x7684;&#x7F16;&#x7801;&#x548C;&#x5C55;&#x793A;&#x90FD;&#x7528;&#x5230;utf8&#x7F16;&#x7801;&#xFF0C;&#x4E24;&#x8005;&#x7F16;&#x7801;&#x4E00;&#x81F4;&#xFF1A;</p>
+<pre><code>:set fenc    // &#x5728;vim&#x547D;&#x4EE4;&#x884C;&#x4E0B;
+  fileencoding=utf-8    // vim&#x547D;&#x4EE4;&#x884C;&#x4E0B;&#x7684;&#x8F93;&#x51FA;
+:set tenc    // &#x540C;&#x4E0A;
   termencoding=utf-8
-</code></pre><p>其实，不用tmux，从「跳板机」ssh连上「开发机」，再使用vim打开任何文本，都是不会乱码的（因为vim配置了正确的编码方式）。  </p>
-<p>对于第3点，tmux添加了utf8的编码也没有效果（其实这2个是设置tmux window的好吗）， tmux的显示到底是根据哪里的配置？？</p>
-<p>到了第4点，确认是系统的locale问题了，tmux依赖于这些设置。由于我是在「跳板机」上使用tmux，tmux会使用到「跳板机」上的locale参数，查看：</p>
+</code></pre><p>&#x5176;&#x5B9E;&#xFF0C;&#x4E0D;&#x7528;tmux&#xFF0C;&#x4ECE;&#x300C;&#x8DF3;&#x677F;&#x673A;&#x300D;ssh&#x8FDE;&#x4E0A;&#x300C;&#x5F00;&#x53D1;&#x673A;&#x300D;&#xFF0C;&#x518D;&#x4F7F;&#x7528;vim&#x6253;&#x5F00;&#x4EFB;&#x4F55;&#x6587;&#x672C;&#xFF0C;&#x90FD;&#x662F;&#x4E0D;&#x4F1A;&#x4E71;&#x7801;&#x7684;&#xFF08;&#x56E0;&#x4E3A;vim&#x914D;&#x7F6E;&#x4E86;&#x6B63;&#x786E;&#x7684;&#x7F16;&#x7801;&#x65B9;&#x5F0F;&#xFF09;&#x3002;  </p>
+<p>&#x5BF9;&#x4E8E;&#x7B2C;3&#x70B9;&#xFF0C;tmux&#x6DFB;&#x52A0;&#x4E86;utf8&#x7684;&#x7F16;&#x7801;&#x4E5F;&#x6CA1;&#x6709;&#x6548;&#x679C;&#xFF08;&#x5176;&#x5B9E;&#x8FD9;2&#x4E2A;&#x662F;&#x8BBE;&#x7F6E;tmux window&#x7684;&#x597D;&#x5417;&#xFF09;&#xFF0C; tmux&#x7684;&#x663E;&#x793A;&#x5230;&#x5E95;&#x662F;&#x6839;&#x636E;&#x54EA;&#x91CC;&#x7684;&#x914D;&#x7F6E;&#xFF1F;&#xFF1F;</p>
+<p>&#x5230;&#x4E86;&#x7B2C;4&#x70B9;&#xFF0C;&#x786E;&#x8BA4;&#x662F;&#x7CFB;&#x7EDF;&#x7684;locale&#x95EE;&#x9898;&#x4E86;&#xFF0C;tmux&#x4F9D;&#x8D56;&#x4E8E;&#x8FD9;&#x4E9B;&#x8BBE;&#x7F6E;&#x3002;&#x7531;&#x4E8E;&#x6211;&#x662F;&#x5728;&#x300C;&#x8DF3;&#x677F;&#x673A;&#x300D;&#x4E0A;&#x4F7F;&#x7528;tmux&#xFF0C;tmux&#x4F1A;&#x4F7F;&#x7528;&#x5230;&#x300C;&#x8DF3;&#x677F;&#x673A;&#x300D;&#x4E0A;&#x7684;locale&#x53C2;&#x6570;&#xFF0C;&#x67E5;&#x770B;&#xFF1A;</p>
 <pre><code>[xiaojie.zhang1@FS67 ~]$ locale
 LANG=en_US.en
 LC_CTYPE=&quot;C&quot;
@@ -92,21 +92,21 @@ LC_TELEPHONE=&quot;C&quot;
 LC_MEASUREMENT=&quot;C&quot;
 LC_IDENTIFICATION=&quot;C&quot;
 LC_ALL=C
-</code></pre><p>果然！！！！于是再检查「跳板机」上是否已经安装zh_cn字符集:</p>
+</code></pre><p>&#x679C;&#x7136;&#xFF01;&#xFF01;&#xFF01;&#xFF01;&#x4E8E;&#x662F;&#x518D;&#x68C0;&#x67E5;&#x300C;&#x8DF3;&#x677F;&#x673A;&#x300D;&#x4E0A;&#x662F;&#x5426;&#x5DF2;&#x7ECF;&#x5B89;&#x88C5;zh_cn&#x5B57;&#x7B26;&#x96C6;:</p>
 <pre><code>[xiaojie.zhang1@FS67 ~]$ locale -a | grep -i zh_cn
 zh_CN
 zh_CN.gb18030
 zh_CN.gb2312
 zh_CN.gbk
 zh_CN.utf8
-</code></pre><p>没让我失望，有<code>zh_cn.utf8</code>，添加到profile里吧:</p>
+</code></pre><p>&#x6CA1;&#x8BA9;&#x6211;&#x5931;&#x671B;&#xFF0C;&#x6709;<code>zh_cn.utf8</code>&#xFF0C;&#x6DFB;&#x52A0;&#x5230;profile&#x91CC;&#x5427;:</p>
 <pre><code>[xiaojie.zhang1@FS67 ~]$ grep -i utf ~/.bash_profile
 export LANG=&quot;zh_CN.UTF-8&quot;
 export LC_ALL=&quot;zh_CN.UTF-8&quot;
-</code></pre><p>kill掉tmux当前的会话，重新登录「跳板机」，新建一个tmux会话，再次确认tmux加载到新的locale</p>
-<pre><code>[xiaojie.zhang1@FS67 ~]$ tmux    // 新建一个tmux会话和窗口
+</code></pre><p>kill&#x6389;tmux&#x5F53;&#x524D;&#x7684;&#x4F1A;&#x8BDD;&#xFF0C;&#x91CD;&#x65B0;&#x767B;&#x5F55;&#x300C;&#x8DF3;&#x677F;&#x673A;&#x300D;&#xFF0C;&#x65B0;&#x5EFA;&#x4E00;&#x4E2A;tmux&#x4F1A;&#x8BDD;&#xFF0C;&#x518D;&#x6B21;&#x786E;&#x8BA4;tmux&#x52A0;&#x8F7D;&#x5230;&#x65B0;&#x7684;locale</p>
+<pre><code>[xiaojie.zhang1@FS67 ~]$ tmux    // &#x65B0;&#x5EFA;&#x4E00;&#x4E2A;tmux&#x4F1A;&#x8BDD;&#x548C;&#x7A97;&#x53E3;
 
-[xiaojie.zhang1@FS67 ~]$ locale    // 进入tmux的窗口，再确认一次locale
+[xiaojie.zhang1@FS67 ~]$ locale    // &#x8FDB;&#x5165;tmux&#x7684;&#x7A97;&#x53E3;&#xFF0C;&#x518D;&#x786E;&#x8BA4;&#x4E00;&#x6B21;locale
 LANG=zh_CN.UTF-8
 LC_CTYPE=&quot;zh_CN.UTF-8&quot;
 LC_NUMERIC=&quot;zh_CN.UTF-8&quot;
@@ -121,27 +121,27 @@ LC_TELEPHONE=&quot;zh_CN.UTF-8&quot;
 LC_MEASUREMENT=&quot;zh_CN.UTF-8&quot;
 LC_IDENTIFICATION=&quot;zh_CN.UTF-8&quot;
 LC_ALL=zh_CN.UTF-8
-</code></pre><p>tmux用到了utf8了， 这时再ssh连接到「开发机」，vim打开之前的文件，乱码已成往事，当然也不会显示错乱。  </p>
-<p>也就是说，若要「乱码」已成往事，需要4个地方的编码：</p>
+</code></pre><p>tmux&#x7528;&#x5230;&#x4E86;utf8&#x4E86;&#xFF0C; &#x8FD9;&#x65F6;&#x518D;ssh&#x8FDE;&#x63A5;&#x5230;&#x300C;&#x5F00;&#x53D1;&#x673A;&#x300D;&#xFF0C;vim&#x6253;&#x5F00;&#x4E4B;&#x524D;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x4E71;&#x7801;&#x5DF2;&#x6210;&#x5F80;&#x4E8B;&#xFF0C;&#x5F53;&#x7136;&#x4E5F;&#x4E0D;&#x4F1A;&#x663E;&#x793A;&#x9519;&#x4E71;&#x3002;  </p>
+<p>&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#xFF0C;&#x82E5;&#x8981;&#x300C;&#x4E71;&#x7801;&#x300D;&#x5DF2;&#x6210;&#x5F80;&#x4E8B;&#xFF0C;&#x9700;&#x8981;4&#x4E2A;&#x5730;&#x65B9;&#x7684;&#x7F16;&#x7801;&#xFF1A;</p>
 <ol>
-<li>终端使用utf8编码（比如我使用iterm2，item2的终端字符集为Unicode(UTF-8) ）  </li>
-<li><p>使用tmux的机器上（比如我这里的「跳板机」），其个人profile的locale使用utf8    </p>
+<li>&#x7EC8;&#x7AEF;&#x4F7F;&#x7528;utf8&#x7F16;&#x7801;&#xFF08;&#x6BD4;&#x5982;&#x6211;&#x4F7F;&#x7528;iterm2&#xFF0C;item2&#x7684;&#x7EC8;&#x7AEF;&#x5B57;&#x7B26;&#x96C6;&#x4E3A;Unicode(UTF-8) &#xFF09;  </li>
+<li><p>&#x4F7F;&#x7528;tmux&#x7684;&#x673A;&#x5668;&#x4E0A;&#xFF08;&#x6BD4;&#x5982;&#x6211;&#x8FD9;&#x91CC;&#x7684;&#x300C;&#x8DF3;&#x677F;&#x673A;&#x300D;&#xFF09;&#xFF0C;&#x5176;&#x4E2A;&#x4EBA;profile&#x7684;locale&#x4F7F;&#x7528;utf8    </p>
 <pre><code> [xiaojie.zhang1@FS67 ~]$ grep -i utf ~/.bash_profile
  export LANG=&quot;zh_CN.UTF-8&quot;
  export LC_ALL=&quot;zh_CN.UTF-8&quot;
-</code></pre><p> 每次登录都会export这2个环境变量，从而设置locale。  </p>
+</code></pre><p> &#x6BCF;&#x6B21;&#x767B;&#x5F55;&#x90FD;&#x4F1A;export&#x8FD9;2&#x4E2A;&#x73AF;&#x5883;&#x53D8;&#x91CF;&#xFF0C;&#x4ECE;&#x800C;&#x8BBE;&#x7F6E;locale&#x3002;  </p>
 </li>
-<li><p>开发机」上vim设置utf8编码（linux)  </p>
+<li><p>&#x5F00;&#x53D1;&#x673A;&#x300D;&#x4E0A;vim&#x8BBE;&#x7F6E;utf8&#x7F16;&#x7801;&#xFF08;linux)  </p>
 <pre><code> xiaojie.zhang1@log83 ~$ grep enc ~/.vimrc
  set enc=utf8
  set fencs=utf8,gbk,gb2312,gb18030,cp936
-</code></pre><p> vim里其实没必要设置<code>tenc</code>，它会从<code>fencs</code>列表中选一个适合的编码方式。  </p>
+</code></pre><p> vim&#x91CC;&#x5176;&#x5B9E;&#x6CA1;&#x5FC5;&#x8981;&#x8BBE;&#x7F6E;<code>tenc</code>&#xFF0C;&#x5B83;&#x4F1A;&#x4ECE;<code>fencs</code>&#x5217;&#x8868;&#x4E2D;&#x9009;&#x4E00;&#x4E2A;&#x9002;&#x5408;&#x7684;&#x7F16;&#x7801;&#x65B9;&#x5F0F;&#x3002;  </p>
 </li>
-<li><p>tmux倒是可以不设置utf8    </p>
+<li><p>tmux&#x5012;&#x662F;&#x53EF;&#x4EE5;&#x4E0D;&#x8BBE;&#x7F6E;utf8    </p>
 </li>
 </ol>
-<p><br><br>推荐一个讲解vim编码方式的普及blog: <a href="http://blog.csdn.net/keepliving/article/details/5623362" target="_blank" rel="external">VIM乱码原因与解决方案</a>  </p>
-<p>– EOF –</p>
+<p><br><br>&#x63A8;&#x8350;&#x4E00;&#x4E2A;&#x8BB2;&#x89E3;vim&#x7F16;&#x7801;&#x65B9;&#x5F0F;&#x7684;&#x666E;&#x53CA;blog: <a href="http://blog.csdn.net/keepliving/article/details/5623362" target="_blank" rel="external">VIM&#x4E71;&#x7801;&#x539F;&#x56E0;&#x4E0E;&#x89E3;&#x51B3;&#x65B9;&#x6848;</a>  </p>
+<p>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -216,7 +216,7 @@ LC_ALL=zh_CN.UTF-8
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

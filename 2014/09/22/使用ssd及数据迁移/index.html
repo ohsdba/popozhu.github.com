@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -50,85 +50,85 @@
 	    
 	    
 
-	    <p>给笔记本 Macbook pro 2012 版添加了一个 ssd，ssd 买的是 intel 530 系列，容量为 240G，看中的是：1. 存储上使用 MLC 颗粒，主控芯片没研究； 2. 看评论都提到 intel 牌子的稳定性好，当然大家只是说了一下，没说明怎么稳定； 3. 公司服务器上有用到 intel 的 ssd，工作期间暂无遇到故障。</p>
-<p>系统版本是 Yosemite 10.10(14A361p)，测试版本。</p>
-<p>ssd 的更换上，考虑两个方案：</p>
+	    <p>&#x7ED9;&#x7B14;&#x8BB0;&#x672C; Macbook pro 2012 &#x7248;&#x6DFB;&#x52A0;&#x4E86;&#x4E00;&#x4E2A; ssd&#xFF0C;ssd &#x4E70;&#x7684;&#x662F; intel 530 &#x7CFB;&#x5217;&#xFF0C;&#x5BB9;&#x91CF;&#x4E3A; 240G&#xFF0C;&#x770B;&#x4E2D;&#x7684;&#x662F;&#xFF1A;1. &#x5B58;&#x50A8;&#x4E0A;&#x4F7F;&#x7528; MLC &#x9897;&#x7C92;&#xFF0C;&#x4E3B;&#x63A7;&#x82AF;&#x7247;&#x6CA1;&#x7814;&#x7A76;&#xFF1B; 2. &#x770B;&#x8BC4;&#x8BBA;&#x90FD;&#x63D0;&#x5230; intel &#x724C;&#x5B50;&#x7684;&#x7A33;&#x5B9A;&#x6027;&#x597D;&#xFF0C;&#x5F53;&#x7136;&#x5927;&#x5BB6;&#x53EA;&#x662F;&#x8BF4;&#x4E86;&#x4E00;&#x4E0B;&#xFF0C;&#x6CA1;&#x8BF4;&#x660E;&#x600E;&#x4E48;&#x7A33;&#x5B9A;&#xFF1B; 3. &#x516C;&#x53F8;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x6709;&#x7528;&#x5230; intel &#x7684; ssd&#xFF0C;&#x5DE5;&#x4F5C;&#x671F;&#x95F4;&#x6682;&#x65E0;&#x9047;&#x5230;&#x6545;&#x969C;&#x3002;</p>
+<p>&#x7CFB;&#x7EDF;&#x7248;&#x672C;&#x662F; Yosemite 10.10(14A361p)&#xFF0C;&#x6D4B;&#x8BD5;&#x7248;&#x672C;&#x3002;</p>
+<p>ssd &#x7684;&#x66F4;&#x6362;&#x4E0A;&#xFF0C;&#x8003;&#x8651;&#x4E24;&#x4E2A;&#x65B9;&#x6848;&#xFF1A;</p>
 <ol>
-<li>直接用 ssd 替换现有的硬盘，只使用 ssd</li>
-<li>现有的硬盘不动，把 ssd 安装到光驱位，两者位置最好不要调换</li>
+<li>&#x76F4;&#x63A5;&#x7528; ssd &#x66FF;&#x6362;&#x73B0;&#x6709;&#x7684;&#x786C;&#x76D8;&#xFF0C;&#x53EA;&#x4F7F;&#x7528; ssd</li>
+<li>&#x73B0;&#x6709;&#x7684;&#x786C;&#x76D8;&#x4E0D;&#x52A8;&#xFF0C;&#x628A; ssd &#x5B89;&#x88C5;&#x5230;&#x5149;&#x9A71;&#x4F4D;&#xFF0C;&#x4E24;&#x8005;&#x4F4D;&#x7F6E;&#x6700;&#x597D;&#x4E0D;&#x8981;&#x8C03;&#x6362;</li>
 </ol>
-<p>准备工作包括有：</p>
+<p>&#x51C6;&#x5907;&#x5DE5;&#x4F5C;&#x5305;&#x62EC;&#x6709;&#xFF1A;</p>
 <ol>
-<li>检查螺丝刀能否拆开笔记本，需要两把螺丝刀：拆卸笔记本背部的十字螺丝刀（也用于拆光驱）、硬盘四角的六角螺丝刀（我是用小钳子转松拧开）。购买 ssd 前我为了减轻笔记本重量先拆掉了光驱，硬盘则更容易拆卸。</li>
-<li>买一个 ssd</li>
-<li>对于方案1，买一个外置的 usb 硬盘盒，用来容纳换下来的机械硬盘</li>
-<li>对于方案2，买一个光驱位托架，容纳 ssd</li>
-<li>数据要实现无缝迁移，不重装系统，不丢失配置。预备方案：a. 使用软件 Carbon copy cloner，但对系统版本有限制； b. 在「终端」使用 rsync + bless。</li>
+<li>&#x68C0;&#x67E5;&#x87BA;&#x4E1D;&#x5200;&#x80FD;&#x5426;&#x62C6;&#x5F00;&#x7B14;&#x8BB0;&#x672C;&#xFF0C;&#x9700;&#x8981;&#x4E24;&#x628A;&#x87BA;&#x4E1D;&#x5200;&#xFF1A;&#x62C6;&#x5378;&#x7B14;&#x8BB0;&#x672C;&#x80CC;&#x90E8;&#x7684;&#x5341;&#x5B57;&#x87BA;&#x4E1D;&#x5200;&#xFF08;&#x4E5F;&#x7528;&#x4E8E;&#x62C6;&#x5149;&#x9A71;&#xFF09;&#x3001;&#x786C;&#x76D8;&#x56DB;&#x89D2;&#x7684;&#x516D;&#x89D2;&#x87BA;&#x4E1D;&#x5200;&#xFF08;&#x6211;&#x662F;&#x7528;&#x5C0F;&#x94B3;&#x5B50;&#x8F6C;&#x677E;&#x62E7;&#x5F00;&#xFF09;&#x3002;&#x8D2D;&#x4E70; ssd &#x524D;&#x6211;&#x4E3A;&#x4E86;&#x51CF;&#x8F7B;&#x7B14;&#x8BB0;&#x672C;&#x91CD;&#x91CF;&#x5148;&#x62C6;&#x6389;&#x4E86;&#x5149;&#x9A71;&#xFF0C;&#x786C;&#x76D8;&#x5219;&#x66F4;&#x5BB9;&#x6613;&#x62C6;&#x5378;&#x3002;</li>
+<li>&#x4E70;&#x4E00;&#x4E2A; ssd</li>
+<li>&#x5BF9;&#x4E8E;&#x65B9;&#x6848;1&#xFF0C;&#x4E70;&#x4E00;&#x4E2A;&#x5916;&#x7F6E;&#x7684; usb &#x786C;&#x76D8;&#x76D2;&#xFF0C;&#x7528;&#x6765;&#x5BB9;&#x7EB3;&#x6362;&#x4E0B;&#x6765;&#x7684;&#x673A;&#x68B0;&#x786C;&#x76D8;</li>
+<li>&#x5BF9;&#x4E8E;&#x65B9;&#x6848;2&#xFF0C;&#x4E70;&#x4E00;&#x4E2A;&#x5149;&#x9A71;&#x4F4D;&#x6258;&#x67B6;&#xFF0C;&#x5BB9;&#x7EB3; ssd</li>
+<li>&#x6570;&#x636E;&#x8981;&#x5B9E;&#x73B0;&#x65E0;&#x7F1D;&#x8FC1;&#x79FB;&#xFF0C;&#x4E0D;&#x91CD;&#x88C5;&#x7CFB;&#x7EDF;&#xFF0C;&#x4E0D;&#x4E22;&#x5931;&#x914D;&#x7F6E;&#x3002;&#x9884;&#x5907;&#x65B9;&#x6848;&#xFF1A;a. &#x4F7F;&#x7528;&#x8F6F;&#x4EF6; Carbon copy cloner&#xFF0C;&#x4F46;&#x5BF9;&#x7CFB;&#x7EDF;&#x7248;&#x672C;&#x6709;&#x9650;&#x5236;&#xFF1B; b. &#x5728;&#x300C;&#x7EC8;&#x7AEF;&#x300D;&#x4F7F;&#x7528; rsync + bless&#x3002;</li>
 </ol>
-<p>硬件上，我本想使用方案1，只使用 ssd，这样笔记本就可以随意地移动，但是我发现系统的「磁盘工具」认不到该 ssd，心好累。额外再买了一个光驱托架，尝试方案2，倒正常了。</p>
-<p>硬盘位置认不到 ssd 的问题，考虑到该 ssd 已经有最新 intel 的固件，也看到有人评价在同型号笔记本上能正常使用(系统是10.9)，怀疑是测试版本的系统导致。硬盘位置和光驱位置的这两个 sata3 接口初步判定是一样的，故障原因可能有：</p>
+<p>&#x786C;&#x4EF6;&#x4E0A;&#xFF0C;&#x6211;&#x672C;&#x60F3;&#x4F7F;&#x7528;&#x65B9;&#x6848;1&#xFF0C;&#x53EA;&#x4F7F;&#x7528; ssd&#xFF0C;&#x8FD9;&#x6837;&#x7B14;&#x8BB0;&#x672C;&#x5C31;&#x53EF;&#x4EE5;&#x968F;&#x610F;&#x5730;&#x79FB;&#x52A8;&#xFF0C;&#x4F46;&#x662F;&#x6211;&#x53D1;&#x73B0;&#x7CFB;&#x7EDF;&#x7684;&#x300C;&#x78C1;&#x76D8;&#x5DE5;&#x5177;&#x300D;&#x8BA4;&#x4E0D;&#x5230;&#x8BE5; ssd&#xFF0C;&#x5FC3;&#x597D;&#x7D2F;&#x3002;&#x989D;&#x5916;&#x518D;&#x4E70;&#x4E86;&#x4E00;&#x4E2A;&#x5149;&#x9A71;&#x6258;&#x67B6;&#xFF0C;&#x5C1D;&#x8BD5;&#x65B9;&#x6848;2&#xFF0C;&#x5012;&#x6B63;&#x5E38;&#x4E86;&#x3002;</p>
+<p>&#x786C;&#x76D8;&#x4F4D;&#x7F6E;&#x8BA4;&#x4E0D;&#x5230; ssd &#x7684;&#x95EE;&#x9898;&#xFF0C;&#x8003;&#x8651;&#x5230;&#x8BE5; ssd &#x5DF2;&#x7ECF;&#x6709;&#x6700;&#x65B0; intel &#x7684;&#x56FA;&#x4EF6;&#xFF0C;&#x4E5F;&#x770B;&#x5230;&#x6709;&#x4EBA;&#x8BC4;&#x4EF7;&#x5728;&#x540C;&#x578B;&#x53F7;&#x7B14;&#x8BB0;&#x672C;&#x4E0A;&#x80FD;&#x6B63;&#x5E38;&#x4F7F;&#x7528;(&#x7CFB;&#x7EDF;&#x662F;10.9)&#xFF0C;&#x6000;&#x7591;&#x662F;&#x6D4B;&#x8BD5;&#x7248;&#x672C;&#x7684;&#x7CFB;&#x7EDF;&#x5BFC;&#x81F4;&#x3002;&#x786C;&#x76D8;&#x4F4D;&#x7F6E;&#x548C;&#x5149;&#x9A71;&#x4F4D;&#x7F6E;&#x7684;&#x8FD9;&#x4E24;&#x4E2A; sata3 &#x63A5;&#x53E3;&#x521D;&#x6B65;&#x5224;&#x5B9A;&#x662F;&#x4E00;&#x6837;&#x7684;&#xFF0C;&#x6545;&#x969C;&#x539F;&#x56E0;&#x53EF;&#x80FD;&#x6709;&#xFF1A;</p>
 <ol>
-<li>测试版本的系统</li>
-<li>ssd 的固件，当前的版本是<code>DC32</code></li>
-<li>笔记本上的两个 sata3 接口的兼容性，两个都是<code>Intel 7 Series Chipset</code>，以及<code>AHCI Version 1.30 Supported</code></li>
-</ol>
-<p><br></p>
-<p>对于方案1，更换思路为：</p>
-<ol>
-<li>把笔记本的硬盘拆出来，放到外置 usb 硬盘盒</li>
-<li>拿到空白未格式化的 ssd， 直接装到硬盘位置。想法就是尽可能早地确认 ssd 在「最终位置」上能否正常工作</li>
-<li>开机按住 option，能够看到外置 usb 硬盘里的系统，启动该系统，这是之前一直在使用的系统</li>
-<li>进到系统后，打开「磁盘管理」工具，但我在该软件中看不到 ssd，该方案中断，否则可以继续</li>
-<li>在「磁盘管理」中对 ssd 进行分区</li>
-<li>安装并使用 Carbon copy cloner 来转移数据，如果 ssd 空间比机械硬盘的小，需要在「用户」目录中排除一些文件。相比TimeMachine，看中就是这个软件的这点可选择性。好吧，我也没TimeMachine备份。</li>
-<li>迁移数据后设置从 ssd 启动系统</li>
-<li>拔掉外置 usb 硬盘</li>
-</ol>
-<p>对于方案2，更换思路为：</p>
-<ol>
-<li>拆下光驱，把 ssd 放到光驱托架</li>
-<li>从现有的机械硬盘启动系统</li>
-<li>打开「磁盘管理」工具，能看到光驱位置上新装的 ssd，否则该方案中断</li>
-<li>在「磁盘管理」中对 ssd 进行分区</li>
-<li>安装并使用 Carbon copy cloner 来转移数据</li>
-<li>迁移数据后设置从 ssd 启动系统</li>
+<li>&#x6D4B;&#x8BD5;&#x7248;&#x672C;&#x7684;&#x7CFB;&#x7EDF;</li>
+<li>ssd &#x7684;&#x56FA;&#x4EF6;&#xFF0C;&#x5F53;&#x524D;&#x7684;&#x7248;&#x672C;&#x662F;<code>DC32</code></li>
+<li>&#x7B14;&#x8BB0;&#x672C;&#x4E0A;&#x7684;&#x4E24;&#x4E2A; sata3 &#x63A5;&#x53E3;&#x7684;&#x517C;&#x5BB9;&#x6027;&#xFF0C;&#x4E24;&#x4E2A;&#x90FD;&#x662F;<code>Intel 7 Series Chipset</code>&#xFF0C;&#x4EE5;&#x53CA;<code>AHCI Version 1.30 Supported</code></li>
 </ol>
 <p><br></p>
-<p>暂时勉强接受方案2，但在数据迁移中，由于系统是测试版本的 Yosemite，需要使用最新版本也是测试版本的 Carbon copy cloner beta 5， 然后发现根本没有转移数据到新 ssd 上，简单的事情变麻烦了。对于「更换硬盘、数据迁移」这两者，觉得上面的更换步骤太容易了。</p>
-<p>苦逼的手动迁移过程如下，其实做完后，反而觉得这个方式更简单。</p>
-<p>打开「终端」，使用命令<code>rsync + bless</code>来做数据迁移，也好，又少了一个依赖的软件。</p>
+<p>&#x5BF9;&#x4E8E;&#x65B9;&#x6848;1&#xFF0C;&#x66F4;&#x6362;&#x601D;&#x8DEF;&#x4E3A;&#xFF1A;</p>
 <ol>
-<li><p>rsync操作，参考<a href="http://www.egg-tech.com/mac_backup/" target="_blank" rel="external">HOWTO: Backup Your Mac With rsync</a><br>新建一个文件<code>backup_excludes.txt</code>，排除一些文件，以及排除几个大容量的目录，这些目录最后再手动按需要复制到 ssd 上就好了</p>
+<li>&#x628A;&#x7B14;&#x8BB0;&#x672C;&#x7684;&#x786C;&#x76D8;&#x62C6;&#x51FA;&#x6765;&#xFF0C;&#x653E;&#x5230;&#x5916;&#x7F6E; usb &#x786C;&#x76D8;&#x76D2;</li>
+<li>&#x62FF;&#x5230;&#x7A7A;&#x767D;&#x672A;&#x683C;&#x5F0F;&#x5316;&#x7684; ssd&#xFF0C; &#x76F4;&#x63A5;&#x88C5;&#x5230;&#x786C;&#x76D8;&#x4F4D;&#x7F6E;&#x3002;&#x60F3;&#x6CD5;&#x5C31;&#x662F;&#x5C3D;&#x53EF;&#x80FD;&#x65E9;&#x5730;&#x786E;&#x8BA4; ssd &#x5728;&#x300C;&#x6700;&#x7EC8;&#x4F4D;&#x7F6E;&#x300D;&#x4E0A;&#x80FD;&#x5426;&#x6B63;&#x5E38;&#x5DE5;&#x4F5C;</li>
+<li>&#x5F00;&#x673A;&#x6309;&#x4F4F; option&#xFF0C;&#x80FD;&#x591F;&#x770B;&#x5230;&#x5916;&#x7F6E; usb &#x786C;&#x76D8;&#x91CC;&#x7684;&#x7CFB;&#x7EDF;&#xFF0C;&#x542F;&#x52A8;&#x8BE5;&#x7CFB;&#x7EDF;&#xFF0C;&#x8FD9;&#x662F;&#x4E4B;&#x524D;&#x4E00;&#x76F4;&#x5728;&#x4F7F;&#x7528;&#x7684;&#x7CFB;&#x7EDF;</li>
+<li>&#x8FDB;&#x5230;&#x7CFB;&#x7EDF;&#x540E;&#xFF0C;&#x6253;&#x5F00;&#x300C;&#x78C1;&#x76D8;&#x7BA1;&#x7406;&#x300D;&#x5DE5;&#x5177;&#xFF0C;&#x4F46;&#x6211;&#x5728;&#x8BE5;&#x8F6F;&#x4EF6;&#x4E2D;&#x770B;&#x4E0D;&#x5230; ssd&#xFF0C;&#x8BE5;&#x65B9;&#x6848;&#x4E2D;&#x65AD;&#xFF0C;&#x5426;&#x5219;&#x53EF;&#x4EE5;&#x7EE7;&#x7EED;</li>
+<li>&#x5728;&#x300C;&#x78C1;&#x76D8;&#x7BA1;&#x7406;&#x300D;&#x4E2D;&#x5BF9; ssd &#x8FDB;&#x884C;&#x5206;&#x533A;</li>
+<li>&#x5B89;&#x88C5;&#x5E76;&#x4F7F;&#x7528; Carbon copy cloner &#x6765;&#x8F6C;&#x79FB;&#x6570;&#x636E;&#xFF0C;&#x5982;&#x679C; ssd &#x7A7A;&#x95F4;&#x6BD4;&#x673A;&#x68B0;&#x786C;&#x76D8;&#x7684;&#x5C0F;&#xFF0C;&#x9700;&#x8981;&#x5728;&#x300C;&#x7528;&#x6237;&#x300D;&#x76EE;&#x5F55;&#x4E2D;&#x6392;&#x9664;&#x4E00;&#x4E9B;&#x6587;&#x4EF6;&#x3002;&#x76F8;&#x6BD4;TimeMachine&#xFF0C;&#x770B;&#x4E2D;&#x5C31;&#x662F;&#x8FD9;&#x4E2A;&#x8F6F;&#x4EF6;&#x7684;&#x8FD9;&#x70B9;&#x53EF;&#x9009;&#x62E9;&#x6027;&#x3002;&#x597D;&#x5427;&#xFF0C;&#x6211;&#x4E5F;&#x6CA1;TimeMachine&#x5907;&#x4EFD;&#x3002;</li>
+<li>&#x8FC1;&#x79FB;&#x6570;&#x636E;&#x540E;&#x8BBE;&#x7F6E;&#x4ECE; ssd &#x542F;&#x52A8;&#x7CFB;&#x7EDF;</li>
+<li>&#x62D4;&#x6389;&#x5916;&#x7F6E; usb &#x786C;&#x76D8;</li>
+</ol>
+<p>&#x5BF9;&#x4E8E;&#x65B9;&#x6848;2&#xFF0C;&#x66F4;&#x6362;&#x601D;&#x8DEF;&#x4E3A;&#xFF1A;</p>
+<ol>
+<li>&#x62C6;&#x4E0B;&#x5149;&#x9A71;&#xFF0C;&#x628A; ssd &#x653E;&#x5230;&#x5149;&#x9A71;&#x6258;&#x67B6;</li>
+<li>&#x4ECE;&#x73B0;&#x6709;&#x7684;&#x673A;&#x68B0;&#x786C;&#x76D8;&#x542F;&#x52A8;&#x7CFB;&#x7EDF;</li>
+<li>&#x6253;&#x5F00;&#x300C;&#x78C1;&#x76D8;&#x7BA1;&#x7406;&#x300D;&#x5DE5;&#x5177;&#xFF0C;&#x80FD;&#x770B;&#x5230;&#x5149;&#x9A71;&#x4F4D;&#x7F6E;&#x4E0A;&#x65B0;&#x88C5;&#x7684; ssd&#xFF0C;&#x5426;&#x5219;&#x8BE5;&#x65B9;&#x6848;&#x4E2D;&#x65AD;</li>
+<li>&#x5728;&#x300C;&#x78C1;&#x76D8;&#x7BA1;&#x7406;&#x300D;&#x4E2D;&#x5BF9; ssd &#x8FDB;&#x884C;&#x5206;&#x533A;</li>
+<li>&#x5B89;&#x88C5;&#x5E76;&#x4F7F;&#x7528; Carbon copy cloner &#x6765;&#x8F6C;&#x79FB;&#x6570;&#x636E;</li>
+<li>&#x8FC1;&#x79FB;&#x6570;&#x636E;&#x540E;&#x8BBE;&#x7F6E;&#x4ECE; ssd &#x542F;&#x52A8;&#x7CFB;&#x7EDF;</li>
+</ol>
+<p><br></p>
+<p>&#x6682;&#x65F6;&#x52C9;&#x5F3A;&#x63A5;&#x53D7;&#x65B9;&#x6848;2&#xFF0C;&#x4F46;&#x5728;&#x6570;&#x636E;&#x8FC1;&#x79FB;&#x4E2D;&#xFF0C;&#x7531;&#x4E8E;&#x7CFB;&#x7EDF;&#x662F;&#x6D4B;&#x8BD5;&#x7248;&#x672C;&#x7684; Yosemite&#xFF0C;&#x9700;&#x8981;&#x4F7F;&#x7528;&#x6700;&#x65B0;&#x7248;&#x672C;&#x4E5F;&#x662F;&#x6D4B;&#x8BD5;&#x7248;&#x672C;&#x7684; Carbon copy cloner beta 5&#xFF0C; &#x7136;&#x540E;&#x53D1;&#x73B0;&#x6839;&#x672C;&#x6CA1;&#x6709;&#x8F6C;&#x79FB;&#x6570;&#x636E;&#x5230;&#x65B0; ssd &#x4E0A;&#xFF0C;&#x7B80;&#x5355;&#x7684;&#x4E8B;&#x60C5;&#x53D8;&#x9EBB;&#x70E6;&#x4E86;&#x3002;&#x5BF9;&#x4E8E;&#x300C;&#x66F4;&#x6362;&#x786C;&#x76D8;&#x3001;&#x6570;&#x636E;&#x8FC1;&#x79FB;&#x300D;&#x8FD9;&#x4E24;&#x8005;&#xFF0C;&#x89C9;&#x5F97;&#x4E0A;&#x9762;&#x7684;&#x66F4;&#x6362;&#x6B65;&#x9AA4;&#x592A;&#x5BB9;&#x6613;&#x4E86;&#x3002;</p>
+<p>&#x82E6;&#x903C;&#x7684;&#x624B;&#x52A8;&#x8FC1;&#x79FB;&#x8FC7;&#x7A0B;&#x5982;&#x4E0B;&#xFF0C;&#x5176;&#x5B9E;&#x505A;&#x5B8C;&#x540E;&#xFF0C;&#x53CD;&#x800C;&#x89C9;&#x5F97;&#x8FD9;&#x4E2A;&#x65B9;&#x5F0F;&#x66F4;&#x7B80;&#x5355;&#x3002;</p>
+<p>&#x6253;&#x5F00;&#x300C;&#x7EC8;&#x7AEF;&#x300D;&#xFF0C;&#x4F7F;&#x7528;&#x547D;&#x4EE4;<code>rsync + bless</code>&#x6765;&#x505A;&#x6570;&#x636E;&#x8FC1;&#x79FB;&#xFF0C;&#x4E5F;&#x597D;&#xFF0C;&#x53C8;&#x5C11;&#x4E86;&#x4E00;&#x4E2A;&#x4F9D;&#x8D56;&#x7684;&#x8F6F;&#x4EF6;&#x3002;</p>
+<ol>
+<li><p>rsync&#x64CD;&#x4F5C;&#xFF0C;&#x53C2;&#x8003;<a href="http://www.egg-tech.com/mac_backup/" target="_blank" rel="external">HOWTO: Backup Your Mac With rsync</a><br>&#x65B0;&#x5EFA;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;<code>backup_excludes.txt</code>&#xFF0C;&#x6392;&#x9664;&#x4E00;&#x4E9B;&#x6587;&#x4EF6;&#xFF0C;&#x4EE5;&#x53CA;&#x6392;&#x9664;&#x51E0;&#x4E2A;&#x5927;&#x5BB9;&#x91CF;&#x7684;&#x76EE;&#x5F55;&#xFF0C;&#x8FD9;&#x4E9B;&#x76EE;&#x5F55;&#x6700;&#x540E;&#x518D;&#x624B;&#x52A8;&#x6309;&#x9700;&#x8981;&#x590D;&#x5236;&#x5230; ssd &#x4E0A;&#x5C31;&#x597D;&#x4E86;</p>
 <pre><code> popozhu $ cat backup_excludes.txt 
  */.Trash
  /private/tmp/*
  /private/var/run/*
  /Users/popozhu/Documents/*
  .Spotlight-*/
-</code></pre><p> rsync 命令使用简单的几个参数就可以了，由于目标盘是一个空白磁盘，不需要参数<code>--delete</code>。同步的源目录自然是当前系统的根目录，而目标目录，通过命令<code>df -h</code>找到 SSD 盘在系统中的挂载点，比如我给 ssd 命名为<code>MacintoshSSD</code>，其挂载到<code>/Volumes</code>下，目标目录最后为<code>/Volumes/MacintoshSSD</code></p>
+</code></pre><p> rsync &#x547D;&#x4EE4;&#x4F7F;&#x7528;&#x7B80;&#x5355;&#x7684;&#x51E0;&#x4E2A;&#x53C2;&#x6570;&#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#xFF0C;&#x7531;&#x4E8E;&#x76EE;&#x6807;&#x76D8;&#x662F;&#x4E00;&#x4E2A;&#x7A7A;&#x767D;&#x78C1;&#x76D8;&#xFF0C;&#x4E0D;&#x9700;&#x8981;&#x53C2;&#x6570;<code>--delete</code>&#x3002;&#x540C;&#x6B65;&#x7684;&#x6E90;&#x76EE;&#x5F55;&#x81EA;&#x7136;&#x662F;&#x5F53;&#x524D;&#x7CFB;&#x7EDF;&#x7684;&#x6839;&#x76EE;&#x5F55;&#xFF0C;&#x800C;&#x76EE;&#x6807;&#x76EE;&#x5F55;&#xFF0C;&#x901A;&#x8FC7;&#x547D;&#x4EE4;<code>df -h</code>&#x627E;&#x5230; SSD &#x76D8;&#x5728;&#x7CFB;&#x7EDF;&#x4E2D;&#x7684;&#x6302;&#x8F7D;&#x70B9;&#xFF0C;&#x6BD4;&#x5982;&#x6211;&#x7ED9; ssd &#x547D;&#x540D;&#x4E3A;<code>MacintoshSSD</code>&#xFF0C;&#x5176;&#x6302;&#x8F7D;&#x5230;<code>/Volumes</code>&#x4E0B;&#xFF0C;&#x76EE;&#x6807;&#x76EE;&#x5F55;&#x6700;&#x540E;&#x4E3A;<code>/Volumes/MacintoshSSD</code></p>
 <pre><code> rsync -av -x -S --exclude-from backup_excludes.txt / /Volumes/MacintoshSSD &amp;
-</code></pre><p> 一开始 rsync 会计算一个文件列表，可以在进程管理器中看到一个rsync进程读取越来越多的数据。然后就是漫长的读写等待，我同步80G数据，大概3个小时 Orz。后来的 rsync 时，我打开 itunes 让其播放音乐，然后静音，避免电脑进入睡眠，然后睡觉了。</p>
-<p> 由于在 rsync 使用了参数<code>-v</code>，同步时会输出当前处理的文件，可以大概估算下同步到哪个目录。</p>
-<p> rsync 同步，能保留文件、目录的用户id、分组id，以及权限，这些是非常重要的。总之是没有差别地迁移「系统文件」+「用户数据」到新的 ssd。需要了解哪些文件、目录是必须的，哪些又是没必要的。但既然使用到「终端」，我想这个问题应该不是什么大问题：清楚知道当前命令在做什么事情。</p>
+</code></pre><p> &#x4E00;&#x5F00;&#x59CB; rsync &#x4F1A;&#x8BA1;&#x7B97;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;&#x5217;&#x8868;&#xFF0C;&#x53EF;&#x4EE5;&#x5728;&#x8FDB;&#x7A0B;&#x7BA1;&#x7406;&#x5668;&#x4E2D;&#x770B;&#x5230;&#x4E00;&#x4E2A;rsync&#x8FDB;&#x7A0B;&#x8BFB;&#x53D6;&#x8D8A;&#x6765;&#x8D8A;&#x591A;&#x7684;&#x6570;&#x636E;&#x3002;&#x7136;&#x540E;&#x5C31;&#x662F;&#x6F2B;&#x957F;&#x7684;&#x8BFB;&#x5199;&#x7B49;&#x5F85;&#xFF0C;&#x6211;&#x540C;&#x6B65;80G&#x6570;&#x636E;&#xFF0C;&#x5927;&#x6982;3&#x4E2A;&#x5C0F;&#x65F6; Orz&#x3002;&#x540E;&#x6765;&#x7684; rsync &#x65F6;&#xFF0C;&#x6211;&#x6253;&#x5F00; itunes &#x8BA9;&#x5176;&#x64AD;&#x653E;&#x97F3;&#x4E50;&#xFF0C;&#x7136;&#x540E;&#x9759;&#x97F3;&#xFF0C;&#x907F;&#x514D;&#x7535;&#x8111;&#x8FDB;&#x5165;&#x7761;&#x7720;&#xFF0C;&#x7136;&#x540E;&#x7761;&#x89C9;&#x4E86;&#x3002;</p>
+<p> &#x7531;&#x4E8E;&#x5728; rsync &#x4F7F;&#x7528;&#x4E86;&#x53C2;&#x6570;<code>-v</code>&#xFF0C;&#x540C;&#x6B65;&#x65F6;&#x4F1A;&#x8F93;&#x51FA;&#x5F53;&#x524D;&#x5904;&#x7406;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x53EF;&#x4EE5;&#x5927;&#x6982;&#x4F30;&#x7B97;&#x4E0B;&#x540C;&#x6B65;&#x5230;&#x54EA;&#x4E2A;&#x76EE;&#x5F55;&#x3002;</p>
+<p> rsync &#x540C;&#x6B65;&#xFF0C;&#x80FD;&#x4FDD;&#x7559;&#x6587;&#x4EF6;&#x3001;&#x76EE;&#x5F55;&#x7684;&#x7528;&#x6237;id&#x3001;&#x5206;&#x7EC4;id&#xFF0C;&#x4EE5;&#x53CA;&#x6743;&#x9650;&#xFF0C;&#x8FD9;&#x4E9B;&#x662F;&#x975E;&#x5E38;&#x91CD;&#x8981;&#x7684;&#x3002;&#x603B;&#x4E4B;&#x662F;&#x6CA1;&#x6709;&#x5DEE;&#x522B;&#x5730;&#x8FC1;&#x79FB;&#x300C;&#x7CFB;&#x7EDF;&#x6587;&#x4EF6;&#x300D;+&#x300C;&#x7528;&#x6237;&#x6570;&#x636E;&#x300D;&#x5230;&#x65B0;&#x7684; ssd&#x3002;&#x9700;&#x8981;&#x4E86;&#x89E3;&#x54EA;&#x4E9B;&#x6587;&#x4EF6;&#x3001;&#x76EE;&#x5F55;&#x662F;&#x5FC5;&#x987B;&#x7684;&#xFF0C;&#x54EA;&#x4E9B;&#x53C8;&#x662F;&#x6CA1;&#x5FC5;&#x8981;&#x7684;&#x3002;&#x4F46;&#x65E2;&#x7136;&#x4F7F;&#x7528;&#x5230;&#x300C;&#x7EC8;&#x7AEF;&#x300D;&#xFF0C;&#x6211;&#x60F3;&#x8FD9;&#x4E2A;&#x95EE;&#x9898;&#x5E94;&#x8BE5;&#x4E0D;&#x662F;&#x4EC0;&#x4E48;&#x5927;&#x95EE;&#x9898;&#xFF1A;&#x6E05;&#x695A;&#x77E5;&#x9053;&#x5F53;&#x524D;&#x547D;&#x4EE4;&#x5728;&#x505A;&#x4EC0;&#x4E48;&#x4E8B;&#x60C5;&#x3002;</p>
 </li>
-<li><p>bless操作<br>看了上面的博客，才知道<code>bless</code>这个命令，简单来说，就是引导 EFI 的加载程序从 ssd 的那个目录加载操作系统。<br>对于当前 ssd 的挂载点<code>/Volumes/MacintoshSSD</code>，需要执行：</p>
+<li><p>bless&#x64CD;&#x4F5C;<br>&#x770B;&#x4E86;&#x4E0A;&#x9762;&#x7684;&#x535A;&#x5BA2;&#xFF0C;&#x624D;&#x77E5;&#x9053;<code>bless</code>&#x8FD9;&#x4E2A;&#x547D;&#x4EE4;&#xFF0C;&#x7B80;&#x5355;&#x6765;&#x8BF4;&#xFF0C;&#x5C31;&#x662F;&#x5F15;&#x5BFC; EFI &#x7684;&#x52A0;&#x8F7D;&#x7A0B;&#x5E8F;&#x4ECE; ssd &#x7684;&#x90A3;&#x4E2A;&#x76EE;&#x5F55;&#x52A0;&#x8F7D;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x3002;<br>&#x5BF9;&#x4E8E;&#x5F53;&#x524D; ssd &#x7684;&#x6302;&#x8F7D;&#x70B9;<code>/Volumes/MacintoshSSD</code>&#xFF0C;&#x9700;&#x8981;&#x6267;&#x884C;&#xFF1A;</p>
 <pre><code> sudo bless -folder /Volumes/MacintoshSSD/System/Library/CoreServices
-</code></pre><p> 一开始我不知道要 bless，从 ssd 启动时等了好久，还以为我 rsync 后文件有错误，看到上面博客提到的<code>bless</code>，如获至宝。</p>
-<p> 至此，设置从 ssd 启动系统就可以了。</p>
+</code></pre><p> &#x4E00;&#x5F00;&#x59CB;&#x6211;&#x4E0D;&#x77E5;&#x9053;&#x8981; bless&#xFF0C;&#x4ECE; ssd &#x542F;&#x52A8;&#x65F6;&#x7B49;&#x4E86;&#x597D;&#x4E45;&#xFF0C;&#x8FD8;&#x4EE5;&#x4E3A;&#x6211; rsync &#x540E;&#x6587;&#x4EF6;&#x6709;&#x9519;&#x8BEF;&#xFF0C;&#x770B;&#x5230;&#x4E0A;&#x9762;&#x535A;&#x5BA2;&#x63D0;&#x5230;&#x7684;<code>bless</code>&#xFF0C;&#x5982;&#x83B7;&#x81F3;&#x5B9D;&#x3002;</p>
+<p> &#x81F3;&#x6B64;&#xFF0C;&#x8BBE;&#x7F6E;&#x4ECE; ssd &#x542F;&#x52A8;&#x7CFB;&#x7EDF;&#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#x3002;</p>
 </li>
 </ol>
 <p><br></p>
-<p>当然，我做的不止这些。在对 ssd 格式化之后，做 rsync 之前，我使用 diskutil 在 SSD 上也建立了一个恢复分区<code>Recovery SSD</code>，从机械硬盘上的<code>Recovery HDD</code>分区拷贝了一份数据。因为后续我只想使用 ssd，机械硬盘是打算外置留在家里做备份使用的。那么假若系统有故障需要恢复，就可以直接启动 ssd 上的恢复分区。</p>
-<p>至于开启Trim，那则是默认要做的。</p>
-<p>另外，也用<code>xbench 1.3</code>这个free软件，做了一下磁盘读写测试，记录下来。计划一段时间后再做一次对比，看看读写性能变化如何。</p>
-<p><br><br>哎，安装了两个硬盘，笔记本的发热量反而变大了，由于考虑到有机械硬盘，我还是不敢大动作移动笔记本。方案2蛮鸡肋的。</p>
-<p>又遇到，使用 ssd，解决了磁盘io缓慢， cpu 变得狂野起来，cpu 使用率很容易就飙高，也进一步加大笔记本发热，Orz</p>
-<p>由于使用了光驱托架容纳 ssd，还得准备接受光驱托架故障的情况。。。</p>
-<p>anyway，最后还是成功用上了 ssd 并完美迁移了系统和我的个人数据，开机即用，文件都跟原来一样的感觉。 </p>
-<p><hr><br>2014-10-27 更新： </p>
-<p>更换两天后，还是买了个光驱支架，把 ssd 安装到光驱位置，同时拆掉了机械硬盘，单独使用 ssd。</p>
-<p>最后确定，硬盘位置不支持该 ssd。</p>
-<p><br><br>– EOF –</p>
+<p>&#x5F53;&#x7136;&#xFF0C;&#x6211;&#x505A;&#x7684;&#x4E0D;&#x6B62;&#x8FD9;&#x4E9B;&#x3002;&#x5728;&#x5BF9; ssd &#x683C;&#x5F0F;&#x5316;&#x4E4B;&#x540E;&#xFF0C;&#x505A; rsync &#x4E4B;&#x524D;&#xFF0C;&#x6211;&#x4F7F;&#x7528; diskutil &#x5728; SSD &#x4E0A;&#x4E5F;&#x5EFA;&#x7ACB;&#x4E86;&#x4E00;&#x4E2A;&#x6062;&#x590D;&#x5206;&#x533A;<code>Recovery SSD</code>&#xFF0C;&#x4ECE;&#x673A;&#x68B0;&#x786C;&#x76D8;&#x4E0A;&#x7684;<code>Recovery HDD</code>&#x5206;&#x533A;&#x62F7;&#x8D1D;&#x4E86;&#x4E00;&#x4EFD;&#x6570;&#x636E;&#x3002;&#x56E0;&#x4E3A;&#x540E;&#x7EED;&#x6211;&#x53EA;&#x60F3;&#x4F7F;&#x7528; ssd&#xFF0C;&#x673A;&#x68B0;&#x786C;&#x76D8;&#x662F;&#x6253;&#x7B97;&#x5916;&#x7F6E;&#x7559;&#x5728;&#x5BB6;&#x91CC;&#x505A;&#x5907;&#x4EFD;&#x4F7F;&#x7528;&#x7684;&#x3002;&#x90A3;&#x4E48;&#x5047;&#x82E5;&#x7CFB;&#x7EDF;&#x6709;&#x6545;&#x969C;&#x9700;&#x8981;&#x6062;&#x590D;&#xFF0C;&#x5C31;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x542F;&#x52A8; ssd &#x4E0A;&#x7684;&#x6062;&#x590D;&#x5206;&#x533A;&#x3002;</p>
+<p>&#x81F3;&#x4E8E;&#x5F00;&#x542F;Trim&#xFF0C;&#x90A3;&#x5219;&#x662F;&#x9ED8;&#x8BA4;&#x8981;&#x505A;&#x7684;&#x3002;</p>
+<p>&#x53E6;&#x5916;&#xFF0C;&#x4E5F;&#x7528;<code>xbench 1.3</code>&#x8FD9;&#x4E2A;free&#x8F6F;&#x4EF6;&#xFF0C;&#x505A;&#x4E86;&#x4E00;&#x4E0B;&#x78C1;&#x76D8;&#x8BFB;&#x5199;&#x6D4B;&#x8BD5;&#xFF0C;&#x8BB0;&#x5F55;&#x4E0B;&#x6765;&#x3002;&#x8BA1;&#x5212;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x540E;&#x518D;&#x505A;&#x4E00;&#x6B21;&#x5BF9;&#x6BD4;&#xFF0C;&#x770B;&#x770B;&#x8BFB;&#x5199;&#x6027;&#x80FD;&#x53D8;&#x5316;&#x5982;&#x4F55;&#x3002;</p>
+<p><br><br>&#x54CE;&#xFF0C;&#x5B89;&#x88C5;&#x4E86;&#x4E24;&#x4E2A;&#x786C;&#x76D8;&#xFF0C;&#x7B14;&#x8BB0;&#x672C;&#x7684;&#x53D1;&#x70ED;&#x91CF;&#x53CD;&#x800C;&#x53D8;&#x5927;&#x4E86;&#xFF0C;&#x7531;&#x4E8E;&#x8003;&#x8651;&#x5230;&#x6709;&#x673A;&#x68B0;&#x786C;&#x76D8;&#xFF0C;&#x6211;&#x8FD8;&#x662F;&#x4E0D;&#x6562;&#x5927;&#x52A8;&#x4F5C;&#x79FB;&#x52A8;&#x7B14;&#x8BB0;&#x672C;&#x3002;&#x65B9;&#x6848;2&#x86EE;&#x9E21;&#x808B;&#x7684;&#x3002;</p>
+<p>&#x53C8;&#x9047;&#x5230;&#xFF0C;&#x4F7F;&#x7528; ssd&#xFF0C;&#x89E3;&#x51B3;&#x4E86;&#x78C1;&#x76D8;io&#x7F13;&#x6162;&#xFF0C; cpu &#x53D8;&#x5F97;&#x72C2;&#x91CE;&#x8D77;&#x6765;&#xFF0C;cpu &#x4F7F;&#x7528;&#x7387;&#x5F88;&#x5BB9;&#x6613;&#x5C31;&#x98D9;&#x9AD8;&#xFF0C;&#x4E5F;&#x8FDB;&#x4E00;&#x6B65;&#x52A0;&#x5927;&#x7B14;&#x8BB0;&#x672C;&#x53D1;&#x70ED;&#xFF0C;Orz</p>
+<p>&#x7531;&#x4E8E;&#x4F7F;&#x7528;&#x4E86;&#x5149;&#x9A71;&#x6258;&#x67B6;&#x5BB9;&#x7EB3; ssd&#xFF0C;&#x8FD8;&#x5F97;&#x51C6;&#x5907;&#x63A5;&#x53D7;&#x5149;&#x9A71;&#x6258;&#x67B6;&#x6545;&#x969C;&#x7684;&#x60C5;&#x51B5;&#x3002;&#x3002;&#x3002;</p>
+<p>anyway&#xFF0C;&#x6700;&#x540E;&#x8FD8;&#x662F;&#x6210;&#x529F;&#x7528;&#x4E0A;&#x4E86; ssd &#x5E76;&#x5B8C;&#x7F8E;&#x8FC1;&#x79FB;&#x4E86;&#x7CFB;&#x7EDF;&#x548C;&#x6211;&#x7684;&#x4E2A;&#x4EBA;&#x6570;&#x636E;&#xFF0C;&#x5F00;&#x673A;&#x5373;&#x7528;&#xFF0C;&#x6587;&#x4EF6;&#x90FD;&#x8DDF;&#x539F;&#x6765;&#x4E00;&#x6837;&#x7684;&#x611F;&#x89C9;&#x3002; </p>
+<p><hr><br>2014-10-27 &#x66F4;&#x65B0;&#xFF1A; </p>
+<p>&#x66F4;&#x6362;&#x4E24;&#x5929;&#x540E;&#xFF0C;&#x8FD8;&#x662F;&#x4E70;&#x4E86;&#x4E2A;&#x5149;&#x9A71;&#x652F;&#x67B6;&#xFF0C;&#x628A; ssd &#x5B89;&#x88C5;&#x5230;&#x5149;&#x9A71;&#x4F4D;&#x7F6E;&#xFF0C;&#x540C;&#x65F6;&#x62C6;&#x6389;&#x4E86;&#x673A;&#x68B0;&#x786C;&#x76D8;&#xFF0C;&#x5355;&#x72EC;&#x4F7F;&#x7528; ssd&#x3002;</p>
+<p>&#x6700;&#x540E;&#x786E;&#x5B9A;&#xFF0C;&#x786C;&#x76D8;&#x4F4D;&#x7F6E;&#x4E0D;&#x652F;&#x6301;&#x8BE5; ssd&#x3002;</p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -203,7 +203,7 @@
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

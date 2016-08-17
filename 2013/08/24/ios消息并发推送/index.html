@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -50,29 +50,29 @@
 	    
 	    
 
-	    <p>不久前php的小伙伴过来说需要推送消息到几个app上，php单进程推送的效率不高，希望能尝试用c来实现。网上查了一下，有php、python、java的，没找到c的实现，可能对于c的开发者来说，这只是个小功能，不值得一提吧。而我还是想做下笔记，因为我也曾迷惑过几天。  </p>
-<p>我的实现也很简单，大概如下：  </p>
+	    <p>&#x4E0D;&#x4E45;&#x524D;php&#x7684;&#x5C0F;&#x4F19;&#x4F34;&#x8FC7;&#x6765;&#x8BF4;&#x9700;&#x8981;&#x63A8;&#x9001;&#x6D88;&#x606F;&#x5230;&#x51E0;&#x4E2A;app&#x4E0A;&#xFF0C;php&#x5355;&#x8FDB;&#x7A0B;&#x63A8;&#x9001;&#x7684;&#x6548;&#x7387;&#x4E0D;&#x9AD8;&#xFF0C;&#x5E0C;&#x671B;&#x80FD;&#x5C1D;&#x8BD5;&#x7528;c&#x6765;&#x5B9E;&#x73B0;&#x3002;&#x7F51;&#x4E0A;&#x67E5;&#x4E86;&#x4E00;&#x4E0B;&#xFF0C;&#x6709;php&#x3001;python&#x3001;java&#x7684;&#xFF0C;&#x6CA1;&#x627E;&#x5230;c&#x7684;&#x5B9E;&#x73B0;&#xFF0C;&#x53EF;&#x80FD;&#x5BF9;&#x4E8E;c&#x7684;&#x5F00;&#x53D1;&#x8005;&#x6765;&#x8BF4;&#xFF0C;&#x8FD9;&#x53EA;&#x662F;&#x4E2A;&#x5C0F;&#x529F;&#x80FD;&#xFF0C;&#x4E0D;&#x503C;&#x5F97;&#x4E00;&#x63D0;&#x5427;&#x3002;&#x800C;&#x6211;&#x8FD8;&#x662F;&#x60F3;&#x505A;&#x4E0B;&#x7B14;&#x8BB0;&#xFF0C;&#x56E0;&#x4E3A;&#x6211;&#x4E5F;&#x66FE;&#x8FF7;&#x60D1;&#x8FC7;&#x51E0;&#x5929;&#x3002;  </p>
+<p>&#x6211;&#x7684;&#x5B9E;&#x73B0;&#x4E5F;&#x5F88;&#x7B80;&#x5355;&#xFF0C;&#x5927;&#x6982;&#x5982;&#x4E0B;&#xFF1A;  </p>
 <ol>
-<li>ios开发的同学给我pem格式的证书和密码，不同app对应不同的pem证书，该证书里有证书内容和私钥  </li>
-<li>web后台管理的同学会生成一条推送消息，推送消息里会指定给哪个app下发；不同app的推送消息，需要使用该app对应的证书</li>
-<li>建立多线程，可配置，目前是15个     </li>
-<li>数据库里已经有不同app的token，因此我只需根据推送消息指定的app，从db里找出该app的所有token，再把token平均分配到每个线程 </li>
-<li>每个线程获得token，每个token在该线程里分配一个唯一的id  </li>
-<li>在每个线程里，使用pem证书跟苹果的推送服务器建立ssl长连接，使用的是socket的阻塞模型（blocking）  </li>
-<li>根据苹果的协议，组装推送消息。一个token组装一个消息包，消息内容包含有该token的id，能根据id反向查找该id对应的token  </li>
-<li>线程里逐个发送消息，发送之后通过select来等待socket fd的可读事件，select的等待超时时间目前设置为25ms，这个时间可配置  </li>
-<li>若该消息被苹果接纳，select是等不到读事件的，直到超时返回（所以这个超时时间会影响推送效率），超时后返回（7）继续发送下一个token  </li>
-<li>若是select返回，解包获取id。需要重新建立ssl长连接（返回（6）），并且该id之后的token需要重新发送。因为等待时间为25ms，导致写的速度比读要快多了，该次select等待获得的回复消息，可能是前几个token的  </li>
-<li>若是写失败，继续尝试写</li>
+<li>ios&#x5F00;&#x53D1;&#x7684;&#x540C;&#x5B66;&#x7ED9;&#x6211;pem&#x683C;&#x5F0F;&#x7684;&#x8BC1;&#x4E66;&#x548C;&#x5BC6;&#x7801;&#xFF0C;&#x4E0D;&#x540C;app&#x5BF9;&#x5E94;&#x4E0D;&#x540C;&#x7684;pem&#x8BC1;&#x4E66;&#xFF0C;&#x8BE5;&#x8BC1;&#x4E66;&#x91CC;&#x6709;&#x8BC1;&#x4E66;&#x5185;&#x5BB9;&#x548C;&#x79C1;&#x94A5;  </li>
+<li>web&#x540E;&#x53F0;&#x7BA1;&#x7406;&#x7684;&#x540C;&#x5B66;&#x4F1A;&#x751F;&#x6210;&#x4E00;&#x6761;&#x63A8;&#x9001;&#x6D88;&#x606F;&#xFF0C;&#x63A8;&#x9001;&#x6D88;&#x606F;&#x91CC;&#x4F1A;&#x6307;&#x5B9A;&#x7ED9;&#x54EA;&#x4E2A;app&#x4E0B;&#x53D1;&#xFF1B;&#x4E0D;&#x540C;app&#x7684;&#x63A8;&#x9001;&#x6D88;&#x606F;&#xFF0C;&#x9700;&#x8981;&#x4F7F;&#x7528;&#x8BE5;app&#x5BF9;&#x5E94;&#x7684;&#x8BC1;&#x4E66;</li>
+<li>&#x5EFA;&#x7ACB;&#x591A;&#x7EBF;&#x7A0B;&#xFF0C;&#x53EF;&#x914D;&#x7F6E;&#xFF0C;&#x76EE;&#x524D;&#x662F;15&#x4E2A;     </li>
+<li>&#x6570;&#x636E;&#x5E93;&#x91CC;&#x5DF2;&#x7ECF;&#x6709;&#x4E0D;&#x540C;app&#x7684;token&#xFF0C;&#x56E0;&#x6B64;&#x6211;&#x53EA;&#x9700;&#x6839;&#x636E;&#x63A8;&#x9001;&#x6D88;&#x606F;&#x6307;&#x5B9A;&#x7684;app&#xFF0C;&#x4ECE;db&#x91CC;&#x627E;&#x51FA;&#x8BE5;app&#x7684;&#x6240;&#x6709;token&#xFF0C;&#x518D;&#x628A;token&#x5E73;&#x5747;&#x5206;&#x914D;&#x5230;&#x6BCF;&#x4E2A;&#x7EBF;&#x7A0B; </li>
+<li>&#x6BCF;&#x4E2A;&#x7EBF;&#x7A0B;&#x83B7;&#x5F97;token&#xFF0C;&#x6BCF;&#x4E2A;token&#x5728;&#x8BE5;&#x7EBF;&#x7A0B;&#x91CC;&#x5206;&#x914D;&#x4E00;&#x4E2A;&#x552F;&#x4E00;&#x7684;id  </li>
+<li>&#x5728;&#x6BCF;&#x4E2A;&#x7EBF;&#x7A0B;&#x91CC;&#xFF0C;&#x4F7F;&#x7528;pem&#x8BC1;&#x4E66;&#x8DDF;&#x82F9;&#x679C;&#x7684;&#x63A8;&#x9001;&#x670D;&#x52A1;&#x5668;&#x5EFA;&#x7ACB;ssl&#x957F;&#x8FDE;&#x63A5;&#xFF0C;&#x4F7F;&#x7528;&#x7684;&#x662F;socket&#x7684;&#x963B;&#x585E;&#x6A21;&#x578B;&#xFF08;blocking&#xFF09;  </li>
+<li>&#x6839;&#x636E;&#x82F9;&#x679C;&#x7684;&#x534F;&#x8BAE;&#xFF0C;&#x7EC4;&#x88C5;&#x63A8;&#x9001;&#x6D88;&#x606F;&#x3002;&#x4E00;&#x4E2A;token&#x7EC4;&#x88C5;&#x4E00;&#x4E2A;&#x6D88;&#x606F;&#x5305;&#xFF0C;&#x6D88;&#x606F;&#x5185;&#x5BB9;&#x5305;&#x542B;&#x6709;&#x8BE5;token&#x7684;id&#xFF0C;&#x80FD;&#x6839;&#x636E;id&#x53CD;&#x5411;&#x67E5;&#x627E;&#x8BE5;id&#x5BF9;&#x5E94;&#x7684;token  </li>
+<li>&#x7EBF;&#x7A0B;&#x91CC;&#x9010;&#x4E2A;&#x53D1;&#x9001;&#x6D88;&#x606F;&#xFF0C;&#x53D1;&#x9001;&#x4E4B;&#x540E;&#x901A;&#x8FC7;select&#x6765;&#x7B49;&#x5F85;socket fd&#x7684;&#x53EF;&#x8BFB;&#x4E8B;&#x4EF6;&#xFF0C;select&#x7684;&#x7B49;&#x5F85;&#x8D85;&#x65F6;&#x65F6;&#x95F4;&#x76EE;&#x524D;&#x8BBE;&#x7F6E;&#x4E3A;25ms&#xFF0C;&#x8FD9;&#x4E2A;&#x65F6;&#x95F4;&#x53EF;&#x914D;&#x7F6E;  </li>
+<li>&#x82E5;&#x8BE5;&#x6D88;&#x606F;&#x88AB;&#x82F9;&#x679C;&#x63A5;&#x7EB3;&#xFF0C;select&#x662F;&#x7B49;&#x4E0D;&#x5230;&#x8BFB;&#x4E8B;&#x4EF6;&#x7684;&#xFF0C;&#x76F4;&#x5230;&#x8D85;&#x65F6;&#x8FD4;&#x56DE;&#xFF08;&#x6240;&#x4EE5;&#x8FD9;&#x4E2A;&#x8D85;&#x65F6;&#x65F6;&#x95F4;&#x4F1A;&#x5F71;&#x54CD;&#x63A8;&#x9001;&#x6548;&#x7387;&#xFF09;&#xFF0C;&#x8D85;&#x65F6;&#x540E;&#x8FD4;&#x56DE;&#xFF08;7&#xFF09;&#x7EE7;&#x7EED;&#x53D1;&#x9001;&#x4E0B;&#x4E00;&#x4E2A;token  </li>
+<li>&#x82E5;&#x662F;select&#x8FD4;&#x56DE;&#xFF0C;&#x89E3;&#x5305;&#x83B7;&#x53D6;id&#x3002;&#x9700;&#x8981;&#x91CD;&#x65B0;&#x5EFA;&#x7ACB;ssl&#x957F;&#x8FDE;&#x63A5;&#xFF08;&#x8FD4;&#x56DE;&#xFF08;6&#xFF09;&#xFF09;&#xFF0C;&#x5E76;&#x4E14;&#x8BE5;id&#x4E4B;&#x540E;&#x7684;token&#x9700;&#x8981;&#x91CD;&#x65B0;&#x53D1;&#x9001;&#x3002;&#x56E0;&#x4E3A;&#x7B49;&#x5F85;&#x65F6;&#x95F4;&#x4E3A;25ms&#xFF0C;&#x5BFC;&#x81F4;&#x5199;&#x7684;&#x901F;&#x5EA6;&#x6BD4;&#x8BFB;&#x8981;&#x5FEB;&#x591A;&#x4E86;&#xFF0C;&#x8BE5;&#x6B21;select&#x7B49;&#x5F85;&#x83B7;&#x5F97;&#x7684;&#x56DE;&#x590D;&#x6D88;&#x606F;&#xFF0C;&#x53EF;&#x80FD;&#x662F;&#x524D;&#x51E0;&#x4E2A;token&#x7684;  </li>
+<li>&#x82E5;&#x662F;&#x5199;&#x5931;&#x8D25;&#xFF0C;&#x7EE7;&#x7EED;&#x5C1D;&#x8BD5;&#x5199;</li>
 </ol>
 <p>ps:  </p>
 <ol>
-<li>ssl里使用非阻塞模型比较麻烦，所以最后使用了阻塞等待，因此每次ssl_write写socket之后，都需要通过select来超时等待读事件  </li>
-<li>苹果回复消息之后会同时断开连接，下次发送需要重新连接ssl连接  </li>
-<li>多线程里使用openssl，使用锁吧：<a href="http://popozhu.github.io/2013/08/15/openssl%E5%92%8C%E5%A4%9A%E7%BA%BF%E7%A8%8B/">openssl和多线程</a></li>
+<li>ssl&#x91CC;&#x4F7F;&#x7528;&#x975E;&#x963B;&#x585E;&#x6A21;&#x578B;&#x6BD4;&#x8F83;&#x9EBB;&#x70E6;&#xFF0C;&#x6240;&#x4EE5;&#x6700;&#x540E;&#x4F7F;&#x7528;&#x4E86;&#x963B;&#x585E;&#x7B49;&#x5F85;&#xFF0C;&#x56E0;&#x6B64;&#x6BCF;&#x6B21;ssl_write&#x5199;socket&#x4E4B;&#x540E;&#xFF0C;&#x90FD;&#x9700;&#x8981;&#x901A;&#x8FC7;select&#x6765;&#x8D85;&#x65F6;&#x7B49;&#x5F85;&#x8BFB;&#x4E8B;&#x4EF6;  </li>
+<li>&#x82F9;&#x679C;&#x56DE;&#x590D;&#x6D88;&#x606F;&#x4E4B;&#x540E;&#x4F1A;&#x540C;&#x65F6;&#x65AD;&#x5F00;&#x8FDE;&#x63A5;&#xFF0C;&#x4E0B;&#x6B21;&#x53D1;&#x9001;&#x9700;&#x8981;&#x91CD;&#x65B0;&#x8FDE;&#x63A5;ssl&#x8FDE;&#x63A5;  </li>
+<li>&#x591A;&#x7EBF;&#x7A0B;&#x91CC;&#x4F7F;&#x7528;openssl&#xFF0C;&#x4F7F;&#x7528;&#x9501;&#x5427;&#xFF1A;<a href="http://popozhu.github.io/2013/08/15/openssl%E5%92%8C%E5%A4%9A%E7%BA%BF%E7%A8%8B/">openssl&#x548C;&#x591A;&#x7EBF;&#x7A0B;</a></li>
 </ol>
-<p>最新的一次推送，给21w个token推送消息，看日志，大约用了7分钟，暂时效率上还能被接受（起15个线程，服务器cpu为：Intel(R) Xeon(R) CPU E5606 @2.13GHz）。</p>
-<p>每个ios设备有一个唯一的mac地址，根据该mac地址可以从苹果获得一个唯一的token，token目前的长度为64字节，按苹果的协议，需要把该64字节转成32字节的二进制格式，转换的demo如下（长度硬编码了）：</p>
+<p>&#x6700;&#x65B0;&#x7684;&#x4E00;&#x6B21;&#x63A8;&#x9001;&#xFF0C;&#x7ED9;21w&#x4E2A;token&#x63A8;&#x9001;&#x6D88;&#x606F;&#xFF0C;&#x770B;&#x65E5;&#x5FD7;&#xFF0C;&#x5927;&#x7EA6;&#x7528;&#x4E86;7&#x5206;&#x949F;&#xFF0C;&#x6682;&#x65F6;&#x6548;&#x7387;&#x4E0A;&#x8FD8;&#x80FD;&#x88AB;&#x63A5;&#x53D7;&#xFF08;&#x8D77;15&#x4E2A;&#x7EBF;&#x7A0B;&#xFF0C;&#x670D;&#x52A1;&#x5668;cpu&#x4E3A;&#xFF1A;Intel(R) Xeon(R) CPU E5606 @2.13GHz&#xFF09;&#x3002;</p>
+<p>&#x6BCF;&#x4E2A;ios&#x8BBE;&#x5907;&#x6709;&#x4E00;&#x4E2A;&#x552F;&#x4E00;&#x7684;mac&#x5730;&#x5740;&#xFF0C;&#x6839;&#x636E;&#x8BE5;mac&#x5730;&#x5740;&#x53EF;&#x4EE5;&#x4ECE;&#x82F9;&#x679C;&#x83B7;&#x5F97;&#x4E00;&#x4E2A;&#x552F;&#x4E00;&#x7684;token&#xFF0C;token&#x76EE;&#x524D;&#x7684;&#x957F;&#x5EA6;&#x4E3A;64&#x5B57;&#x8282;&#xFF0C;&#x6309;&#x82F9;&#x679C;&#x7684;&#x534F;&#x8BAE;&#xFF0C;&#x9700;&#x8981;&#x628A;&#x8BE5;64&#x5B57;&#x8282;&#x8F6C;&#x6210;32&#x5B57;&#x8282;&#x7684;&#x4E8C;&#x8FDB;&#x5236;&#x683C;&#x5F0F;&#xFF0C;&#x8F6C;&#x6362;&#x7684;demo&#x5982;&#x4E0B;&#xFF08;&#x957F;&#x5EA6;&#x786C;&#x7F16;&#x7801;&#x4E86;&#xFF09;&#xFF1A;</p>
 <pre><code class="cpp">int get_device_token_binary(const char *token, char *binary)
 {
     uint8_t value;
@@ -89,16 +89,16 @@
         low = *(p+i+1);
         //printf(&quot;[%c][%c] &quot;, high, low);
 
-        if (high &gt;= &#39;0&#39; &amp;&amp; high &lt;= &#39;9&#39;){
-            high -= &#39;0&#39;;
-        }else if (high &gt;= &#39;a&#39; &amp;&amp; high &lt;= &#39;f&#39;){
-            high -= (&#39;a&#39; - 10);
+        if (high &gt;= &apos;0&apos; &amp;&amp; high &lt;= &apos;9&apos;){
+            high -= &apos;0&apos;;
+        }else if (high &gt;= &apos;a&apos; &amp;&amp; high &lt;= &apos;f&apos;){
+            high -= (&apos;a&apos; - 10);
         }
 
-        if (low &gt;= &#39;0&#39; &amp;&amp; low &lt;= &#39;9&#39;){
-            low -= &#39;0&#39;;
-        }else if (low &gt;= &#39;a&#39; &amp;&amp; low &lt;= &#39;f&#39;){
-            low -= (&#39;a&#39; - 10);
+        if (low &gt;= &apos;0&apos; &amp;&amp; low &lt;= &apos;9&apos;){
+            low -= &apos;0&apos;;
+        }else if (low &gt;= &apos;a&apos; &amp;&amp; low &lt;= &apos;f&apos;){
+            low -= (&apos;a&apos; - 10);
         }
 
         value = (high &lt;&lt; 4) | (low &lt;&lt; 0);
@@ -110,62 +110,62 @@
     return 0;
 }
 </code></pre>
-<p>ssl的读写大概为：</p>
-<pre><code class="cpp">顶部reconnect: 建立ssl长连接;
+<p>ssl&#x7684;&#x8BFB;&#x5199;&#x5927;&#x6982;&#x4E3A;&#xFF1A;</p>
+<pre><code class="cpp">&#x9876;&#x90E8;reconnect: &#x5EFA;&#x7ACB;ssl&#x957F;&#x8FDE;&#x63A5;;
 
-while (还有token没发送)
+while (&#x8FD8;&#x6709;token&#x6CA1;&#x53D1;&#x9001;)
 {
-    组装消息包;
-    ret = ssl_write(消息)
+    &#x7EC4;&#x88C5;&#x6D88;&#x606F;&#x5305;;
+    ret = ssl_write(&#x6D88;&#x606F;)
     sslerrno = SSL_get_error(ssl, ret);
     switch(sslerrno){
         case SSL_ERROR_NONE:
-            // 发送成功
+            // &#x53D1;&#x9001;&#x6210;&#x529F;
             break;
         case SSL_ERROR_WANT_WRITE:
-            重新发送;
+            &#x91CD;&#x65B0;&#x53D1;&#x9001;;
             break;
         case SSL_ERROR_WANT_READ:
-            重新发送;
+            &#x91CD;&#x65B0;&#x53D1;&#x9001;;
             break;
         default:          
-            遇到ssl错误，回到顶部，重新连接，再重新发送
+            &#x9047;&#x5230;ssl&#x9519;&#x8BEF;&#xFF0C;&#x56DE;&#x5230;&#x9876;&#x90E8;&#xFF0C;&#x91CD;&#x65B0;&#x8FDE;&#x63A5;&#xFF0C;&#x518D;&#x91CD;&#x65B0;&#x53D1;&#x9001;
     }
 
-    select 最多等待25ms;
+    select &#x6700;&#x591A;&#x7B49;&#x5F85;25ms;
 
-    if (有消息返回)
+    if (&#x6709;&#x6D88;&#x606F;&#x8FD4;&#x56DE;)
     {
         ret = SSL_read(ssl, s2c, MAX_BUFF_SIZE);
         if (ret &gt; 0)
         {
-            读到回复消息，解包，获取id；然后回到顶部，重新连接ssl，id之后的token重新发送
+            &#x8BFB;&#x5230;&#x56DE;&#x590D;&#x6D88;&#x606F;&#xFF0C;&#x89E3;&#x5305;&#xFF0C;&#x83B7;&#x53D6;id&#xFF1B;&#x7136;&#x540E;&#x56DE;&#x5230;&#x9876;&#x90E8;&#xFF0C;&#x91CD;&#x65B0;&#x8FDE;&#x63A5;ssl&#xFF0C;id&#x4E4B;&#x540E;&#x7684;token&#x91CD;&#x65B0;&#x53D1;&#x9001;
         }
         sslerrno = SSL_get_error(ssl, ret);
         switch(sslerrno){
             case SSL_ERROR_ZERO_RETURN:
-                连接已断开，回到顶部重连;
+                &#x8FDE;&#x63A5;&#x5DF2;&#x65AD;&#x5F00;&#xFF0C;&#x56DE;&#x5230;&#x9876;&#x90E8;&#x91CD;&#x8FDE;;
             case SSL_ERROR_WANT_READ:
                 continue;
             case SSL_ERROR_WANT_WRITE:
                 continue;
             default:
-                遇到ssl错误，回到顶部，重新连接
+                &#x9047;&#x5230;ssl&#x9519;&#x8BEF;&#xFF0C;&#x56DE;&#x5230;&#x9876;&#x90E8;&#xFF0C;&#x91CD;&#x65B0;&#x8FDE;&#x63A5;
         }
     }
 }
 </code></pre>
-<p>是的，如果读的时候遇到ssl错误，导致读取失败，那就麻烦了，这时候不知道是哪个id发送失败！！！</p>
-<p>目前影响效率的因素有3个：</p>
+<p>&#x662F;&#x7684;&#xFF0C;&#x5982;&#x679C;&#x8BFB;&#x7684;&#x65F6;&#x5019;&#x9047;&#x5230;ssl&#x9519;&#x8BEF;&#xFF0C;&#x5BFC;&#x81F4;&#x8BFB;&#x53D6;&#x5931;&#x8D25;&#xFF0C;&#x90A3;&#x5C31;&#x9EBB;&#x70E6;&#x4E86;&#xFF0C;&#x8FD9;&#x65F6;&#x5019;&#x4E0D;&#x77E5;&#x9053;&#x662F;&#x54EA;&#x4E2A;id&#x53D1;&#x9001;&#x5931;&#x8D25;&#xFF01;&#xFF01;&#xFF01;</p>
+<p>&#x76EE;&#x524D;&#x5F71;&#x54CD;&#x6548;&#x7387;&#x7684;&#x56E0;&#x7D20;&#x6709;3&#x4E2A;&#xFF1A;</p>
 <ol>
-<li>无效token的数量。一旦遇到无效token，苹果返回消息，断开连接，重新建立ssl连接的时间开销很明显。至于无效token的清理，对效率不高，php那边的小伙伴心情好的时候会做清理:)  </li>
-<li>select超时等待的时间</li>
-<li>线程数量</li>
+<li>&#x65E0;&#x6548;token&#x7684;&#x6570;&#x91CF;&#x3002;&#x4E00;&#x65E6;&#x9047;&#x5230;&#x65E0;&#x6548;token&#xFF0C;&#x82F9;&#x679C;&#x8FD4;&#x56DE;&#x6D88;&#x606F;&#xFF0C;&#x65AD;&#x5F00;&#x8FDE;&#x63A5;&#xFF0C;&#x91CD;&#x65B0;&#x5EFA;&#x7ACB;ssl&#x8FDE;&#x63A5;&#x7684;&#x65F6;&#x95F4;&#x5F00;&#x9500;&#x5F88;&#x660E;&#x663E;&#x3002;&#x81F3;&#x4E8E;&#x65E0;&#x6548;token&#x7684;&#x6E05;&#x7406;&#xFF0C;&#x5BF9;&#x6548;&#x7387;&#x4E0D;&#x9AD8;&#xFF0C;php&#x90A3;&#x8FB9;&#x7684;&#x5C0F;&#x4F19;&#x4F34;&#x5FC3;&#x60C5;&#x597D;&#x7684;&#x65F6;&#x5019;&#x4F1A;&#x505A;&#x6E05;&#x7406;:)  </li>
+<li>select&#x8D85;&#x65F6;&#x7B49;&#x5F85;&#x7684;&#x65F6;&#x95F4;</li>
+<li>&#x7EBF;&#x7A0B;&#x6570;&#x91CF;</li>
 </ol>
-<p>另外，我尝试使用openssl的session，可惜获取不到session，初步怀疑是苹果服务器上没有启用session。  </p>
-<p>其他的内容，苹果已经说得很详细了: <a href="https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW7" target="_blank" rel="external">Local and Push Notification Programming Guide</a>    </p>
-<p>apns的详细流程: <a href="https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW9" target="_blank" rel="external">Local and Push Notification Programming Guide</a></p>
-<p><br><br>– EOF –</p>
+<p>&#x53E6;&#x5916;&#xFF0C;&#x6211;&#x5C1D;&#x8BD5;&#x4F7F;&#x7528;openssl&#x7684;session&#xFF0C;&#x53EF;&#x60DC;&#x83B7;&#x53D6;&#x4E0D;&#x5230;session&#xFF0C;&#x521D;&#x6B65;&#x6000;&#x7591;&#x662F;&#x82F9;&#x679C;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x6CA1;&#x6709;&#x542F;&#x7528;session&#x3002;  </p>
+<p>&#x5176;&#x4ED6;&#x7684;&#x5185;&#x5BB9;&#xFF0C;&#x82F9;&#x679C;&#x5DF2;&#x7ECF;&#x8BF4;&#x5F97;&#x5F88;&#x8BE6;&#x7EC6;&#x4E86;: <a href="https://developer.apple.com/library/mac/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW7" target="_blank" rel="external">Local and Push Notification Programming Guide</a>    </p>
+<p>apns&#x7684;&#x8BE6;&#x7EC6;&#x6D41;&#x7A0B;: <a href="https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW9" target="_blank" rel="external">Local and Push Notification Programming Guide</a></p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -240,7 +240,7 @@ while (还有token没发送)
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

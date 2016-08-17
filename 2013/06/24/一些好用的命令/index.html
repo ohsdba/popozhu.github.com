@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -51,21 +51,21 @@
 	    
 
 	    <blockquote>
-<p>摘录自<a href="http://clippy.in/b/YJLM9W" target="_blank" rel="external">http://clippy.in/b/YJLM9W</a> </p>
+<p>&#x6458;&#x5F55;&#x81EA;<a href="http://clippy.in/b/YJLM9W" target="_blank" rel="external">http://clippy.in/b/YJLM9W</a> </p>
 </blockquote>
-<p><code>$ sudo !!</code><br>Run the last command as root<br>Useful when you forget to use sudo for a command. “!!” grabs the last run command.  </p>
+<p><code>$ sudo !!</code><br>Run the last command as root<br>Useful when you forget to use sudo for a command. &#x201C;!!&#x201D; grabs the last run command.  </p>
 <p><code>$ python -m SimpleHTTPServer</code><br>Serve current directory tree at <a href="http://$HOSTNAME:8000/" target="_blank" rel="external">http://$HOSTNAME:8000/</a>  </p>
-<p><code>$ :w !sudo tee %</code><br>Save a file you edited in vim without the needed permissions<br>I often forget to sudo before editing a file I don’t have write permissions on. When you come to save that file and get the infamous “E212: Can’t open file for writing”, just issue that vim command in order to save the file without the need to save it to a temp file and then copy it back again.</p>
+<p><code>$ :w !sudo tee %</code><br>Save a file you edited in vim without the needed permissions<br>I often forget to sudo before editing a file I don&#x2019;t have write permissions on. When you come to save that file and get the infamous &#x201C;E212: Can&#x2019;t open file for writing&#x201D;, just issue that vim command in order to save the file without the need to save it to a temp file and then copy it back again.</p>
 <p><code>$ cd -</code><br>change to the previous working directory  </p>
 <p><code>$ ^foo^bar</code><br>Runs previous command but replacing<br>Really useful for when you have a typo in a previous command. Also, arguments default to empty so if you accidentally run:<code>echo &quot;no typozs&quot;</code><br>you can correct it with<code>^z</code>  </p>
-<p><code>$ ctrl-x e</code><br>Rapidly invoke an editor to write a long, complex, or tricky command<br>Next time you are using your shell, try typing ctrl-x e (that is holding control key press x and then e). The shell will take what you’ve written on the command line thus far and paste it into the editor specified by $EDITOR. Then you can edit at leisure using all the powerful macros and commands of vi, emacs, nano, or whatever.  </p>
-<p><code>$ &lt;space&gt;command</code><br>Execute a command without saving it in the history<br>Prepending one or more spaces to your command won’t be saved in history.<br>Useful for pr0n or passwords on the commandline.<br>Tested on BASH.  </p>
+<p><code>$ ctrl-x e</code><br>Rapidly invoke an editor to write a long, complex, or tricky command<br>Next time you are using your shell, try typing ctrl-x e (that is holding control key press x and then e). The shell will take what you&#x2019;ve written on the command line thus far and paste it into the editor specified by $EDITOR. Then you can edit at leisure using all the powerful macros and commands of vi, emacs, nano, or whatever.  </p>
+<p><code>$ &lt;space&gt;command</code><br>Execute a command without saving it in the history<br>Prepending one or more spaces to your command won&#x2019;t be saved in history.<br>Useful for pr0n or passwords on the commandline.<br>Tested on BASH.  </p>
 <p><code>$ &gt; file.txt</code><br>Empty a file<br>For when you want to flush all content from a file without removing it (hat-tip to Marc Kilgus).  </p>
 <p><code>$ $ssh-copy-id user@host</code><br>Copy ssh keys to user@host to enable password-less ssh logins.<br>To generate the keys use the command ssh-keygen  </p>
-<p><code>$ &#39;ALT+.&#39; or &#39;&lt;ESC&gt; .&#39;</code><br>Place the argument of the most recent command on the shell<br>When typing out long arguments, such as:<br><code>cp file.txt /var/www/wp-content/uploads/2009/03/</code><br>You can put that argument on your command line by holding down the ALT key and pressing the period ‘.’ or by pressing <esc> then the period ‘.’. For example: <code>cd &#39;ALT+.&#39;</code><br>would put ‘/var/www/wp-content/uploads/2009/03/ as my argument. Keeping pressing ‘ALT+.’ to cycle through arguments of your commands starting from most recent to oldest. This can save a ton of typing.   </esc></p>
-<p><code>$ mount | column -t</code><br>currently mounted filesystems in nice layout<br>Particularly useful if you’re mounting different drives, using the following command will allow you to see all the filesystems currently mounted on your computer and their respective specs with the added benefit of nice formatting.  </p>
-<p><code>$ ssh -N -L2001:localhost:80 somemachine</code><br>start a tunnel from some machine’s port 80 to your local post 2001<br>now you can acces the website by going to <a href="http://localhost:2001/" target="_blank" rel="external">http://localhost:2001/</a>  </p>
-<p><code>$ netstat -tlnp</code><br>Lists all listening ports together with the PID of the associated process<br>The PID will only be printed if you’re holding a root equivalent ID.  </p>
+<p><code>$ &apos;ALT+.&apos; or &apos;&lt;ESC&gt; .&apos;</code><br>Place the argument of the most recent command on the shell<br>When typing out long arguments, such as:<br><code>cp file.txt /var/www/wp-content/uploads/2009/03/</code><br>You can put that argument on your command line by holding down the ALT key and pressing the period &#x2018;.&#x2019; or by pressing <esc> then the period &#x2018;.&#x2019;. For example: <code>cd &apos;ALT+.&apos;</code><br>would put &#x2018;/var/www/wp-content/uploads/2009/03/ as my argument. Keeping pressing &#x2018;ALT+.&#x2019; to cycle through arguments of your commands starting from most recent to oldest. This can save a ton of typing.   </esc></p>
+<p><code>$ mount | column -t</code><br>currently mounted filesystems in nice layout<br>Particularly useful if you&#x2019;re mounting different drives, using the following command will allow you to see all the filesystems currently mounted on your computer and their respective specs with the added benefit of nice formatting.  </p>
+<p><code>$ ssh -N -L2001:localhost:80 somemachine</code><br>start a tunnel from some machine&#x2019;s port 80 to your local post 2001<br>now you can acces the website by going to <a href="http://localhost:2001/" target="_blank" rel="external">http://localhost:2001/</a>  </p>
+<p><code>$ netstat -tlnp</code><br>Lists all listening ports together with the PID of the associated process<br>The PID will only be printed if you&#x2019;re holding a root equivalent ID.  </p>
 <p><code>$ man ascii</code><br>Quick access to the ascii table.   </p>
 <p><code>$ sshfs name@server:/path/to/folder /path/to/mount/point</code><br>Mount folder/filesystem through SSH<br>Install SSHFS from <a href="http://fuse.sourceforge.net/sshfs.html" target="_blank" rel="external">http://fuse.sourceforge.net/sshfs.html</a><br>Will allow you to mount a folder security over a network.  </p>
 <p>ref:   </p>
@@ -73,7 +73,7 @@
 <li><a href="http://mmb.pcb.ub.es/~carlesfe/unix/tricks.txt" target="_blank" rel="external">http://mmb.pcb.ub.es/~carlesfe/unix/tricks.txt</a>  </li>
 <li><a href="http://clippy.in/b/YJLM9W" target="_blank" rel="external">http://clippy.in/b/YJLM9W</a>  </li>
 </ol>
-<p><br><br>– EOF –</p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -148,7 +148,7 @@
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

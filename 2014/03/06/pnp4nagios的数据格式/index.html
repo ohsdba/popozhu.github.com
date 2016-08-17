@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -50,30 +50,30 @@
 	    
 	    
 
-	    <p>虽然pnp4nagios本意上是nagios的一个插件，提供一个web界面，展示nagios里的数据，但是可以把pnp4nagios单独搭建起来，使用它的web界面来展示我的数据。只需要4个步骤：   </p>
+	    <p>&#x867D;&#x7136;pnp4nagios&#x672C;&#x610F;&#x4E0A;&#x662F;nagios&#x7684;&#x4E00;&#x4E2A;&#x63D2;&#x4EF6;&#xFF0C;&#x63D0;&#x4F9B;&#x4E00;&#x4E2A;web&#x754C;&#x9762;&#xFF0C;&#x5C55;&#x793A;nagios&#x91CC;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x4F46;&#x662F;&#x53EF;&#x4EE5;&#x628A;pnp4nagios&#x5355;&#x72EC;&#x642D;&#x5EFA;&#x8D77;&#x6765;&#xFF0C;&#x4F7F;&#x7528;&#x5B83;&#x7684;web&#x754C;&#x9762;&#x6765;&#x5C55;&#x793A;&#x6211;&#x7684;&#x6570;&#x636E;&#x3002;&#x53EA;&#x9700;&#x8981;4&#x4E2A;&#x6B65;&#x9AA4;&#xFF1A;   </p>
 <ol>
-<li>写一个数据格式转换工具，把我的数据转换成pnp4nagios的格式，而这个数据格式，就是这里我要说的，因为pnp4nagios的官方文档里并没有提到  </li>
-<li>数据转换工具输出的数据文件，放到pnp4nagios配置的一个文件目录里，<code>spool目录</code> </li>
-<li>启用pnp4nagios的npcd进程，这是一个C语言daemon，使用它的bulk工作模式（默认）。由npcd扫描这个spool目录，然后把每个文件给予perl脚本<code>process_perfdata.pl</code>（pnp4nagios提供），脚本把数据写入RRD文件  </li>
-<li>配置展示数据的模板，把模板给到pnp4nagios的模板目录  </li>
+<li>&#x5199;&#x4E00;&#x4E2A;&#x6570;&#x636E;&#x683C;&#x5F0F;&#x8F6C;&#x6362;&#x5DE5;&#x5177;&#xFF0C;&#x628A;&#x6211;&#x7684;&#x6570;&#x636E;&#x8F6C;&#x6362;&#x6210;pnp4nagios&#x7684;&#x683C;&#x5F0F;&#xFF0C;&#x800C;&#x8FD9;&#x4E2A;&#x6570;&#x636E;&#x683C;&#x5F0F;&#xFF0C;&#x5C31;&#x662F;&#x8FD9;&#x91CC;&#x6211;&#x8981;&#x8BF4;&#x7684;&#xFF0C;&#x56E0;&#x4E3A;pnp4nagios&#x7684;&#x5B98;&#x65B9;&#x6587;&#x6863;&#x91CC;&#x5E76;&#x6CA1;&#x6709;&#x63D0;&#x5230;  </li>
+<li>&#x6570;&#x636E;&#x8F6C;&#x6362;&#x5DE5;&#x5177;&#x8F93;&#x51FA;&#x7684;&#x6570;&#x636E;&#x6587;&#x4EF6;&#xFF0C;&#x653E;&#x5230;pnp4nagios&#x914D;&#x7F6E;&#x7684;&#x4E00;&#x4E2A;&#x6587;&#x4EF6;&#x76EE;&#x5F55;&#x91CC;&#xFF0C;<code>spool&#x76EE;&#x5F55;</code> </li>
+<li>&#x542F;&#x7528;pnp4nagios&#x7684;npcd&#x8FDB;&#x7A0B;&#xFF0C;&#x8FD9;&#x662F;&#x4E00;&#x4E2A;C&#x8BED;&#x8A00;daemon&#xFF0C;&#x4F7F;&#x7528;&#x5B83;&#x7684;bulk&#x5DE5;&#x4F5C;&#x6A21;&#x5F0F;&#xFF08;&#x9ED8;&#x8BA4;&#xFF09;&#x3002;&#x7531;npcd&#x626B;&#x63CF;&#x8FD9;&#x4E2A;spool&#x76EE;&#x5F55;&#xFF0C;&#x7136;&#x540E;&#x628A;&#x6BCF;&#x4E2A;&#x6587;&#x4EF6;&#x7ED9;&#x4E88;perl&#x811A;&#x672C;<code>process_perfdata.pl</code>&#xFF08;pnp4nagios&#x63D0;&#x4F9B;&#xFF09;&#xFF0C;&#x811A;&#x672C;&#x628A;&#x6570;&#x636E;&#x5199;&#x5165;RRD&#x6587;&#x4EF6;  </li>
+<li>&#x914D;&#x7F6E;&#x5C55;&#x793A;&#x6570;&#x636E;&#x7684;&#x6A21;&#x677F;&#xFF0C;&#x628A;&#x6A21;&#x677F;&#x7ED9;&#x5230;pnp4nagios&#x7684;&#x6A21;&#x677F;&#x76EE;&#x5F55;  </li>
 </ol>
-<p>目前我使用pnp4gios提供了一个伪接口，传入机器的hostname和模板名，就可以查看数据了，调用方式类似：<br><code>http://your_hostname/pnp4nagios/index.php/graph?host=param_hostname&amp;srv=param_template</code><br>传入了2个参数：<code>host</code>和<code>srv</code>。  </p>
-<p>嗯，总的来说，使用的是pnp4nagios的<code>Bulk Mode with NPCD</code>模式，抛开nagios，把pnp4nagios单独拿出来。<br><!-- ![bulk-npcd](/img/2014/bulk-npcdmod.png) --></p>
-<p><hr><br>pnp4nagios的数据格式，也就是输入到脚本<code>process_perfdata.pl</code>的每个文件，文件名要求默认要求是以<code>perfdata</code>开头。这个perl脚本对应有一个配置文件<code>process_perfdata.cfg</code>，有较多的配置需要在这里修改。而脚本期望的每一行数据（这里假设我只使用<code>SERVICEPERFDATA</code>这个数据类型)包含如下字段，各个字段用<code>\t</code>分割，字段顺序没要求:</p>
-<pre><code>DATATYPE                            值为SERVICEPERFDATA
-TIMET                                时间戳
-HOSTNAME                            域名或ip
-SERVICEDESC                        服务描述
-SERVICEPERFDATA                    性能数据
-SERVICECHECKCOMMAND                命令名，跟模板名一致，process_perfdata.pl使用它来匹配模板名
-</code></pre><p>各个字段中，稍微复杂些的是「性能数据」<code>SERVICEPERFDATA</code>的格式，为：<code>&#39;label&#39;=value[UOM];[warn];[crit];[min];[max]</code>，可以包含多个性能数据，空格分割。<br><a href="http://docs.pnp4nagios.org/pnp-0.6/perfdata_format" target="_blank" rel="external">性能数据格式SERVICEPERFDATA</a>在pnp4nagios文档有详细描述。</p>
-<p>总的来说，假设有一个数据样例为:   </p>
+<p>&#x76EE;&#x524D;&#x6211;&#x4F7F;&#x7528;pnp4gios&#x63D0;&#x4F9B;&#x4E86;&#x4E00;&#x4E2A;&#x4F2A;&#x63A5;&#x53E3;&#xFF0C;&#x4F20;&#x5165;&#x673A;&#x5668;&#x7684;hostname&#x548C;&#x6A21;&#x677F;&#x540D;&#xFF0C;&#x5C31;&#x53EF;&#x4EE5;&#x67E5;&#x770B;&#x6570;&#x636E;&#x4E86;&#xFF0C;&#x8C03;&#x7528;&#x65B9;&#x5F0F;&#x7C7B;&#x4F3C;&#xFF1A;<br><code>http://your_hostname/pnp4nagios/index.php/graph?host=param_hostname&amp;srv=param_template</code><br>&#x4F20;&#x5165;&#x4E86;2&#x4E2A;&#x53C2;&#x6570;&#xFF1A;<code>host</code>&#x548C;<code>srv</code>&#x3002;  </p>
+<p>&#x55EF;&#xFF0C;&#x603B;&#x7684;&#x6765;&#x8BF4;&#xFF0C;&#x4F7F;&#x7528;&#x7684;&#x662F;pnp4nagios&#x7684;<code>Bulk Mode with NPCD</code>&#x6A21;&#x5F0F;&#xFF0C;&#x629B;&#x5F00;nagios&#xFF0C;&#x628A;pnp4nagios&#x5355;&#x72EC;&#x62FF;&#x51FA;&#x6765;&#x3002;<br><!-- ![bulk-npcd](/img/2014/bulk-npcdmod.png) --></p>
+<p><hr><br>pnp4nagios&#x7684;&#x6570;&#x636E;&#x683C;&#x5F0F;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x8F93;&#x5165;&#x5230;&#x811A;&#x672C;<code>process_perfdata.pl</code>&#x7684;&#x6BCF;&#x4E2A;&#x6587;&#x4EF6;&#xFF0C;&#x6587;&#x4EF6;&#x540D;&#x8981;&#x6C42;&#x9ED8;&#x8BA4;&#x8981;&#x6C42;&#x662F;&#x4EE5;<code>perfdata</code>&#x5F00;&#x5934;&#x3002;&#x8FD9;&#x4E2A;perl&#x811A;&#x672C;&#x5BF9;&#x5E94;&#x6709;&#x4E00;&#x4E2A;&#x914D;&#x7F6E;&#x6587;&#x4EF6;<code>process_perfdata.cfg</code>&#xFF0C;&#x6709;&#x8F83;&#x591A;&#x7684;&#x914D;&#x7F6E;&#x9700;&#x8981;&#x5728;&#x8FD9;&#x91CC;&#x4FEE;&#x6539;&#x3002;&#x800C;&#x811A;&#x672C;&#x671F;&#x671B;&#x7684;&#x6BCF;&#x4E00;&#x884C;&#x6570;&#x636E;&#xFF08;&#x8FD9;&#x91CC;&#x5047;&#x8BBE;&#x6211;&#x53EA;&#x4F7F;&#x7528;<code>SERVICEPERFDATA</code>&#x8FD9;&#x4E2A;&#x6570;&#x636E;&#x7C7B;&#x578B;)&#x5305;&#x542B;&#x5982;&#x4E0B;&#x5B57;&#x6BB5;&#xFF0C;&#x5404;&#x4E2A;&#x5B57;&#x6BB5;&#x7528;<code>\t</code>&#x5206;&#x5272;&#xFF0C;&#x5B57;&#x6BB5;&#x987A;&#x5E8F;&#x6CA1;&#x8981;&#x6C42;:</p>
+<pre><code>DATATYPE                            &#x503C;&#x4E3A;SERVICEPERFDATA
+TIMET                                &#x65F6;&#x95F4;&#x6233;
+HOSTNAME                            &#x57DF;&#x540D;&#x6216;ip
+SERVICEDESC                        &#x670D;&#x52A1;&#x63CF;&#x8FF0;
+SERVICEPERFDATA                    &#x6027;&#x80FD;&#x6570;&#x636E;
+SERVICECHECKCOMMAND                &#x547D;&#x4EE4;&#x540D;&#xFF0C;&#x8DDF;&#x6A21;&#x677F;&#x540D;&#x4E00;&#x81F4;&#xFF0C;process_perfdata.pl&#x4F7F;&#x7528;&#x5B83;&#x6765;&#x5339;&#x914D;&#x6A21;&#x677F;&#x540D;
+</code></pre><p>&#x5404;&#x4E2A;&#x5B57;&#x6BB5;&#x4E2D;&#xFF0C;&#x7A0D;&#x5FAE;&#x590D;&#x6742;&#x4E9B;&#x7684;&#x662F;&#x300C;&#x6027;&#x80FD;&#x6570;&#x636E;&#x300D;<code>SERVICEPERFDATA</code>&#x7684;&#x683C;&#x5F0F;&#xFF0C;&#x4E3A;&#xFF1A;<code>&apos;label&apos;=value[UOM];[warn];[crit];[min];[max]</code>&#xFF0C;&#x53EF;&#x4EE5;&#x5305;&#x542B;&#x591A;&#x4E2A;&#x6027;&#x80FD;&#x6570;&#x636E;&#xFF0C;&#x7A7A;&#x683C;&#x5206;&#x5272;&#x3002;<br><a href="http://docs.pnp4nagios.org/pnp-0.6/perfdata_format" target="_blank" rel="external">&#x6027;&#x80FD;&#x6570;&#x636E;&#x683C;&#x5F0F;SERVICEPERFDATA</a>&#x5728;pnp4nagios&#x6587;&#x6863;&#x6709;&#x8BE6;&#x7EC6;&#x63CF;&#x8FF0;&#x3002;</p>
+<p>&#x603B;&#x7684;&#x6765;&#x8BF4;&#xFF0C;&#x5047;&#x8BBE;&#x6709;&#x4E00;&#x4E2A;&#x6570;&#x636E;&#x6837;&#x4F8B;&#x4E3A;:   </p>
 <ol>
 <li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::rta=92.412ms;200.000;500.000;0; pl=0%;40;80;; rtmax=97.281ms;;;; rtmin=86.727ms;;;;</li>
 </ol>
-<p>数据经处理后，通过数据里的<code>zh_v542(hostname)</code>和<code>check_icmp(servicecheckcommand)</code>，访问url<code>http://your_hostname/pnp4nagios/index.php/graph?host=zh_v542&amp;srv=check_icmp</code>就可以查看pnp4nagios的数据展示了。   </p>
-<p>后续我再把略微繁琐的部署和配置记录一下，以备忘。  </p>
-<p><br><br>– EOF –</p>
+<p>&#x6570;&#x636E;&#x7ECF;&#x5904;&#x7406;&#x540E;&#xFF0C;&#x901A;&#x8FC7;&#x6570;&#x636E;&#x91CC;&#x7684;<code>zh_v542(hostname)</code>&#x548C;<code>check_icmp(servicecheckcommand)</code>&#xFF0C;&#x8BBF;&#x95EE;url<code>http://your_hostname/pnp4nagios/index.php/graph?host=zh_v542&amp;srv=check_icmp</code>&#x5C31;&#x53EF;&#x4EE5;&#x67E5;&#x770B;pnp4nagios&#x7684;&#x6570;&#x636E;&#x5C55;&#x793A;&#x4E86;&#x3002;   </p>
+<p>&#x540E;&#x7EED;&#x6211;&#x518D;&#x628A;&#x7565;&#x5FAE;&#x7E41;&#x7410;&#x7684;&#x90E8;&#x7F72;&#x548C;&#x914D;&#x7F6E;&#x8BB0;&#x5F55;&#x4E00;&#x4E0B;&#xFF0C;&#x4EE5;&#x5907;&#x5FD8;&#x3002;  </p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -148,7 +148,7 @@ SERVICECHECKCOMMAND                命令名，跟模板名一致，process_perf
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

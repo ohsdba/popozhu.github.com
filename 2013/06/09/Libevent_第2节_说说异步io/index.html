@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -49,15 +49,15 @@
 	
 	    
 	    
-		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example:_A_simple_blocking_HTTP_client"><span class="toc-text">Example: A simple blocking HTTP client</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Bad_Example"><span class="toc-text">Bad Example</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Example:_Forking_ROT13_server"><span class="toc-text">Example: Forking ROT13 server</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Bad_Example:_busy-polling_all_sockets"><span class="toc-text">Bad Example: busy-polling all sockets</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Example:_Using_select"><span class="toc-text">Example: Using select</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Example:_select()-based_ROT13_server"><span class="toc-text">Example: select()-based ROT13 server</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Example:_A_low-level_ROT13_server_with_Libevent"><span class="toc-text">Example: A low-level ROT13 server with Libevent</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用Libevent方便吗，在Windows下又如何"><span class="toc-text">使用Libevent方便吗，在Windows下又如何</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example:_A_simpler_ROT13_server_with_Libevent"><span class="toc-text">Example: A simpler ROT13 server with Libevent</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#真的有这么高效率？"><span class="toc-text">真的有这么高效率？</span></a> </div>
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#example-a-simple-blocking-http-client"><span class="toc-text">Example: A simple blocking HTTP client</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bad-example"><span class="toc-text">Bad Example</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#example-forking-rot13-server"><span class="toc-text">Example: Forking ROT13 server</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bad-example-busy-polling-all-sockets"><span class="toc-text">Bad Example: busy-polling all sockets</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#example-using-select"><span class="toc-text">Example: Using select</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#example-select-based-rot13-server"><span class="toc-text">Example: select()-based ROT13 server</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#example-a-low-level-rot13-server-with-libevent"><span class="toc-text">Example: A low-level ROT13 server with Libevent</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用libevent方便吗在windows下又如何"><span class="toc-text">使用Libevent方便吗，在Windows下又如何</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#example-a-simpler-rot13-server-with-libevent"><span class="toc-text">Example: A simpler ROT13 server with Libevent</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#真的有这么高效率"><span class="toc-text">真的有这么高效率？</span></a> </div>
 	    
 
 	    <blockquote>
-<p>原文：<a href="http://www.wangafu.net/~nickm/libevent-book/01_intro.html" target="_blank" rel="external">Chapter 1: A tiny introduction to asynchronous IO.</a></p>
+<p>&#x539F;&#x6587;&#xFF1A;<a href="http://www.wangafu.net/~nickm/libevent-book/01_intro.html" target="_blank" rel="external">Chapter 1: A tiny introduction to asynchronous IO.</a></p>
 </blockquote>
-<p>很多人开始时使用的是阻塞式IO函数。<br>如果一个函数在操作完成之前，或者在超时之前，都不会返回，那么就说这个函数是<strong>同步</strong>的。<br>比如当你对一个TCP连接调用<code>connect()</code>，你的操作系统会有一个队列，一个保存发送出去的<strong>SYN请求</strong>的队列。<br>然后对于每个<strong>SYN请求</strong>，系统尝试等待TCP另一端返回对应的确认码，即<strong>SYN ACK</strong>。<br>在确认码ACK返回之前，或者直到超时，同步的函数是不会返回，称之为阻塞IO。  </p>
-<p>下面有个使用阻塞IO函数的例子，它打开一个连接，连接到www.google.com，发送一个简单的HTTP请求，然后打印出返回内容到stdout。  </p>
-<h4 id="Example:_A_simple_blocking_HTTP_client">Example: A simple blocking HTTP client</h4><pre><code>/* For sockaddr_in */
+<p>&#x5F88;&#x591A;&#x4EBA;&#x5F00;&#x59CB;&#x65F6;&#x4F7F;&#x7528;&#x7684;&#x662F;&#x963B;&#x585E;&#x5F0F;IO&#x51FD;&#x6570;&#x3002;<br>&#x5982;&#x679C;&#x4E00;&#x4E2A;&#x51FD;&#x6570;&#x5728;&#x64CD;&#x4F5C;&#x5B8C;&#x6210;&#x4E4B;&#x524D;&#xFF0C;&#x6216;&#x8005;&#x5728;&#x8D85;&#x65F6;&#x4E4B;&#x524D;&#xFF0C;&#x90FD;&#x4E0D;&#x4F1A;&#x8FD4;&#x56DE;&#xFF0C;&#x90A3;&#x4E48;&#x5C31;&#x8BF4;&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x662F;<strong>&#x540C;&#x6B65;</strong>&#x7684;&#x3002;<br>&#x6BD4;&#x5982;&#x5F53;&#x4F60;&#x5BF9;&#x4E00;&#x4E2A;TCP&#x8FDE;&#x63A5;&#x8C03;&#x7528;<code>connect()</code>&#xFF0C;&#x4F60;&#x7684;&#x64CD;&#x4F5C;&#x7CFB;&#x7EDF;&#x4F1A;&#x6709;&#x4E00;&#x4E2A;&#x961F;&#x5217;&#xFF0C;&#x4E00;&#x4E2A;&#x4FDD;&#x5B58;&#x53D1;&#x9001;&#x51FA;&#x53BB;&#x7684;<strong>SYN&#x8BF7;&#x6C42;</strong>&#x7684;&#x961F;&#x5217;&#x3002;<br>&#x7136;&#x540E;&#x5BF9;&#x4E8E;&#x6BCF;&#x4E2A;<strong>SYN&#x8BF7;&#x6C42;</strong>&#xFF0C;&#x7CFB;&#x7EDF;&#x5C1D;&#x8BD5;&#x7B49;&#x5F85;TCP&#x53E6;&#x4E00;&#x7AEF;&#x8FD4;&#x56DE;&#x5BF9;&#x5E94;&#x7684;&#x786E;&#x8BA4;&#x7801;&#xFF0C;&#x5373;<strong>SYN ACK</strong>&#x3002;<br>&#x5728;&#x786E;&#x8BA4;&#x7801;ACK&#x8FD4;&#x56DE;&#x4E4B;&#x524D;&#xFF0C;&#x6216;&#x8005;&#x76F4;&#x5230;&#x8D85;&#x65F6;&#xFF0C;&#x540C;&#x6B65;&#x7684;&#x51FD;&#x6570;&#x662F;&#x4E0D;&#x4F1A;&#x8FD4;&#x56DE;&#xFF0C;&#x79F0;&#x4E4B;&#x4E3A;&#x963B;&#x585E;IO&#x3002;  </p>
+<p>&#x4E0B;&#x9762;&#x6709;&#x4E2A;&#x4F7F;&#x7528;&#x963B;&#x585E;IO&#x51FD;&#x6570;&#x7684;&#x4F8B;&#x5B50;&#xFF0C;&#x5B83;&#x6253;&#x5F00;&#x4E00;&#x4E2A;&#x8FDE;&#x63A5;&#xFF0C;&#x8FDE;&#x63A5;&#x5230;www.google.com&#xFF0C;&#x53D1;&#x9001;&#x4E00;&#x4E2A;&#x7B80;&#x5355;&#x7684;HTTP&#x8BF7;&#x6C42;&#xFF0C;&#x7136;&#x540E;&#x6253;&#x5370;&#x51FA;&#x8FD4;&#x56DE;&#x5185;&#x5BB9;&#x5230;stdout&#x3002;  </p>
+<h4 id="example-a-simple-blocking-http-client"><a href="#Example-A-simple-blocking-HTTP-client" class="headerlink" title="Example: A simple blocking HTTP client"></a>Example: A simple blocking HTTP client</h4><pre><code>/* For sockaddr_in */
 #include &lt;netinet/in.h&gt;
 /* For socket functions */
 #include &lt;sys/socket.h&gt;
@@ -84,10 +84,10 @@ int main(int c, char **v)
 
     /* Look up the IP address for the hostname.  
        Watch out; 
-       this isn&#39;t threadsafe on most platforms. */  
+       this isn&apos;t threadsafe on most platforms. */  
     h = gethostbyname(hostname);
     if (!h) {
-        fprintf(stderr, &quot;Couldn&#39;t lookup %s: %s&quot;, hostname, hstrerror(h_errno));
+        fprintf(stderr, &quot;Couldn&apos;t lookup %s: %s&quot;, hostname, hstrerror(h_errno));
         return 1;
     }
     if (h-&gt;h_addrtype != AF_INET) {
@@ -142,15 +142,15 @@ int main(int c, char **v)
     close(fd);
     return 0;
 }
-</code></pre><p>上面使用的网络相关函数都是阻塞式的。  </p>
+</code></pre><p>&#x4E0A;&#x9762;&#x4F7F;&#x7528;&#x7684;&#x7F51;&#x7EDC;&#x76F8;&#x5173;&#x51FD;&#x6570;&#x90FD;&#x662F;&#x963B;&#x585E;&#x5F0F;&#x7684;&#x3002;  </p>
 <ol>
-<li><code>gethostbyname</code>在成功解析域名<code>www.google.com</code>或超时前是不会返回的；  </li>
-<li><code>connect</code>在成功连接后才返回；  </li>
-<li><code>recv</code>接收数据才返回，或者对方关闭了sock也会让recv返回；  </li>
-<li>而<code>send</code>也阻塞，直到把数据复制到系统内核buffer之中。  </li>
+<li><code>gethostbyname</code>&#x5728;&#x6210;&#x529F;&#x89E3;&#x6790;&#x57DF;&#x540D;<code>www.google.com</code>&#x6216;&#x8D85;&#x65F6;&#x524D;&#x662F;&#x4E0D;&#x4F1A;&#x8FD4;&#x56DE;&#x7684;&#xFF1B;  </li>
+<li><code>connect</code>&#x5728;&#x6210;&#x529F;&#x8FDE;&#x63A5;&#x540E;&#x624D;&#x8FD4;&#x56DE;&#xFF1B;  </li>
+<li><code>recv</code>&#x63A5;&#x6536;&#x6570;&#x636E;&#x624D;&#x8FD4;&#x56DE;&#xFF0C;&#x6216;&#x8005;&#x5BF9;&#x65B9;&#x5173;&#x95ED;&#x4E86;sock&#x4E5F;&#x4F1A;&#x8BA9;recv&#x8FD4;&#x56DE;&#xFF1B;  </li>
+<li>&#x800C;<code>send</code>&#x4E5F;&#x963B;&#x585E;&#xFF0C;&#x76F4;&#x5230;&#x628A;&#x6570;&#x636E;&#x590D;&#x5236;&#x5230;&#x7CFB;&#x7EDF;&#x5185;&#x6838;buffer&#x4E4B;&#x4E2D;&#x3002;  </li>
 </ol>
-<p>如果你在同一时间内只做一个事情，IO阻塞函数也没有什么不好。但假若你的程序里要同时响应多个连接，比如你需要同时从2个连接sock中接收数据，而且你不知道哪个数据先到来，你不能这样写你的程序:  </p>
-<h4 id="Bad_Example">Bad Example</h4><pre><code>/* This won&#39;t work. */
+<p>&#x5982;&#x679C;&#x4F60;&#x5728;&#x540C;&#x4E00;&#x65F6;&#x95F4;&#x5185;&#x53EA;&#x505A;&#x4E00;&#x4E2A;&#x4E8B;&#x60C5;&#xFF0C;IO&#x963B;&#x585E;&#x51FD;&#x6570;&#x4E5F;&#x6CA1;&#x6709;&#x4EC0;&#x4E48;&#x4E0D;&#x597D;&#x3002;&#x4F46;&#x5047;&#x82E5;&#x4F60;&#x7684;&#x7A0B;&#x5E8F;&#x91CC;&#x8981;&#x540C;&#x65F6;&#x54CD;&#x5E94;&#x591A;&#x4E2A;&#x8FDE;&#x63A5;&#xFF0C;&#x6BD4;&#x5982;&#x4F60;&#x9700;&#x8981;&#x540C;&#x65F6;&#x4ECE;2&#x4E2A;&#x8FDE;&#x63A5;sock&#x4E2D;&#x63A5;&#x6536;&#x6570;&#x636E;&#xFF0C;&#x800C;&#x4E14;&#x4F60;&#x4E0D;&#x77E5;&#x9053;&#x54EA;&#x4E2A;&#x6570;&#x636E;&#x5148;&#x5230;&#x6765;&#xFF0C;&#x4F60;&#x4E0D;&#x80FD;&#x8FD9;&#x6837;&#x5199;&#x4F60;&#x7684;&#x7A0B;&#x5E8F;:  </p>
+<h4 id="bad-example"><a href="#Bad-Example" class="headerlink" title="Bad Example"></a>Bad Example</h4><pre><code>/* This won&apos;t work. */
 char buf[1024];
 int i, n;
 while (i_still_want_to_read()) {
@@ -164,9 +164,9 @@ while (i_still_want_to_read()) {
             handle_input(fd[i], buf, n);
     }
 }
-</code></pre><p>因为如果<code>fd[2]</code>的数据先到来的话，这段代码甚至不会尝试去读取<code>fd[1]</code>的数据，因为它要求数据是按顺序到来，而这明显是简单地想当然了。  </p>
-<p>当然也可以使用多个<strong>进程/线程</strong>来处理每个sock，每个sock的数据处理互不影响，A进程阻塞了，并不影响到B进程的工作。<br>举例，下面的代码是我们的<strong>ROT13</strong>服务端代码，使用unix的<code>fork()</code>为每个连接建立一个进程。从端口40713中每次读取一行，对读取的该行每个字符做点转换，然后把该行数据写回。  </p>
-<h4 id="Example:_Forking_ROT13_server">Example: Forking ROT13 server</h4><pre><code>/* For sockaddr_in */
+</code></pre><p>&#x56E0;&#x4E3A;&#x5982;&#x679C;<code>fd[2]</code>&#x7684;&#x6570;&#x636E;&#x5148;&#x5230;&#x6765;&#x7684;&#x8BDD;&#xFF0C;&#x8FD9;&#x6BB5;&#x4EE3;&#x7801;&#x751A;&#x81F3;&#x4E0D;&#x4F1A;&#x5C1D;&#x8BD5;&#x53BB;&#x8BFB;&#x53D6;<code>fd[1]</code>&#x7684;&#x6570;&#x636E;&#xFF0C;&#x56E0;&#x4E3A;&#x5B83;&#x8981;&#x6C42;&#x6570;&#x636E;&#x662F;&#x6309;&#x987A;&#x5E8F;&#x5230;&#x6765;&#xFF0C;&#x800C;&#x8FD9;&#x660E;&#x663E;&#x662F;&#x7B80;&#x5355;&#x5730;&#x60F3;&#x5F53;&#x7136;&#x4E86;&#x3002;  </p>
+<p>&#x5F53;&#x7136;&#x4E5F;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;&#x591A;&#x4E2A;<strong>&#x8FDB;&#x7A0B;/&#x7EBF;&#x7A0B;</strong>&#x6765;&#x5904;&#x7406;&#x6BCF;&#x4E2A;sock&#xFF0C;&#x6BCF;&#x4E2A;sock&#x7684;&#x6570;&#x636E;&#x5904;&#x7406;&#x4E92;&#x4E0D;&#x5F71;&#x54CD;&#xFF0C;A&#x8FDB;&#x7A0B;&#x963B;&#x585E;&#x4E86;&#xFF0C;&#x5E76;&#x4E0D;&#x5F71;&#x54CD;&#x5230;B&#x8FDB;&#x7A0B;&#x7684;&#x5DE5;&#x4F5C;&#x3002;<br>&#x4E3E;&#x4F8B;&#xFF0C;&#x4E0B;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x662F;&#x6211;&#x4EEC;&#x7684;<strong>ROT13</strong>&#x670D;&#x52A1;&#x7AEF;&#x4EE3;&#x7801;&#xFF0C;&#x4F7F;&#x7528;unix&#x7684;<code>fork()</code>&#x4E3A;&#x6BCF;&#x4E2A;&#x8FDE;&#x63A5;&#x5EFA;&#x7ACB;&#x4E00;&#x4E2A;&#x8FDB;&#x7A0B;&#x3002;&#x4ECE;&#x7AEF;&#x53E3;40713&#x4E2D;&#x6BCF;&#x6B21;&#x8BFB;&#x53D6;&#x4E00;&#x884C;&#xFF0C;&#x5BF9;&#x8BFB;&#x53D6;&#x7684;&#x8BE5;&#x884C;&#x6BCF;&#x4E2A;&#x5B57;&#x7B26;&#x505A;&#x70B9;&#x8F6C;&#x6362;&#xFF0C;&#x7136;&#x540E;&#x628A;&#x8BE5;&#x884C;&#x6570;&#x636E;&#x5199;&#x56DE;&#x3002;  </p>
+<h4 id="example-forking-rot13-server"><a href="#Example-Forking-ROT13-server" class="headerlink" title="Example: Forking ROT13 server"></a>Example: Forking ROT13 server</h4><pre><code>/* For sockaddr_in */
 #include &lt;netinet/in.h&gt;
 /* For socket functions */
 #include &lt;sys/socket.h&gt;
@@ -181,11 +181,11 @@ while (i_still_want_to_read()) {
 char
 rot13_char(char c)
 {
-    /* We don&#39;t want to use isalpha here; setting the locale would change
+    /* We don&apos;t want to use isalpha here; setting the locale would change
      * which characters are considered alphabetical. */
-    if ((c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;m&#39;) || (c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;M&#39;))
+    if ((c &gt;= &apos;a&apos; &amp;&amp; c &lt;= &apos;m&apos;) || (c &gt;= &apos;A&apos; &amp;&amp; c &lt;= &apos;M&apos;))
         return c + 13;
-    else if ((c &gt;= &#39;n&#39; &amp;&amp; c &lt;= &#39;z&#39;) || (c &gt;= &#39;N&#39; &amp;&amp; c &lt;= &#39;Z&#39;))
+    else if ((c &gt;= &apos;n&apos; &amp;&amp; c &lt;= &apos;z&apos;) || (c &gt;= &apos;N&apos; &amp;&amp; c &lt;= &apos;Z&apos;))
         return c - 13;
     else
         return c;
@@ -213,7 +213,7 @@ child(int fd)
             outbuf[outbuf_used++] = rot13_char(ch);
         }
 
-        if (ch == &#39;\n&#39;) {
+        if (ch == &apos;\n&apos;) {
             send(fd, outbuf, outbuf_used, 0);
             outbuf_used = 0;
             continue;
@@ -273,12 +273,12 @@ main(int c, char **v)
     run();
     return 0;
 }
-</code></pre><p>那么，有没有更好的方案来同时处理多个连接吗？我就这样使用上面的方案回去解决我的问题了吗？<br>当然不是！<br>首先，在一些平台上，创建一个进程/线程的代价是很昂贵的。实际开发中你会使用一个线程池，而不是创建一个新进程。 不过，假若你需要处理数以千万个连接，维护这么多线程，性能也许没有你期待的那么美好。  </p>
-<p>使用线程不是最好的答案。在Unix下，你可以设置sock为非阻塞，使用函数<code>fcntl</code>：  </p>
+</code></pre><p>&#x90A3;&#x4E48;&#xFF0C;&#x6709;&#x6CA1;&#x6709;&#x66F4;&#x597D;&#x7684;&#x65B9;&#x6848;&#x6765;&#x540C;&#x65F6;&#x5904;&#x7406;&#x591A;&#x4E2A;&#x8FDE;&#x63A5;&#x5417;&#xFF1F;&#x6211;&#x5C31;&#x8FD9;&#x6837;&#x4F7F;&#x7528;&#x4E0A;&#x9762;&#x7684;&#x65B9;&#x6848;&#x56DE;&#x53BB;&#x89E3;&#x51B3;&#x6211;&#x7684;&#x95EE;&#x9898;&#x4E86;&#x5417;&#xFF1F;<br>&#x5F53;&#x7136;&#x4E0D;&#x662F;&#xFF01;<br>&#x9996;&#x5148;&#xFF0C;&#x5728;&#x4E00;&#x4E9B;&#x5E73;&#x53F0;&#x4E0A;&#xFF0C;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x8FDB;&#x7A0B;/&#x7EBF;&#x7A0B;&#x7684;&#x4EE3;&#x4EF7;&#x662F;&#x5F88;&#x6602;&#x8D35;&#x7684;&#x3002;&#x5B9E;&#x9645;&#x5F00;&#x53D1;&#x4E2D;&#x4F60;&#x4F1A;&#x4F7F;&#x7528;&#x4E00;&#x4E2A;&#x7EBF;&#x7A0B;&#x6C60;&#xFF0C;&#x800C;&#x4E0D;&#x662F;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x65B0;&#x8FDB;&#x7A0B;&#x3002; &#x4E0D;&#x8FC7;&#xFF0C;&#x5047;&#x82E5;&#x4F60;&#x9700;&#x8981;&#x5904;&#x7406;&#x6570;&#x4EE5;&#x5343;&#x4E07;&#x4E2A;&#x8FDE;&#x63A5;&#xFF0C;&#x7EF4;&#x62A4;&#x8FD9;&#x4E48;&#x591A;&#x7EBF;&#x7A0B;&#xFF0C;&#x6027;&#x80FD;&#x4E5F;&#x8BB8;&#x6CA1;&#x6709;&#x4F60;&#x671F;&#x5F85;&#x7684;&#x90A3;&#x4E48;&#x7F8E;&#x597D;&#x3002;  </p>
+<p>&#x4F7F;&#x7528;&#x7EBF;&#x7A0B;&#x4E0D;&#x662F;&#x6700;&#x597D;&#x7684;&#x7B54;&#x6848;&#x3002;&#x5728;Unix&#x4E0B;&#xFF0C;&#x4F60;&#x53EF;&#x4EE5;&#x8BBE;&#x7F6E;sock&#x4E3A;&#x975E;&#x963B;&#x585E;&#xFF0C;&#x4F7F;&#x7528;&#x51FD;&#x6570;<code>fcntl</code>&#xFF1A;  </p>
 <pre><code>fcntl(fd, F_SETFL, O_NONBLOCK); 
-//fd对应于sock的文件描述符(file descriptor)
+//fd&#x5BF9;&#x5E94;&#x4E8E;sock&#x7684;&#x6587;&#x4EF6;&#x63CF;&#x8FF0;&#x7B26;(file descriptor)
 
-//其实一般先获取sock的flag，修改flag，再设置新的flag，如下大概  
+//&#x5176;&#x5B9E;&#x4E00;&#x822C;&#x5148;&#x83B7;&#x53D6;sock&#x7684;flag&#xFF0C;&#x4FEE;&#x6539;flag&#xFF0C;&#x518D;&#x8BBE;&#x7F6E;&#x65B0;&#x7684;flag&#xFF0C;&#x5982;&#x4E0B;&#x5927;&#x6982;  
 /* Set a socket as nonblocking */
 int flags; 
 if ((flags = fcntl (fd, F_GETFL, 0)) &lt; 0) 
@@ -286,8 +286,8 @@ if ((flags = fcntl (fd, F_GETFL, 0)) &lt; 0)
 flags |= O_NONBLOCK;
 if (fcntl(fd, F_SETFL, flags) &lt; 0) 
      err_sys(&quot;F_SETFL error&quot;);
-</code></pre><p>一旦你对sock fd设置非阻塞，那么对这个fd调用网络相关的函数，比如recv，函数会马上返回，这时你要检查返回码以及全局变量<code>errno</code>，上面从多个sock读取数据的代码段修改为：   </p>
-<h4 id="Bad_Example:_busy-polling_all_sockets">Bad Example: busy-polling all sockets</h4><pre><code>/* This will work, but the performance will be unforgivably bad. */
+</code></pre><p>&#x4E00;&#x65E6;&#x4F60;&#x5BF9;sock fd&#x8BBE;&#x7F6E;&#x975E;&#x963B;&#x585E;&#xFF0C;&#x90A3;&#x4E48;&#x5BF9;&#x8FD9;&#x4E2A;fd&#x8C03;&#x7528;&#x7F51;&#x7EDC;&#x76F8;&#x5173;&#x7684;&#x51FD;&#x6570;&#xFF0C;&#x6BD4;&#x5982;recv&#xFF0C;&#x51FD;&#x6570;&#x4F1A;&#x9A6C;&#x4E0A;&#x8FD4;&#x56DE;&#xFF0C;&#x8FD9;&#x65F6;&#x4F60;&#x8981;&#x68C0;&#x67E5;&#x8FD4;&#x56DE;&#x7801;&#x4EE5;&#x53CA;&#x5168;&#x5C40;&#x53D8;&#x91CF;<code>errno</code>&#xFF0C;&#x4E0A;&#x9762;&#x4ECE;&#x591A;&#x4E2A;sock&#x8BFB;&#x53D6;&#x6570;&#x636E;&#x7684;&#x4EE3;&#x7801;&#x6BB5;&#x4FEE;&#x6539;&#x4E3A;&#xFF1A;   </p>
+<h4 id="bad-example-busy-polling-all-sockets"><a href="#Bad-Example-busy-polling-all-sockets" class="headerlink" title="Bad Example: busy-polling all sockets"></a>Bad Example: busy-polling all sockets</h4><pre><code>/* This will work, but the performance will be unforgivably bad. */
 int i, n;
 char buf[1024];
 for (i=0; i &lt; n_sockets; ++i)
@@ -300,7 +300,7 @@ while (i_still_want_to_read()) {
             handle_close(fd[i]);
         } else if (n &lt; 0) {
             if (errno == EAGAIN)
-                 ; /* The kernel didn&#39;t have any data for us to read. */
+                 ; /* The kernel didn&apos;t have any data for us to read. */
             else
                  handle_error(fd[i], errno);
          } else {
@@ -308,24 +308,24 @@ while (i_still_want_to_read()) {
          }
     }
 }
-</code></pre><p>上面的代码也存在性能问题，2个原因：  </p>
+</code></pre><p>&#x4E0A;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x4E5F;&#x5B58;&#x5728;&#x6027;&#x80FD;&#x95EE;&#x9898;&#xFF0C;2&#x4E2A;&#x539F;&#x56E0;&#xFF1A;  </p>
 <ol>
-<li>如果没有数据到来，代码不断循环，不断消耗cpu；  </li>
-<li>每次轮询都会调用内核级别的函数（即系统调用），因为有没有数据可以读取，一般是检查内核数据buffer，这个过程由系统调用帮我们做检查。我们不断轮询，每次产生系统调用的消耗， 不是很环保的做法。</li>
+<li>&#x5982;&#x679C;&#x6CA1;&#x6709;&#x6570;&#x636E;&#x5230;&#x6765;&#xFF0C;&#x4EE3;&#x7801;&#x4E0D;&#x65AD;&#x5FAA;&#x73AF;&#xFF0C;&#x4E0D;&#x65AD;&#x6D88;&#x8017;cpu&#xFF1B;  </li>
+<li>&#x6BCF;&#x6B21;&#x8F6E;&#x8BE2;&#x90FD;&#x4F1A;&#x8C03;&#x7528;&#x5185;&#x6838;&#x7EA7;&#x522B;&#x7684;&#x51FD;&#x6570;&#xFF08;&#x5373;&#x7CFB;&#x7EDF;&#x8C03;&#x7528;&#xFF09;&#xFF0C;&#x56E0;&#x4E3A;&#x6709;&#x6CA1;&#x6709;&#x6570;&#x636E;&#x53EF;&#x4EE5;&#x8BFB;&#x53D6;&#xFF0C;&#x4E00;&#x822C;&#x662F;&#x68C0;&#x67E5;&#x5185;&#x6838;&#x6570;&#x636E;buffer&#xFF0C;&#x8FD9;&#x4E2A;&#x8FC7;&#x7A0B;&#x7531;&#x7CFB;&#x7EDF;&#x8C03;&#x7528;&#x5E2E;&#x6211;&#x4EEC;&#x505A;&#x68C0;&#x67E5;&#x3002;&#x6211;&#x4EEC;&#x4E0D;&#x65AD;&#x8F6E;&#x8BE2;&#xFF0C;&#x6BCF;&#x6B21;&#x4EA7;&#x751F;&#x7CFB;&#x7EDF;&#x8C03;&#x7528;&#x7684;&#x6D88;&#x8017;&#xFF0C; &#x4E0D;&#x662F;&#x5F88;&#x73AF;&#x4FDD;&#x7684;&#x505A;&#x6CD5;&#x3002;</li>
 </ol>
-<p>我们需要更为智能的方式，当数据最后可读时让内核主动告诉我们。最古老的方式是使用<code>select()</code>。<br>函数原型：</p>
+<p>&#x6211;&#x4EEC;&#x9700;&#x8981;&#x66F4;&#x4E3A;&#x667A;&#x80FD;&#x7684;&#x65B9;&#x5F0F;&#xFF0C;&#x5F53;&#x6570;&#x636E;&#x6700;&#x540E;&#x53EF;&#x8BFB;&#x65F6;&#x8BA9;&#x5185;&#x6838;&#x4E3B;&#x52A8;&#x544A;&#x8BC9;&#x6211;&#x4EEC;&#x3002;&#x6700;&#x53E4;&#x8001;&#x7684;&#x65B9;&#x5F0F;&#x662F;&#x4F7F;&#x7528;<code>select()</code>&#x3002;<br>&#x51FD;&#x6570;&#x539F;&#x578B;&#xFF1A;</p>
 <pre><code>int select(int nfds, 
     fd_set *restrict readfds, 
     fd_set *restrict writefds,
      fd_set *restrict errorfds, 
      struct timeval *restrict timeout);
-</code></pre><p>select这个函数使用了3个sock fd集合（set of fds）， 分别对应：  </p>
+</code></pre><p>select&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x4F7F;&#x7528;&#x4E86;3&#x4E2A;sock fd&#x96C6;&#x5408;&#xFF08;set of fds&#xFF09;&#xFF0C; &#x5206;&#x522B;&#x5BF9;&#x5E94;&#xFF1A;  </p>
 <ol>
-<li>可读的fd集合，告诉select()请检查这个集合内的fd们，若其中某一个可读，请select返回，告诉我集合中有多少个fd有数据可以读了，下2个同意思；  </li>
-<li>可写的fd集合；  </li>
-<li>异常的fd集合；  </li>
+<li>&#x53EF;&#x8BFB;&#x7684;fd&#x96C6;&#x5408;&#xFF0C;&#x544A;&#x8BC9;select()&#x8BF7;&#x68C0;&#x67E5;&#x8FD9;&#x4E2A;&#x96C6;&#x5408;&#x5185;&#x7684;fd&#x4EEC;&#xFF0C;&#x82E5;&#x5176;&#x4E2D;&#x67D0;&#x4E00;&#x4E2A;&#x53EF;&#x8BFB;&#xFF0C;&#x8BF7;select&#x8FD4;&#x56DE;&#xFF0C;&#x544A;&#x8BC9;&#x6211;&#x96C6;&#x5408;&#x4E2D;&#x6709;&#x591A;&#x5C11;&#x4E2A;fd&#x6709;&#x6570;&#x636E;&#x53EF;&#x4EE5;&#x8BFB;&#x4E86;&#xFF0C;&#x4E0B;2&#x4E2A;&#x540C;&#x610F;&#x601D;&#xFF1B;  </li>
+<li>&#x53EF;&#x5199;&#x7684;fd&#x96C6;&#x5408;&#xFF1B;  </li>
+<li>&#x5F02;&#x5E38;&#x7684;fd&#x96C6;&#x5408;&#xFF1B;  </li>
 </ol>
-<h4 id="Example:_Using_select">Example: Using select</h4><pre><code>/* If you only have a couple dozen fds, this version won&#39;t be awful */
+<h4 id="example-using-select"><a href="#Example-Using-select" class="headerlink" title="Example: Using select"></a>Example: Using select</h4><pre><code>/* If you only have a couple dozen fds, this version won&apos;t be awful */
 fd_set readset;
 int i, n;
 char buf[1024];
@@ -351,7 +351,7 @@ while (i_still_want_to_read()) {
                 handle_close(fd[i]);
             } else if (n &lt; 0) {
                 if (errno == EAGAIN)
-                     ; /* The kernel didn&#39;t have any data for us to read. */
+                     ; /* The kernel didn&apos;t have any data for us to read. */
                 else
                      handle_error(fd[i], errno);
              } else {
@@ -360,8 +360,8 @@ while (i_still_want_to_read()) {
         }
     }
 }
-</code></pre><p>然后，对于上面已经提到的<strong>ROT13</strong>服务端代码(也许你已经忘了)，使用<code>select()</code>:  </p>
-<h4 id="Example:_select()-based_ROT13_server">Example: select()-based ROT13 server</h4><pre><code>/* For sockaddr_in */
+</code></pre><p>&#x7136;&#x540E;&#xFF0C;&#x5BF9;&#x4E8E;&#x4E0A;&#x9762;&#x5DF2;&#x7ECF;&#x63D0;&#x5230;&#x7684;<strong>ROT13</strong>&#x670D;&#x52A1;&#x7AEF;&#x4EE3;&#x7801;(&#x4E5F;&#x8BB8;&#x4F60;&#x5DF2;&#x7ECF;&#x5FD8;&#x4E86;)&#xFF0C;&#x4F7F;&#x7528;<code>select()</code>:  </p>
+<h4 id="example-select-based-rot13-server"><a href="#Example-select-based-ROT13-server" class="headerlink" title="Example: select()-based ROT13 server"></a>Example: select()-based ROT13 server</h4><pre><code>/* For sockaddr_in */
 #include &lt;netinet/in.h&gt;
 /* For socket functions */
 #include &lt;sys/socket.h&gt;
@@ -382,11 +382,11 @@ while (i_still_want_to_read()) {
 char
 rot13_char(char c)
 {
-    /* We don&#39;t want to use isalpha here; setting the locale would change
+    /* We don&apos;t want to use isalpha here; setting the locale would change
      * which characters are considered alphabetical. */
-    if ((c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;m&#39;) || (c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;M&#39;))
+    if ((c &gt;= &apos;a&apos; &amp;&amp; c &lt;= &apos;m&apos;) || (c &gt;= &apos;A&apos; &amp;&amp; c &lt;= &apos;M&apos;))
         return c + 13;
-    else if ((c &gt;= &#39;n&#39; &amp;&amp; c &lt;= &#39;z&#39;) || (c &gt;= &#39;N&#39; &amp;&amp; c &lt;= &#39;Z&#39;))
+    else if ((c &gt;= &apos;n&apos; &amp;&amp; c &lt;= &apos;z&apos;) || (c &gt;= &apos;N&apos; &amp;&amp; c &lt;= &apos;Z&apos;))
         return c - 13;
     else
         return c;
@@ -438,7 +438,7 @@ do_read(int fd, struct fd_state *state)
         for (i=0; i &lt; result; ++i)  {
             if (state-&gt;buffer_used &lt; sizeof(state-&gt;buffer))
                 state-&gt;buffer[state-&gt;buffer_used++] = rot13_char(buf[i]);
-            if (buf[i] == &#39;\n&#39;) {
+            if (buf[i] == &apos;\n&apos;) {
                 state-&gt;writing = 1;
                 state-&gt;write_upto = state-&gt;buffer_used;
             }
@@ -588,12 +588,12 @@ main(int c, char **v)
     run();
     return 0;
 }
-</code></pre><p>但是我们还没完成。随着每个fd集合中fd数量的增多，每次检查也相应要花费更多时间。<br>不同的系统提供不同的优化方案，包括poll(), epoll(), kqueue(), evports, /dev/poll。<br>所有这些优化都能获得更好的性能，而且除了poll()，其他的函数，增加、删除一个fd，或者测试sock是否可读写，这3个操作都是O(1)的效率。  </p>
-<p>可惜这些优化的方案，都不是标准。linux使用epoll()，BSDs(包括苹果内核)使用kqueue()，Solaris使用evports和/dev/poll， 致命的是，同个系统只使用他们的优化方案，不包括其他，比如linux上就没有使用kqueue()。  </p>
-<p>所以，如果你想要写一个高性能异步IO的程序，若考虑移植和跨平台，你还需要做一些额外的包装。  </p>
-<p><strong>于是，Libevent的API做了上面提到的这些。</strong></p>
-<p>马上再看一个异步IO的<strong>ROTI13</strong>服务端代码。这次我们使用Libevent2来代替select()。注意fd_sets被替换了，现在使用的是事件events。</p>
-<h4 id="Example:_A_low-level_ROT13_server_with_Libevent">Example: A low-level ROT13 server with Libevent</h4><pre><code>/* For sockaddr_in */
+</code></pre><p>&#x4F46;&#x662F;&#x6211;&#x4EEC;&#x8FD8;&#x6CA1;&#x5B8C;&#x6210;&#x3002;&#x968F;&#x7740;&#x6BCF;&#x4E2A;fd&#x96C6;&#x5408;&#x4E2D;fd&#x6570;&#x91CF;&#x7684;&#x589E;&#x591A;&#xFF0C;&#x6BCF;&#x6B21;&#x68C0;&#x67E5;&#x4E5F;&#x76F8;&#x5E94;&#x8981;&#x82B1;&#x8D39;&#x66F4;&#x591A;&#x65F6;&#x95F4;&#x3002;<br>&#x4E0D;&#x540C;&#x7684;&#x7CFB;&#x7EDF;&#x63D0;&#x4F9B;&#x4E0D;&#x540C;&#x7684;&#x4F18;&#x5316;&#x65B9;&#x6848;&#xFF0C;&#x5305;&#x62EC;poll(), epoll(), kqueue(), evports, /dev/poll&#x3002;<br>&#x6240;&#x6709;&#x8FD9;&#x4E9B;&#x4F18;&#x5316;&#x90FD;&#x80FD;&#x83B7;&#x5F97;&#x66F4;&#x597D;&#x7684;&#x6027;&#x80FD;&#xFF0C;&#x800C;&#x4E14;&#x9664;&#x4E86;poll()&#xFF0C;&#x5176;&#x4ED6;&#x7684;&#x51FD;&#x6570;&#xFF0C;&#x589E;&#x52A0;&#x3001;&#x5220;&#x9664;&#x4E00;&#x4E2A;fd&#xFF0C;&#x6216;&#x8005;&#x6D4B;&#x8BD5;sock&#x662F;&#x5426;&#x53EF;&#x8BFB;&#x5199;&#xFF0C;&#x8FD9;3&#x4E2A;&#x64CD;&#x4F5C;&#x90FD;&#x662F;O(1)&#x7684;&#x6548;&#x7387;&#x3002;  </p>
+<p>&#x53EF;&#x60DC;&#x8FD9;&#x4E9B;&#x4F18;&#x5316;&#x7684;&#x65B9;&#x6848;&#xFF0C;&#x90FD;&#x4E0D;&#x662F;&#x6807;&#x51C6;&#x3002;linux&#x4F7F;&#x7528;epoll()&#xFF0C;BSDs(&#x5305;&#x62EC;&#x82F9;&#x679C;&#x5185;&#x6838;)&#x4F7F;&#x7528;kqueue()&#xFF0C;Solaris&#x4F7F;&#x7528;evports&#x548C;/dev/poll&#xFF0C; &#x81F4;&#x547D;&#x7684;&#x662F;&#xFF0C;&#x540C;&#x4E2A;&#x7CFB;&#x7EDF;&#x53EA;&#x4F7F;&#x7528;&#x4ED6;&#x4EEC;&#x7684;&#x4F18;&#x5316;&#x65B9;&#x6848;&#xFF0C;&#x4E0D;&#x5305;&#x62EC;&#x5176;&#x4ED6;&#xFF0C;&#x6BD4;&#x5982;linux&#x4E0A;&#x5C31;&#x6CA1;&#x6709;&#x4F7F;&#x7528;kqueue()&#x3002;  </p>
+<p>&#x6240;&#x4EE5;&#xFF0C;&#x5982;&#x679C;&#x4F60;&#x60F3;&#x8981;&#x5199;&#x4E00;&#x4E2A;&#x9AD8;&#x6027;&#x80FD;&#x5F02;&#x6B65;IO&#x7684;&#x7A0B;&#x5E8F;&#xFF0C;&#x82E5;&#x8003;&#x8651;&#x79FB;&#x690D;&#x548C;&#x8DE8;&#x5E73;&#x53F0;&#xFF0C;&#x4F60;&#x8FD8;&#x9700;&#x8981;&#x505A;&#x4E00;&#x4E9B;&#x989D;&#x5916;&#x7684;&#x5305;&#x88C5;&#x3002;  </p>
+<p><strong>&#x4E8E;&#x662F;&#xFF0C;Libevent&#x7684;API&#x505A;&#x4E86;&#x4E0A;&#x9762;&#x63D0;&#x5230;&#x7684;&#x8FD9;&#x4E9B;&#x3002;</strong></p>
+<p>&#x9A6C;&#x4E0A;&#x518D;&#x770B;&#x4E00;&#x4E2A;&#x5F02;&#x6B65;IO&#x7684;<strong>ROTI13</strong>&#x670D;&#x52A1;&#x7AEF;&#x4EE3;&#x7801;&#x3002;&#x8FD9;&#x6B21;&#x6211;&#x4EEC;&#x4F7F;&#x7528;Libevent2&#x6765;&#x4EE3;&#x66FF;select()&#x3002;&#x6CE8;&#x610F;fd_sets&#x88AB;&#x66FF;&#x6362;&#x4E86;&#xFF0C;&#x73B0;&#x5728;&#x4F7F;&#x7528;&#x7684;&#x662F;&#x4E8B;&#x4EF6;events&#x3002;</p>
+<h4 id="example-a-low-level-rot13-server-with-libevent"><a href="#Example-A-low-level-ROT13-server-with-Libevent" class="headerlink" title="Example: A low-level ROT13 server with Libevent"></a>Example: A low-level ROT13 server with Libevent</h4><pre><code>/* For sockaddr_in */
 #include &lt;netinet/in.h&gt;
 /* For socket functions */
 #include &lt;sys/socket.h&gt;
@@ -617,11 +617,11 @@ void do_write(evutil_socket_t fd, short events, void *arg);
 char
 rot13_char(char c)
 {
-    /* We don&#39;t want to use isalpha here; setting the locale would change
+    /* We don&apos;t want to use isalpha here; setting the locale would change
      * which characters are considered alphabetical. */
-    if ((c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;m&#39;) || (c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;M&#39;))
+    if ((c &gt;= &apos;a&apos; &amp;&amp; c &lt;= &apos;m&apos;) || (c &gt;= &apos;A&apos; &amp;&amp; c &lt;= &apos;M&apos;))
         return c + 13;
-    else if ((c &gt;= &#39;n&#39; &amp;&amp; c &lt;= &#39;z&#39;) || (c &gt;= &#39;N&#39; &amp;&amp; c &lt;= &#39;Z&#39;))
+    else if ((c &gt;= &apos;n&apos; &amp;&amp; c &lt;= &apos;z&apos;) || (c &gt;= &apos;N&apos; &amp;&amp; c &lt;= &apos;Z&apos;))
         return c - 13;
     else
         return c;
@@ -688,7 +688,7 @@ do_read(evutil_socket_t fd, short events, void *arg)
         for (i=0; i &lt; result; ++i)  {
             if (state-&gt;buffer_used &lt; sizeof(state-&gt;buffer))
                 state-&gt;buffer[state-&gt;buffer_used++] = rot13_char(buf[i]);
-            if (buf[i] == &#39;\n&#39;) {
+            if (buf[i] == &apos;\n&apos;) {
                 assert(state-&gt;write_event);
                 event_add(state-&gt;write_event, NULL);
                 state-&gt;write_upto = state-&gt;buffer_used;
@@ -803,14 +803,14 @@ main(int c, char **v)
     run();
     return 0;
 }
-</code></pre><p>注意到，sockets的数据类型不是<strong>int</strong>，我们做了包装: <strong>evutil_socket_t</strong>； 不是使用<code>fcntl(O_NONBLOCK)</code>来设置sock非阻塞，替换成<code>evutil_make_socket_nonblocking</code>这个函数。这些封装，让这个程序也能兼容windows的API。</p>
+</code></pre><p>&#x6CE8;&#x610F;&#x5230;&#xFF0C;sockets&#x7684;&#x6570;&#x636E;&#x7C7B;&#x578B;&#x4E0D;&#x662F;<strong>int</strong>&#xFF0C;&#x6211;&#x4EEC;&#x505A;&#x4E86;&#x5305;&#x88C5;: <strong>evutil_socket_t</strong>&#xFF1B; &#x4E0D;&#x662F;&#x4F7F;&#x7528;<code>fcntl(O_NONBLOCK)</code>&#x6765;&#x8BBE;&#x7F6E;sock&#x975E;&#x963B;&#x585E;&#xFF0C;&#x66FF;&#x6362;&#x6210;<code>evutil_make_socket_nonblocking</code>&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x3002;&#x8FD9;&#x4E9B;&#x5C01;&#x88C5;&#xFF0C;&#x8BA9;&#x8FD9;&#x4E2A;&#x7A0B;&#x5E8F;&#x4E5F;&#x80FD;&#x517C;&#x5BB9;windows&#x7684;API&#x3002;</p>
 <p><br></p>
-<h2 id="使用Libevent方便吗，在Windows下又如何">使用Libevent方便吗，在Windows下又如何</h2><p>也许你注意到最后的代码更为高效，也更为复杂。  </p>
-<p>回过头来看，我们并没有为每个连接维护一个buffer，每个进程只是使用一份栈上分配的内存。不需要精准跟踪当前是哪个sock的读写，也不需跟踪当前有多少sock完成了操作，我们只是循环，推出栈上的变量。  </p>
-<p>还有，如果你有Windows丰富的网络编程经验，你将会注意到，按上面的模型使用Libevent写的程序，在Windows下可能不会有很好的性能。在Windows下并不是使用类似select的调用来实现快速异步IO，而是使用IOCP (IO Completion Ports)这个API。 </p>
-<p>不像其他所有的快速网络API，IOCP并不会通知你的程序说哪些sock准备好读写了。反过来，需要先由程序告诉Windows networking stack开始网络操作，然后由IOCP来告知哪些操作完成了。（popozhu注：我的理解是，linux是等内核通知你可以读或写，读写操作可以马上非阻塞地返回，而Windows则是程序先做读或写，然后程序苦等IOCP把执行结果告知程序。前者是发起读写，后者是结束读写，后者可能存在等待吧)。</p>
-<p>幸运的是，Libevent2 “bufferevents”的接口解决了这个问题，让接口更容易使用，而且提供了适用于linux和windows的高效接口。<br>于是，<strong>ROT13</strong>服务端代码最终版，使用bufferevents这个API。  </p>
-<h4 id="Example:_A_simpler_ROT13_server_with_Libevent">Example: A simpler ROT13 server with Libevent</h4><pre><code>/* For sockaddr_in */
+<h2 id="&#x4F7F;&#x7528;libevent&#x65B9;&#x4FBF;&#x5417;&#x5728;windows&#x4E0B;&#x53C8;&#x5982;&#x4F55;"><a href="#&#x4F7F;&#x7528;Libevent&#x65B9;&#x4FBF;&#x5417;&#xFF0C;&#x5728;Windows&#x4E0B;&#x53C8;&#x5982;&#x4F55;" class="headerlink" title="&#x4F7F;&#x7528;Libevent&#x65B9;&#x4FBF;&#x5417;&#xFF0C;&#x5728;Windows&#x4E0B;&#x53C8;&#x5982;&#x4F55;"></a>&#x4F7F;&#x7528;Libevent&#x65B9;&#x4FBF;&#x5417;&#xFF0C;&#x5728;Windows&#x4E0B;&#x53C8;&#x5982;&#x4F55;</h2><p>&#x4E5F;&#x8BB8;&#x4F60;&#x6CE8;&#x610F;&#x5230;&#x6700;&#x540E;&#x7684;&#x4EE3;&#x7801;&#x66F4;&#x4E3A;&#x9AD8;&#x6548;&#xFF0C;&#x4E5F;&#x66F4;&#x4E3A;&#x590D;&#x6742;&#x3002;  </p>
+<p>&#x56DE;&#x8FC7;&#x5934;&#x6765;&#x770B;&#xFF0C;&#x6211;&#x4EEC;&#x5E76;&#x6CA1;&#x6709;&#x4E3A;&#x6BCF;&#x4E2A;&#x8FDE;&#x63A5;&#x7EF4;&#x62A4;&#x4E00;&#x4E2A;buffer&#xFF0C;&#x6BCF;&#x4E2A;&#x8FDB;&#x7A0B;&#x53EA;&#x662F;&#x4F7F;&#x7528;&#x4E00;&#x4EFD;&#x6808;&#x4E0A;&#x5206;&#x914D;&#x7684;&#x5185;&#x5B58;&#x3002;&#x4E0D;&#x9700;&#x8981;&#x7CBE;&#x51C6;&#x8DDF;&#x8E2A;&#x5F53;&#x524D;&#x662F;&#x54EA;&#x4E2A;sock&#x7684;&#x8BFB;&#x5199;&#xFF0C;&#x4E5F;&#x4E0D;&#x9700;&#x8DDF;&#x8E2A;&#x5F53;&#x524D;&#x6709;&#x591A;&#x5C11;sock&#x5B8C;&#x6210;&#x4E86;&#x64CD;&#x4F5C;&#xFF0C;&#x6211;&#x4EEC;&#x53EA;&#x662F;&#x5FAA;&#x73AF;&#xFF0C;&#x63A8;&#x51FA;&#x6808;&#x4E0A;&#x7684;&#x53D8;&#x91CF;&#x3002;  </p>
+<p>&#x8FD8;&#x6709;&#xFF0C;&#x5982;&#x679C;&#x4F60;&#x6709;Windows&#x4E30;&#x5BCC;&#x7684;&#x7F51;&#x7EDC;&#x7F16;&#x7A0B;&#x7ECF;&#x9A8C;&#xFF0C;&#x4F60;&#x5C06;&#x4F1A;&#x6CE8;&#x610F;&#x5230;&#xFF0C;&#x6309;&#x4E0A;&#x9762;&#x7684;&#x6A21;&#x578B;&#x4F7F;&#x7528;Libevent&#x5199;&#x7684;&#x7A0B;&#x5E8F;&#xFF0C;&#x5728;Windows&#x4E0B;&#x53EF;&#x80FD;&#x4E0D;&#x4F1A;&#x6709;&#x5F88;&#x597D;&#x7684;&#x6027;&#x80FD;&#x3002;&#x5728;Windows&#x4E0B;&#x5E76;&#x4E0D;&#x662F;&#x4F7F;&#x7528;&#x7C7B;&#x4F3C;select&#x7684;&#x8C03;&#x7528;&#x6765;&#x5B9E;&#x73B0;&#x5FEB;&#x901F;&#x5F02;&#x6B65;IO&#xFF0C;&#x800C;&#x662F;&#x4F7F;&#x7528;IOCP (IO Completion Ports)&#x8FD9;&#x4E2A;API&#x3002; </p>
+<p>&#x4E0D;&#x50CF;&#x5176;&#x4ED6;&#x6240;&#x6709;&#x7684;&#x5FEB;&#x901F;&#x7F51;&#x7EDC;API&#xFF0C;IOCP&#x5E76;&#x4E0D;&#x4F1A;&#x901A;&#x77E5;&#x4F60;&#x7684;&#x7A0B;&#x5E8F;&#x8BF4;&#x54EA;&#x4E9B;sock&#x51C6;&#x5907;&#x597D;&#x8BFB;&#x5199;&#x4E86;&#x3002;&#x53CD;&#x8FC7;&#x6765;&#xFF0C;&#x9700;&#x8981;&#x5148;&#x7531;&#x7A0B;&#x5E8F;&#x544A;&#x8BC9;Windows networking stack&#x5F00;&#x59CB;&#x7F51;&#x7EDC;&#x64CD;&#x4F5C;&#xFF0C;&#x7136;&#x540E;&#x7531;IOCP&#x6765;&#x544A;&#x77E5;&#x54EA;&#x4E9B;&#x64CD;&#x4F5C;&#x5B8C;&#x6210;&#x4E86;&#x3002;&#xFF08;popozhu&#x6CE8;&#xFF1A;&#x6211;&#x7684;&#x7406;&#x89E3;&#x662F;&#xFF0C;linux&#x662F;&#x7B49;&#x5185;&#x6838;&#x901A;&#x77E5;&#x4F60;&#x53EF;&#x4EE5;&#x8BFB;&#x6216;&#x5199;&#xFF0C;&#x8BFB;&#x5199;&#x64CD;&#x4F5C;&#x53EF;&#x4EE5;&#x9A6C;&#x4E0A;&#x975E;&#x963B;&#x585E;&#x5730;&#x8FD4;&#x56DE;&#xFF0C;&#x800C;Windows&#x5219;&#x662F;&#x7A0B;&#x5E8F;&#x5148;&#x505A;&#x8BFB;&#x6216;&#x5199;&#xFF0C;&#x7136;&#x540E;&#x7A0B;&#x5E8F;&#x82E6;&#x7B49;IOCP&#x628A;&#x6267;&#x884C;&#x7ED3;&#x679C;&#x544A;&#x77E5;&#x7A0B;&#x5E8F;&#x3002;&#x524D;&#x8005;&#x662F;&#x53D1;&#x8D77;&#x8BFB;&#x5199;&#xFF0C;&#x540E;&#x8005;&#x662F;&#x7ED3;&#x675F;&#x8BFB;&#x5199;&#xFF0C;&#x540E;&#x8005;&#x53EF;&#x80FD;&#x5B58;&#x5728;&#x7B49;&#x5F85;&#x5427;)&#x3002;</p>
+<p>&#x5E78;&#x8FD0;&#x7684;&#x662F;&#xFF0C;Libevent2 &#x201C;bufferevents&#x201D;&#x7684;&#x63A5;&#x53E3;&#x89E3;&#x51B3;&#x4E86;&#x8FD9;&#x4E2A;&#x95EE;&#x9898;&#xFF0C;&#x8BA9;&#x63A5;&#x53E3;&#x66F4;&#x5BB9;&#x6613;&#x4F7F;&#x7528;&#xFF0C;&#x800C;&#x4E14;&#x63D0;&#x4F9B;&#x4E86;&#x9002;&#x7528;&#x4E8E;linux&#x548C;windows&#x7684;&#x9AD8;&#x6548;&#x63A5;&#x53E3;&#x3002;<br>&#x4E8E;&#x662F;&#xFF0C;<strong>ROT13</strong>&#x670D;&#x52A1;&#x7AEF;&#x4EE3;&#x7801;&#x6700;&#x7EC8;&#x7248;&#xFF0C;&#x4F7F;&#x7528;bufferevents&#x8FD9;&#x4E2A;API&#x3002;  </p>
+<h4 id="example-a-simpler-rot13-server-with-libevent"><a href="#Example-A-simpler-ROT13-server-with-Libevent" class="headerlink" title="Example: A simpler ROT13 server with Libevent"></a>Example: A simpler ROT13 server with Libevent</h4><pre><code>/* For sockaddr_in */
 #include &lt;netinet/in.h&gt;
 /* For socket functions */
 #include &lt;sys/socket.h&gt;
@@ -836,11 +836,11 @@ void do_write(evutil_socket_t fd, short events, void *arg);
 char
 rot13_char(char c)
 {
-    /* We don&#39;t want to use isalpha here; setting the locale would change
+    /* We don&apos;t want to use isalpha here; setting the locale would change
      * which characters are considered alphabetical. */
-    if ((c &gt;= &#39;a&#39; &amp;&amp; c &lt;= &#39;m&#39;) || (c &gt;= &#39;A&#39; &amp;&amp; c &lt;= &#39;M&#39;))
+    if ((c &gt;= &apos;a&apos; &amp;&amp; c &lt;= &apos;m&apos;) || (c &gt;= &apos;A&apos; &amp;&amp; c &lt;= &apos;M&apos;))
         return c + 13;
-    else if ((c &gt;= &#39;n&#39; &amp;&amp; c &lt;= &#39;z&#39;) || (c &gt;= &#39;N&#39; &amp;&amp; c &lt;= &#39;Z&#39;))
+    else if ((c &gt;= &apos;n&apos; &amp;&amp; c &lt;= &apos;z&apos;) || (c &gt;= &apos;N&apos; &amp;&amp; c &lt;= &apos;Z&apos;))
         return c - 13;
     else
         return c;
@@ -866,7 +866,7 @@ readcb(struct bufferevent *bev, void *ctx)
 
     if (evbuffer_get_length(input) &gt;= MAX_LINE) {
         /* Too long; just process what there is and go on so that the buffer
-         * doesn&#39;t grow infinitely long. */
+         * doesn&apos;t grow infinitely long. */
         char buf[1024];
         while (evbuffer_get_length(input)) {
             int n = evbuffer_remove(input, buf, sizeof(buf));
@@ -967,8 +967,8 @@ main(int c, char **v)
     return 0;
 }
 </code></pre><p><br></p>
-<h2 id="真的有这么高效率？">真的有这么高效率？</h2><p>官方压测文档是很久之前的了，文档作者表示怀疑。</p>
-<p>– EOF –</p>
+<h2 id="&#x771F;&#x7684;&#x6709;&#x8FD9;&#x4E48;&#x9AD8;&#x6548;&#x7387;"><a href="#&#x771F;&#x7684;&#x6709;&#x8FD9;&#x4E48;&#x9AD8;&#x6548;&#x7387;&#xFF1F;" class="headerlink" title="&#x771F;&#x7684;&#x6709;&#x8FD9;&#x4E48;&#x9AD8;&#x6548;&#x7387;&#xFF1F;"></a>&#x771F;&#x7684;&#x6709;&#x8FD9;&#x4E48;&#x9AD8;&#x6548;&#x7387;&#xFF1F;</h2><p>&#x5B98;&#x65B9;&#x538B;&#x6D4B;&#x6587;&#x6863;&#x662F;&#x5F88;&#x4E45;&#x4E4B;&#x524D;&#x7684;&#x4E86;&#xFF0C;&#x6587;&#x6863;&#x4F5C;&#x8005;&#x8868;&#x793A;&#x6000;&#x7591;&#x3002;</p>
+<p>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -1043,7 +1043,7 @@ main(int c, char **v)
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

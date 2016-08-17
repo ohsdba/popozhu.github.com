@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -50,16 +50,16 @@
 	    
 	    
 
-	    <p>在前几天我写了个「<a href="/2014/03/09/pnp4nagios的模板/">pnp4nagios的模板</a>」后，发现使用npcd的bulk模式处理3.5w条性能数据，花费了将近30分钟时间，而我期望的是在1分钟内处理完。需要换个方式，为此我切换到<code>gearman模式</code>来并发，记录如下：</p>
+	    <p>&#x5728;&#x524D;&#x51E0;&#x5929;&#x6211;&#x5199;&#x4E86;&#x4E2A;&#x300C;<a href="/2014/03/09/pnp4nagios&#x7684;&#x6A21;&#x677F;/">pnp4nagios&#x7684;&#x6A21;&#x677F;</a>&#x300D;&#x540E;&#xFF0C;&#x53D1;&#x73B0;&#x4F7F;&#x7528;npcd&#x7684;bulk&#x6A21;&#x5F0F;&#x5904;&#x7406;3.5w&#x6761;&#x6027;&#x80FD;&#x6570;&#x636E;&#xFF0C;&#x82B1;&#x8D39;&#x4E86;&#x5C06;&#x8FD1;30&#x5206;&#x949F;&#x65F6;&#x95F4;&#xFF0C;&#x800C;&#x6211;&#x671F;&#x671B;&#x7684;&#x662F;&#x5728;1&#x5206;&#x949F;&#x5185;&#x5904;&#x7406;&#x5B8C;&#x3002;&#x9700;&#x8981;&#x6362;&#x4E2A;&#x65B9;&#x5F0F;&#xFF0C;&#x4E3A;&#x6B64;&#x6211;&#x5207;&#x6362;&#x5230;<code>gearman&#x6A21;&#x5F0F;</code>&#x6765;&#x5E76;&#x53D1;&#xFF0C;&#x8BB0;&#x5F55;&#x5982;&#x4E0B;&#xFF1A;</p>
 <ol>
-<li>换用SSD硬盘</li>
-<li>对3.5w条源数据做多一步处理，合并相同host相同servicedesc的数据，最后只有3.4k条</li>
-<li>停了npcd，启用gearmand做server端</li>
-<li>以4个工作进程启动process_perfdata.pl，为4个worker</li>
-<li>把3.4k条数据做为client数据，发送到server端</li>
+<li>&#x6362;&#x7528;SSD&#x786C;&#x76D8;</li>
+<li>&#x5BF9;3.5w&#x6761;&#x6E90;&#x6570;&#x636E;&#x505A;&#x591A;&#x4E00;&#x6B65;&#x5904;&#x7406;&#xFF0C;&#x5408;&#x5E76;&#x76F8;&#x540C;host&#x76F8;&#x540C;servicedesc&#x7684;&#x6570;&#x636E;&#xFF0C;&#x6700;&#x540E;&#x53EA;&#x6709;3.4k&#x6761;</li>
+<li>&#x505C;&#x4E86;npcd&#xFF0C;&#x542F;&#x7528;gearmand&#x505A;server&#x7AEF;</li>
+<li>&#x4EE5;4&#x4E2A;&#x5DE5;&#x4F5C;&#x8FDB;&#x7A0B;&#x542F;&#x52A8;process_perfdata.pl&#xFF0C;&#x4E3A;4&#x4E2A;worker</li>
+<li>&#x628A;3.4k&#x6761;&#x6570;&#x636E;&#x505A;&#x4E3A;client&#x6570;&#x636E;&#xFF0C;&#x53D1;&#x9001;&#x5230;server&#x7AEF;</li>
 </ol>
 <p><br></p>
-<p>###SSD硬盘<br>硬盘空间不是很充足，我减少了RRD文件大小。之前我把pnp4nagios安装到了/home目录下，则修改<code>/home/pnp4nagios/etc/rra.cfg</code>配置，让RRD文件只保存最多90天的数据</p>
+<p>###SSD&#x786C;&#x76D8;<br>&#x786C;&#x76D8;&#x7A7A;&#x95F4;&#x4E0D;&#x662F;&#x5F88;&#x5145;&#x8DB3;&#xFF0C;&#x6211;&#x51CF;&#x5C11;&#x4E86;RRD&#x6587;&#x4EF6;&#x5927;&#x5C0F;&#x3002;&#x4E4B;&#x524D;&#x6211;&#x628A;pnp4nagios&#x5B89;&#x88C5;&#x5230;&#x4E86;/home&#x76EE;&#x5F55;&#x4E0B;&#xFF0C;&#x5219;&#x4FEE;&#x6539;<code>/home/pnp4nagios/etc/rra.cfg</code>&#x914D;&#x7F6E;&#xFF0C;&#x8BA9;RRD&#x6587;&#x4EF6;&#x53EA;&#x4FDD;&#x5B58;&#x6700;&#x591A;90&#x5929;&#x7684;&#x6570;&#x636E;</p>
 <pre><code>RRA_STEP=60
 #
 # PNP default RRA config
@@ -92,29 +92,29 @@ RRA:MIN:0.5:5:2880
 RRA:MIN:0.5:30:4320
 #RRA:MIN:0.5:360:5840
 </code></pre><p><br></p>
-<p>###合并数据<br>无论是npcd来调用process_perfdata.pl，或者是在gearman中启动process_perfdata.pl的worker，实际写RRD文件的，都是这个<code>process_perfdata.pl</code>脚本，减少它对源数据的解析，自然是一个优化的点。举个例子</p>
+<p>###&#x5408;&#x5E76;&#x6570;&#x636E;<br>&#x65E0;&#x8BBA;&#x662F;npcd&#x6765;&#x8C03;&#x7528;process_perfdata.pl&#xFF0C;&#x6216;&#x8005;&#x662F;&#x5728;gearman&#x4E2D;&#x542F;&#x52A8;process_perfdata.pl&#x7684;worker&#xFF0C;&#x5B9E;&#x9645;&#x5199;RRD&#x6587;&#x4EF6;&#x7684;&#xFF0C;&#x90FD;&#x662F;&#x8FD9;&#x4E2A;<code>process_perfdata.pl</code>&#x811A;&#x672C;&#xFF0C;&#x51CF;&#x5C11;&#x5B83;&#x5BF9;&#x6E90;&#x6570;&#x636E;&#x7684;&#x89E3;&#x6790;&#xFF0C;&#x81EA;&#x7136;&#x662F;&#x4E00;&#x4E2A;&#x4F18;&#x5316;&#x7684;&#x70B9;&#x3002;&#x4E3E;&#x4E2A;&#x4F8B;&#x5B50;</p>
 <ol>
 <li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::rta=92.412ms;200.000;500.000;0; </li>
 <li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::pl=0%;40;80;; </li>
 <li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp     SERVICEPERFDATA::rtmax=97.281ms;;;; </li>
 <li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::rtmin=86.727ms;;;;</li>
 </ol>
-<p>上面这4条数据，通过放弃时间戳TIMET(可能不同)，他们有相同的HOSTNAME和SERVICEDESC，合并为1条</p>
+<p>&#x4E0A;&#x9762;&#x8FD9;4&#x6761;&#x6570;&#x636E;&#xFF0C;&#x901A;&#x8FC7;&#x653E;&#x5F03;&#x65F6;&#x95F4;&#x6233;TIMET(&#x53EF;&#x80FD;&#x4E0D;&#x540C;)&#xFF0C;&#x4ED6;&#x4EEC;&#x6709;&#x76F8;&#x540C;&#x7684;HOSTNAME&#x548C;SERVICEDESC&#xFF0C;&#x5408;&#x5E76;&#x4E3A;1&#x6761;</p>
 <ol>
 <li>DATATYPE::SERVICEPERFDATA   TIMET::1378779841   HOSTNAME::zh_v542   SERVICEDESC::PING   SERVICECHECKCOMMAND::check_icmp    SERVICEPERFDATA::rta=92.412ms;200.000;500.000;0; pl=0%;40;80;; rtmax=97.281ms;;;; rtmin=86.727ms;;;;</li>
 </ol>
 <p><br></p>
-<p>###server端<br>停了npcd： <code>/etc/init.d/npcd stop</code>  </p>
-<p>修改gearmand的配置，主要添加<code>-t 4</code>，启动4个IO线程</p>
+<p>###server&#x7AEF;<br>&#x505C;&#x4E86;npcd&#xFF1A; <code>/etc/init.d/npcd stop</code>  </p>
+<p>&#x4FEE;&#x6539;gearmand&#x7684;&#x914D;&#x7F6E;&#xFF0C;&#x4E3B;&#x8981;&#x6DFB;&#x52A0;<code>-t 4</code>&#xFF0C;&#x542F;&#x52A8;4&#x4E2A;IO&#x7EBF;&#x7A0B;</p>
 <pre><code>$ cat /etc/sysconfig/gearmand
 ### Settings for gearmand
 # OPTIONS=&quot;&quot;
 OPTIONS=&quot;--listen=127.0.0.1 --port=4730 --log-file=/diskb/pnp4nagios/gearmand/gearmand.log -t 4&quot;
-</code></pre><p>以默认端口4730启动<code>/etc/init.d/gearmand start</code>，监听client发送上来的数据</p>
+</code></pre><p>&#x4EE5;&#x9ED8;&#x8BA4;&#x7AEF;&#x53E3;4730&#x542F;&#x52A8;<code>/etc/init.d/gearmand start</code>&#xFF0C;&#x76D1;&#x542C;client&#x53D1;&#x9001;&#x4E0A;&#x6765;&#x7684;&#x6570;&#x636E;</p>
 <pre><code>$ netstat -an | grep 4730
 tcp        0      0 127.0.0.1:4730              0.0.0.0:*                   LISTEN
 </code></pre><p><br></p>
-<p>###worker进程<br>在pnp4nagios的安装目录中，找到<code>/home/pnp4nagios/libexec/process_perfdata.pl</code>，修改worker工作方式，让其一直执行任务，而不需要重启，修改<code>new_child</code>这个函数(下面的第41行)</p>
+<p>###worker&#x8FDB;&#x7A0B;<br>&#x5728;pnp4nagios&#x7684;&#x5B89;&#x88C5;&#x76EE;&#x5F55;&#x4E2D;&#xFF0C;&#x627E;&#x5230;<code>/home/pnp4nagios/libexec/process_perfdata.pl</code>&#xFF0C;&#x4FEE;&#x6539;worker&#x5DE5;&#x4F5C;&#x65B9;&#x5F0F;&#xFF0C;&#x8BA9;&#x5176;&#x4E00;&#x76F4;&#x6267;&#x884C;&#x4EFB;&#x52A1;&#xFF0C;&#x800C;&#x4E0D;&#x9700;&#x8981;&#x91CD;&#x542F;&#xFF0C;&#x4FEE;&#x6539;<code>new_child</code>&#x8FD9;&#x4E2A;&#x51FD;&#x6570;(&#x4E0B;&#x9762;&#x7684;&#x7B2C;41&#x884C;)</p>
 <pre><code>#
 # start a new worker process
 #
@@ -125,46 +125,46 @@ sub new_child {
     # block signal for fork
     $sigset = POSIX::SigSet-&gt;new(SIGINT);
     sigprocmask(SIG_BLOCK, $sigset)
-        or die &quot;Can&#39;t block SIGINT for fork: $!\n&quot;;
+        or die &quot;Can&apos;t block SIGINT for fork: $!\n&quot;;
 
     die &quot;fork: $!&quot; unless defined ($pid = fork);
 
     if ($pid) {
-        # Parent records the child&#39;s birth and returns.
+        # Parent records the child&apos;s birth and returns.
         sigprocmask(SIG_UNBLOCK, $sigset)
-            or die &quot;Can&#39;t unblock SIGINT for fork: $!\n&quot;;
+            or die &quot;Can&apos;t unblock SIGINT for fork: $!\n&quot;;
         $children{$pid} = 1;
         $children++;
         return;
     } else {
         # Child can *not* return from this subroutine.
-        $SIG{INT} = &#39;DEFAULT&#39;;      # make SIGINT kill us as it did before
+        $SIG{INT} = &apos;DEFAULT&apos;;      # make SIGINT kill us as it did before
 
         # unblock signals
         sigprocmask(SIG_UNBLOCK, $sigset)
-            or die &quot;Can&#39;t unblock SIGINT for fork: $!\n&quot;;
+            or die &quot;Can&apos;t unblock SIGINT for fork: $!\n&quot;;
 
         my $worker = Gearman::Worker-&gt;new();
-        my @job_servers = split(/,/, $conf{&#39;GEARMAN_HOST&#39;}); # allow multiple gearman job servers 
+        my @job_servers = split(/,/, $conf{&apos;GEARMAN_HOST&apos;}); # allow multiple gearman job servers 
         $worker-&gt;job_servers(@job_servers);
-        # worker向server注册的函数名为 perfdata，它对应的处理流程是 main函数
+        # worker&#x5411;server&#x6CE8;&#x518C;&#x7684;&#x51FD;&#x6570;&#x540D;&#x4E3A; perfdata&#xFF0C;&#x5B83;&#x5BF9;&#x5E94;&#x7684;&#x5904;&#x7406;&#x6D41;&#x7A0B;&#x662F; main&#x51FD;&#x6570;
         $worker-&gt;register_function(&quot;perfdata&quot;, 2, sub { return main(@_); });
         my %opt = ( 
                     on_complete =&gt; sub { $req++; }, 
-                    stop_if =&gt; sub { if ( $req &gt; $conf{&#39;REQUESTS_PER_CHILD&#39;} ) { return 1;}; } 
+                    stop_if =&gt; sub { if ( $req &gt; $conf{&apos;REQUESTS_PER_CHILD&apos;} ) { return 1;}; } 
                   );
-        print_log(&quot;connecting to gearmand &#39;&quot;.$conf{&#39;GEARMAN_HOST&#39;}.&quot;&#39;&quot;,0);
+        print_log(&quot;connecting to gearmand &apos;&quot;.$conf{&apos;GEARMAN_HOST&apos;}.&quot;&apos;&quot;,0);
 
-        # 忽略REQUESTS_PER_CHILD配置项，不退出一直执行
+        # &#x5FFD;&#x7565;REQUESTS_PER_CHILD&#x914D;&#x7F6E;&#x9879;&#xFF0C;&#x4E0D;&#x9000;&#x51FA;&#x4E00;&#x76F4;&#x6267;&#x884C;
         $worker-&gt;work( %opt ) while 1;
-        print_log(&quot;max requests per child reached (&quot;.$conf{&#39;REQUESTS_PER_CHILD&#39;}.&quot;)&quot;,1);
+        print_log(&quot;max requests per child reached (&quot;.$conf{&apos;REQUESTS_PER_CHILD&apos;}.&quot;)&quot;,1);
         # this exit is VERY important, otherwise the child will become
         # a producer of more and more children, forking yourself into
         # process death.
         exit;
     }
 }
-</code></pre><p>脚本中另一个修改的地方，在<code>parse_env</code>函数中，它解析client发送上来的数据<code>$job_data</code>时会做一个base64解码，但我client端的数据并没有做base编码（也没有加密），这里注释掉这个解码</p>
+</code></pre><p>&#x811A;&#x672C;&#x4E2D;&#x53E6;&#x4E00;&#x4E2A;&#x4FEE;&#x6539;&#x7684;&#x5730;&#x65B9;&#xFF0C;&#x5728;<code>parse_env</code>&#x51FD;&#x6570;&#x4E2D;&#xFF0C;&#x5B83;&#x89E3;&#x6790;client&#x53D1;&#x9001;&#x4E0A;&#x6765;&#x7684;&#x6570;&#x636E;<code>$job_data</code>&#x65F6;&#x4F1A;&#x505A;&#x4E00;&#x4E2A;base64&#x89E3;&#x7801;&#xFF0C;&#x4F46;&#x6211;client&#x7AEF;&#x7684;&#x6570;&#x636E;&#x5E76;&#x6CA1;&#x6709;&#x505A;base&#x7F16;&#x7801;&#xFF08;&#x4E5F;&#x6CA1;&#x6709;&#x52A0;&#x5BC6;&#xFF09;&#xFF0C;&#x8FD9;&#x91CC;&#x6CE8;&#x91CA;&#x6389;&#x8FD9;&#x4E2A;&#x89E3;&#x7801;</p>
 <pre><code>#
 # Parse %ENV and return a global hash %NAGIOS
 #
@@ -175,7 +175,7 @@ sub parse_env {
 
     if(defined $opt_gm){
         # Gearman Worker
-        # 由于我client端没做base64编码，这里就不需要解码了
+        # &#x7531;&#x4E8E;&#x6211;client&#x7AEF;&#x6CA1;&#x505A;base64&#x7F16;&#x7801;&#xFF0C;&#x8FD9;&#x91CC;&#x5C31;&#x4E0D;&#x9700;&#x8981;&#x89E3;&#x7801;&#x4E86;
         #$job_data = decode_base64($job_data);
         if($conf{ENCRYPTION} == 1){
             $job_data = $cypher-&gt;decrypt( $job_data )        
@@ -191,7 +191,7 @@ sub parse_env {
         }
     }
 }
-</code></pre><p>同时修改这个perl脚本配置文件<code>/home/pnp4nagios/etc/process_perfdata.cfg</code>中关于gearman的配置项，主要是启动4个进程作为4个worker、server端的ip和端口号、以及不使用加密（默认是加密）:</p>
+</code></pre><p>&#x540C;&#x65F6;&#x4FEE;&#x6539;&#x8FD9;&#x4E2A;perl&#x811A;&#x672C;&#x914D;&#x7F6E;&#x6587;&#x4EF6;<code>/home/pnp4nagios/etc/process_perfdata.cfg</code>&#x4E2D;&#x5173;&#x4E8E;gearman&#x7684;&#x914D;&#x7F6E;&#x9879;&#xFF0C;&#x4E3B;&#x8981;&#x662F;&#x542F;&#x52A8;4&#x4E2A;&#x8FDB;&#x7A0B;&#x4F5C;&#x4E3A;4&#x4E2A;worker&#x3001;server&#x7AEF;&#x7684;ip&#x548C;&#x7AEF;&#x53E3;&#x53F7;&#x3001;&#x4EE5;&#x53CA;&#x4E0D;&#x4F7F;&#x7528;&#x52A0;&#x5BC6;&#xFF08;&#x9ED8;&#x8BA4;&#x662F;&#x52A0;&#x5BC6;&#xFF09;:</p>
 <pre><code>#
 # File with RRA options used to create new RRD files
 #
@@ -220,35 +220,35 @@ GEARMAN_HOST = localhost:4730
 # Default is 1.
 #
 ENCRYPTION = 0
-</code></pre><p>基于上面的修改和配置，接着启动worker进程，传入2个参数<code>--gearman --daemon</code>给到<code>process_perfdata.pl</code>即可</p>
+</code></pre><p>&#x57FA;&#x4E8E;&#x4E0A;&#x9762;&#x7684;&#x4FEE;&#x6539;&#x548C;&#x914D;&#x7F6E;&#xFF0C;&#x63A5;&#x7740;&#x542F;&#x52A8;worker&#x8FDB;&#x7A0B;&#xFF0C;&#x4F20;&#x5165;2&#x4E2A;&#x53C2;&#x6570;<code>--gearman --daemon</code>&#x7ED9;&#x5230;<code>process_perfdata.pl</code>&#x5373;&#x53EF;</p>
 <pre><code>$ cat run.sh
 #!/bin/sh
 
-ps -ef | grep process_perfdata | grep -v grep | awk &#39;{print $2}&#39; | xargs kill -9
+ps -ef | grep process_perfdata | grep -v grep | awk &apos;{print $2}&apos; | xargs kill -9
 sleep 1
 su - nagios -c &quot;perl /home/pnp4nagios/libexec/process_perfdata.pl --gearman --daemon&quot;
 sleep 1
 ps -ef | grep process_perfdata | grep -v grep
-</code></pre><p>完整的<code>process_perfdata.pl</code>在gist: <a href="https://gist.github.com/popozhu/9509554" target="_blank" rel="external">https://gist.github.com/popozhu/9509554</a></p>
+</code></pre><p>&#x5B8C;&#x6574;&#x7684;<code>process_perfdata.pl</code>&#x5728;gist: <a href="https://gist.github.com/popozhu/9509554" target="_blank" rel="external">https://gist.github.com/popozhu/9509554</a></p>
 <p><br></p>
-<p>###client端<br>把合并后的数据以异步提交的方式发送到server端，由于<code>process_perfdata.pl</code>的worker向server端注册的函数名是<code>perfdata</code>，client向server端提交数据时，也得使用相同的函数名<code>perfdata</code></p>
+<p>###client&#x7AEF;<br>&#x628A;&#x5408;&#x5E76;&#x540E;&#x7684;&#x6570;&#x636E;&#x4EE5;&#x5F02;&#x6B65;&#x63D0;&#x4EA4;&#x7684;&#x65B9;&#x5F0F;&#x53D1;&#x9001;&#x5230;server&#x7AEF;&#xFF0C;&#x7531;&#x4E8E;<code>process_perfdata.pl</code>&#x7684;worker&#x5411;server&#x7AEF;&#x6CE8;&#x518C;&#x7684;&#x51FD;&#x6570;&#x540D;&#x662F;<code>perfdata</code>&#xFF0C;client&#x5411;server&#x7AEF;&#x63D0;&#x4EA4;&#x6570;&#x636E;&#x65F6;&#xFF0C;&#x4E5F;&#x5F97;&#x4F7F;&#x7528;&#x76F8;&#x540C;&#x7684;&#x51FD;&#x6570;&#x540D;<code>perfdata</code></p>
 <pre><code>#!/usr/bin/perl
 use Gearman::Client;
 
 my $client = Gearman::Client-&gt;new;
 $client-&gt;job_servers(&quot;localhost:4730&quot;);
 
-# 其他数据处理，最后是合并后的数据，在%perfdata里
+# &#x5176;&#x4ED6;&#x6570;&#x636E;&#x5904;&#x7406;&#xFF0C;&#x6700;&#x540E;&#x662F;&#x5408;&#x5E76;&#x540E;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x5728;%perfdata&#x91CC;
 
 foreach my $data (keys %perfdata){
     $client-&gt;dispatch_background(&quot;perfdata&quot;, data);
 }
-</code></pre><p>可以通过<code>/usr/bin/gearadmin --status</code>来查看当前执行的情况，输出的4个字段分别为:<br><code>注册的函数 任务队列中的任务数量 工作中的worker数量 总共有多少个worker</code></p>
+</code></pre><p>&#x53EF;&#x4EE5;&#x901A;&#x8FC7;<code>/usr/bin/gearadmin --status</code>&#x6765;&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6267;&#x884C;&#x7684;&#x60C5;&#x51B5;&#xFF0C;&#x8F93;&#x51FA;&#x7684;4&#x4E2A;&#x5B57;&#x6BB5;&#x5206;&#x522B;&#x4E3A;:<br><code>&#x6CE8;&#x518C;&#x7684;&#x51FD;&#x6570; &#x4EFB;&#x52A1;&#x961F;&#x5217;&#x4E2D;&#x7684;&#x4EFB;&#x52A1;&#x6570;&#x91CF; &#x5DE5;&#x4F5C;&#x4E2D;&#x7684;worker&#x6570;&#x91CF; &#x603B;&#x5171;&#x6709;&#x591A;&#x5C11;&#x4E2A;worker</code></p>
 <pre><code>$ /usr/bin/gearadmin --status
 perfdata        3061    4       5
 .
-</code></pre><p>最后3.4k条性能数据，以4个worker并发写入/更新到SSD硬盘的RRD文件里，大约40s，不到1分钟，收工。  </p>
-<p><br><br>– EOF –</p>
+</code></pre><p>&#x6700;&#x540E;3.4k&#x6761;&#x6027;&#x80FD;&#x6570;&#x636E;&#xFF0C;&#x4EE5;4&#x4E2A;worker&#x5E76;&#x53D1;&#x5199;&#x5165;/&#x66F4;&#x65B0;&#x5230;SSD&#x786C;&#x76D8;&#x7684;RRD&#x6587;&#x4EF6;&#x91CC;&#xFF0C;&#x5927;&#x7EA6;40s&#xFF0C;&#x4E0D;&#x5230;1&#x5206;&#x949F;&#xFF0C;&#x6536;&#x5DE5;&#x3002;  </p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -323,7 +323,7 @@ perfdata        3061    4       5
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

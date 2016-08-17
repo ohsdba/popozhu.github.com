@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -52,18 +52,18 @@
 		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装rrdtool"><span class="toc-text">安装rrdtool</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装pnp4nagios"><span class="toc-text">安装pnp4nagios</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安装php和php-fpm"><span class="toc-text">安装php和php-fpm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#配置nginx"><span class="toc-text">配置nginx</span></a></li></ol> </div>
 	    
 
-	    <p>pnp4nagios依赖rrdtool，把数据写入RRD文件，同时需要一个web服务器来托管pnp4nagios的php页面，因为需要安装rrdtool、pnp4nagios、php、nginx。  </p>
-<h3 id="安装rrdtool">安装rrdtool</h3><p>在系统CentOS 5.9上，我通过rpm安装rrdtool以及它的perl模块，版本为1.4.7。其他版本可以在<code>http://pkgs.repoforge.org/rrdtool/</code>下载。</p>
+	    <p>pnp4nagios&#x4F9D;&#x8D56;rrdtool&#xFF0C;&#x628A;&#x6570;&#x636E;&#x5199;&#x5165;RRD&#x6587;&#x4EF6;&#xFF0C;&#x540C;&#x65F6;&#x9700;&#x8981;&#x4E00;&#x4E2A;web&#x670D;&#x52A1;&#x5668;&#x6765;&#x6258;&#x7BA1;pnp4nagios&#x7684;php&#x9875;&#x9762;&#xFF0C;&#x56E0;&#x4E3A;&#x9700;&#x8981;&#x5B89;&#x88C5;rrdtool&#x3001;pnp4nagios&#x3001;php&#x3001;nginx&#x3002;  </p>
+<h3 id="&#x5B89;&#x88C5;rrdtool"><a href="#&#x5B89;&#x88C5;rrdtool" class="headerlink" title="&#x5B89;&#x88C5;rrdtool"></a>&#x5B89;&#x88C5;rrdtool</h3><p>&#x5728;&#x7CFB;&#x7EDF;CentOS 5.9&#x4E0A;&#xFF0C;&#x6211;&#x901A;&#x8FC7;rpm&#x5B89;&#x88C5;rrdtool&#x4EE5;&#x53CA;&#x5B83;&#x7684;perl&#x6A21;&#x5757;&#xFF0C;&#x7248;&#x672C;&#x4E3A;1.4.7&#x3002;&#x5176;&#x4ED6;&#x7248;&#x672C;&#x53EF;&#x4EE5;&#x5728;<code>http://pkgs.repoforge.org/rrdtool/</code>&#x4E0B;&#x8F7D;&#x3002;</p>
 <pre><code>cd /tmp
 wget http://pkgs.repoforge.org/rrdtool/perl-rrdtool-1.4.7-1.el5.rf.x86_64.rpm
 wget http://pkgs.repoforge.org/rrdtool/rrdtool-1.4.7-1.el5.rf.x86_64.rpm
 
-# 删除已有版本1.2.7
+# &#x5220;&#x9664;&#x5DF2;&#x6709;&#x7248;&#x672C;1.2.7
 yum remove rrdtool
 
 rpm -ivh perl-rrdtool-1.4.7-1.el5.rf.x86_64.rpm rrdtool-1.4.7-1.el5.rf.x86_64.rpm
 </code></pre><p><br></p>
-<h3 id="安装pnp4nagios">安装pnp4nagios</h3><p>pnp4nagios从sourceforge上下载最新版本，configure时配置<code>rrd文件路径perfdata</code>、<code>文件池目录spool</code>、<code>日志文件目录</code>，其他配置项可通过<code>./configure --help</code>查看</p>
+<h3 id="&#x5B89;&#x88C5;pnp4nagios"><a href="#&#x5B89;&#x88C5;pnp4nagios" class="headerlink" title="&#x5B89;&#x88C5;pnp4nagios"></a>&#x5B89;&#x88C5;pnp4nagios</h3><p>pnp4nagios&#x4ECE;sourceforge&#x4E0A;&#x4E0B;&#x8F7D;&#x6700;&#x65B0;&#x7248;&#x672C;&#xFF0C;configure&#x65F6;&#x914D;&#x7F6E;<code>rrd&#x6587;&#x4EF6;&#x8DEF;&#x5F84;perfdata</code>&#x3001;<code>&#x6587;&#x4EF6;&#x6C60;&#x76EE;&#x5F55;spool</code>&#x3001;<code>&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#x76EE;&#x5F55;</code>&#xFF0C;&#x5176;&#x4ED6;&#x914D;&#x7F6E;&#x9879;&#x53EF;&#x901A;&#x8FC7;<code>./configure --help</code>&#x67E5;&#x770B;</p>
 <pre><code>cd /tmp
 wget http://sourceforge.net/projects/pnp4nagios/files/PNP-0.6/pnp4nagios-0.6.21.tar.gz/download
 cd pnp4nagios-0.6.21
@@ -75,7 +75,7 @@ cd pnp4nagios-0.6.21
   --with-perfdata-dir=/diska/pnp4nagios/perfdata \
   --with-perfdata-spool-dir=/diska/pnp4nagios/spool \
   --with-perfdata-logfile=/diska/pnp4nagios/perf_logs
-</code></pre><p>configure后的信息如下：</p>
+</code></pre><p>configure&#x540E;&#x7684;&#x4FE1;&#x606F;&#x5982;&#x4E0B;&#xFF1A;</p>
 <pre><code>*** Configuration summary for pnp4nagios-0.6.21 03-24-2013 ***
 
   General Options:
@@ -94,24 +94,24 @@ cd pnp4nagios-0.6.21
   -------------------------         -------------------
   HTML URL:                         http://localhost/pnp4nagios
   Apache Config File:               /etc/httpd/conf.d/pnp4nagios.conf
-</code></pre><p>再接着编译安装</p>
+</code></pre><p>&#x518D;&#x63A5;&#x7740;&#x7F16;&#x8BD1;&#x5B89;&#x88C5;</p>
 <pre><code>make all  
 make fullinstall
-</code></pre><p>一开始我采用pnp4nagios的<code>npcd</code>来读取数据，启动npcd，npcd进程会扫描spool目录<code>/diska/pnp4nagios/spool</code>(spool目录在configure时配置，或者在配置文件/home/pnp4nagios/etc/npcd.cfg进行修改)  </p>
+</code></pre><p>&#x4E00;&#x5F00;&#x59CB;&#x6211;&#x91C7;&#x7528;pnp4nagios&#x7684;<code>npcd</code>&#x6765;&#x8BFB;&#x53D6;&#x6570;&#x636E;&#xFF0C;&#x542F;&#x52A8;npcd&#xFF0C;npcd&#x8FDB;&#x7A0B;&#x4F1A;&#x626B;&#x63CF;spool&#x76EE;&#x5F55;<code>/diska/pnp4nagios/spool</code>(spool&#x76EE;&#x5F55;&#x5728;configure&#x65F6;&#x914D;&#x7F6E;&#xFF0C;&#x6216;&#x8005;&#x5728;&#x914D;&#x7F6E;&#x6587;&#x4EF6;/home/pnp4nagios/etc/npcd.cfg&#x8FDB;&#x884C;&#x4FEE;&#x6539;)  </p>
 <pre><code>/etc/init.d/npcd start
-</code></pre><p>同时我在<code>/home/pnp4nagios/etc/npcd.cfg</code>配置了npcd的日志也输出到<code>/diska/pnp4nagios/perf_logs</code>中，本意打算把各种日志都存入这个目录，方便查看。  </p>
-<h3 id="安装php和php-fpm">安装php和php-fpm</h3><pre><code>./configure --prefix=/home/pnp --enable-fpm --with-gd --with-zlib
+</code></pre><p>&#x540C;&#x65F6;&#x6211;&#x5728;<code>/home/pnp4nagios/etc/npcd.cfg</code>&#x914D;&#x7F6E;&#x4E86;npcd&#x7684;&#x65E5;&#x5FD7;&#x4E5F;&#x8F93;&#x51FA;&#x5230;<code>/diska/pnp4nagios/perf_logs</code>&#x4E2D;&#xFF0C;&#x672C;&#x610F;&#x6253;&#x7B97;&#x628A;&#x5404;&#x79CD;&#x65E5;&#x5FD7;&#x90FD;&#x5B58;&#x5165;&#x8FD9;&#x4E2A;&#x76EE;&#x5F55;&#xFF0C;&#x65B9;&#x4FBF;&#x67E5;&#x770B;&#x3002;  </p>
+<h3 id="&#x5B89;&#x88C5;php&#x548C;php-fpm"><a href="#&#x5B89;&#x88C5;php&#x548C;php-fpm" class="headerlink" title="&#x5B89;&#x88C5;php&#x548C;php-fpm"></a>&#x5B89;&#x88C5;php&#x548C;php-fpm</h3><pre><code>./configure --prefix=/home/pnp --enable-fpm --with-gd --with-zlib
 make
 make install
-</code></pre><p>修改配置/home/php/etc/php-fpm.conf，监听socket修改为: <code>listen = /home/php/php-fastcgi.sock</code>，打开pid文件路径，然后启动php-fpm  </p>
-<pre><code># 启动
+</code></pre><p>&#x4FEE;&#x6539;&#x914D;&#x7F6E;/home/php/etc/php-fpm.conf&#xFF0C;&#x76D1;&#x542C;socket&#x4FEE;&#x6539;&#x4E3A;: <code>listen = /home/php/php-fastcgi.sock</code>&#xFF0C;&#x6253;&#x5F00;pid&#x6587;&#x4EF6;&#x8DEF;&#x5F84;&#xFF0C;&#x7136;&#x540E;&#x542F;&#x52A8;php-fpm  </p>
+<pre><code># &#x542F;&#x52A8;
 /home/pnp/sbin/php-fpm
-# 重启，发送INT信号
+# &#x91CD;&#x542F;&#xFF0C;&#x53D1;&#x9001;INT&#x4FE1;&#x53F7;
 cat /home/php/var/run/php-fpm.pid | xargs kill -INT
-# 重启，发送USR2信号
+# &#x91CD;&#x542F;&#xFF0C;&#x53D1;&#x9001;USR2&#x4FE1;&#x53F7;
 cat /home/php/var/run/php-fpm.pid | xargs kill -USR2
 </code></pre><p><br></p>
-<h3 id="配置nginx">配置nginx</h3><p>安装略，主要是配置，在nginx的配置文件中，引入pnp4nagios的配置模板内容，<code>/home/nginx/conf/nginx.conf</code>截取如下</p>
+<h3 id="&#x914D;&#x7F6E;nginx"><a href="#&#x914D;&#x7F6E;nginx" class="headerlink" title="&#x914D;&#x7F6E;nginx"></a>&#x914D;&#x7F6E;nginx</h3><p>&#x5B89;&#x88C5;&#x7565;&#xFF0C;&#x4E3B;&#x8981;&#x662F;&#x914D;&#x7F6E;&#xFF0C;&#x5728;nginx&#x7684;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x4E2D;&#xFF0C;&#x5F15;&#x5165;pnp4nagios&#x7684;&#x914D;&#x7F6E;&#x6A21;&#x677F;&#x5185;&#x5BB9;&#xFF0C;<code>/home/nginx/conf/nginx.conf</code>&#x622A;&#x53D6;&#x5982;&#x4E0B;</p>
 <pre><code># ... 
 http {
     # ... 
@@ -128,8 +128,8 @@ http {
             # if we have e.g. /pnp4nagios/media/css/common.css
             # nginx will check
             # /usr/local/png4nagios/share/media/css/common/css
-            # and return it if it&#39;s found
-            # if it can&#39;t find a matching file even adding a trailing /
+            # and return it if it&apos;s found
+            # if it can&apos;t find a matching file even adding a trailing /
             # the request is handled to the @pnp4nagios location
             try_files $uri $uri/ @pnp4nagios;
         }   
@@ -142,19 +142,19 @@ http {
             include fastcgi_params;
 
             # this splits out the trailing path
-            # eg index.php?host -&gt; $fastcgi_path_info == &#39;host&#39;
+            # eg index.php?host -&gt; $fastcgi_path_info == &apos;host&apos;
             fastcgi_split_path_info ^(.+\.php)(.*)$;
             fastcgi_param PATH_INFO $fastcgi_path_info;
             fastcgi_param SCRIPT_FILENAME /home/pnp4nagios/share/index.php;
         }   
     }   
 }
-</code></pre><p>在<code>alias</code>配置php4nagios的目录，在<code>fastcgi_pass</code>配置php-fpm的socket文件，启动nginx后，通过<code>http://localhost/pnp4nagios/index.php</code>后会跳转到pnp4nagios的「配置测试页面」，包含<code>PNP4Nagios Environment Tests</code>和<code>Kohana Environment Tests</code>，测试正常的话，页面底部会提示：</p>
+</code></pre><p>&#x5728;<code>alias</code>&#x914D;&#x7F6E;php4nagios&#x7684;&#x76EE;&#x5F55;&#xFF0C;&#x5728;<code>fastcgi_pass</code>&#x914D;&#x7F6E;php-fpm&#x7684;socket&#x6587;&#x4EF6;&#xFF0C;&#x542F;&#x52A8;nginx&#x540E;&#xFF0C;&#x901A;&#x8FC7;<code>http://localhost/pnp4nagios/index.php</code>&#x540E;&#x4F1A;&#x8DF3;&#x8F6C;&#x5230;pnp4nagios&#x7684;&#x300C;&#x914D;&#x7F6E;&#x6D4B;&#x8BD5;&#x9875;&#x9762;&#x300D;&#xFF0C;&#x5305;&#x542B;<code>PNP4Nagios Environment Tests</code>&#x548C;<code>Kohana Environment Tests</code>&#xFF0C;&#x6D4B;&#x8BD5;&#x6B63;&#x5E38;&#x7684;&#x8BDD;&#xFF0C;&#x9875;&#x9762;&#x5E95;&#x90E8;&#x4F1A;&#x63D0;&#x793A;&#xFF1A;</p>
 <pre><code>Your environment passed all requirements. Remove or rename the /home/pnp4nagios/share/install.php file now.
-</code></pre><p>若测试异常，页面上会给出红色说明，若一切都ok，则把/home/pnp4nagiosn/share/install.php删除或rename。</p>
-<p>后续就是在<code>http://localhost/pnp4nagios/index.php</code>加上参数hostname和serv来访问某个机器的数据。</p>
-<p>pnp4nagios的模板配置另外整理。</p>
-<p><br><br>– EOF –</p>
+</code></pre><p>&#x82E5;&#x6D4B;&#x8BD5;&#x5F02;&#x5E38;&#xFF0C;&#x9875;&#x9762;&#x4E0A;&#x4F1A;&#x7ED9;&#x51FA;&#x7EA2;&#x8272;&#x8BF4;&#x660E;&#xFF0C;&#x82E5;&#x4E00;&#x5207;&#x90FD;ok&#xFF0C;&#x5219;&#x628A;/home/pnp4nagiosn/share/install.php&#x5220;&#x9664;&#x6216;rename&#x3002;</p>
+<p>&#x540E;&#x7EED;&#x5C31;&#x662F;&#x5728;<code>http://localhost/pnp4nagios/index.php</code>&#x52A0;&#x4E0A;&#x53C2;&#x6570;hostname&#x548C;serv&#x6765;&#x8BBF;&#x95EE;&#x67D0;&#x4E2A;&#x673A;&#x5668;&#x7684;&#x6570;&#x636E;&#x3002;</p>
+<p>pnp4nagios&#x7684;&#x6A21;&#x677F;&#x914D;&#x7F6E;&#x53E6;&#x5916;&#x6574;&#x7406;&#x3002;</p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -229,7 +229,7 @@ http {
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

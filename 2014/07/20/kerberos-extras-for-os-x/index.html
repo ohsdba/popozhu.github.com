@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -50,26 +50,26 @@
 	    
 	    
 
-	    <p>如果在mac上使用kerberos遇到了问题，可以考虑安装 <a href="http://web.mit.edu/macdev/KfM/Common/Documentation/osx-kerberos-extras.html" target="_blank" rel="external">Kerberos Extras</a>.</p>
-<p>对于我，我通过<code>kinit</code>成功获取到了<code>票据</code>，但连接到服务端时仍提示让我输入密码。 使用票据的话是不需再输入密码的，那么是没使用到票据，或者票据有问题。 </p>
-<p>ssh连接会使用几种验证方式(PreferredAuthentications)，通过<code>man ssh_config</code>，搜索<code>PreferredAuthentications</code>可以看到ssh使用的几种验证方式，且按顺序逐一尝试，默认是:</p>
+	    <p>&#x5982;&#x679C;&#x5728;mac&#x4E0A;&#x4F7F;&#x7528;kerberos&#x9047;&#x5230;&#x4E86;&#x95EE;&#x9898;&#xFF0C;&#x53EF;&#x4EE5;&#x8003;&#x8651;&#x5B89;&#x88C5; <a href="http://web.mit.edu/macdev/KfM/Common/Documentation/osx-kerberos-extras.html" target="_blank" rel="external">Kerberos Extras</a>.</p>
+<p>&#x5BF9;&#x4E8E;&#x6211;&#xFF0C;&#x6211;&#x901A;&#x8FC7;<code>kinit</code>&#x6210;&#x529F;&#x83B7;&#x53D6;&#x5230;&#x4E86;<code>&#x7968;&#x636E;</code>&#xFF0C;&#x4F46;&#x8FDE;&#x63A5;&#x5230;&#x670D;&#x52A1;&#x7AEF;&#x65F6;&#x4ECD;&#x63D0;&#x793A;&#x8BA9;&#x6211;&#x8F93;&#x5165;&#x5BC6;&#x7801;&#x3002; &#x4F7F;&#x7528;&#x7968;&#x636E;&#x7684;&#x8BDD;&#x662F;&#x4E0D;&#x9700;&#x518D;&#x8F93;&#x5165;&#x5BC6;&#x7801;&#x7684;&#xFF0C;&#x90A3;&#x4E48;&#x662F;&#x6CA1;&#x4F7F;&#x7528;&#x5230;&#x7968;&#x636E;&#xFF0C;&#x6216;&#x8005;&#x7968;&#x636E;&#x6709;&#x95EE;&#x9898;&#x3002; </p>
+<p>ssh&#x8FDE;&#x63A5;&#x4F1A;&#x4F7F;&#x7528;&#x51E0;&#x79CD;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;(PreferredAuthentications)&#xFF0C;&#x901A;&#x8FC7;<code>man ssh_config</code>&#xFF0C;&#x641C;&#x7D22;<code>PreferredAuthentications</code>&#x53EF;&#x4EE5;&#x770B;&#x5230;ssh&#x4F7F;&#x7528;&#x7684;&#x51E0;&#x79CD;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;&#xFF0C;&#x4E14;&#x6309;&#x987A;&#x5E8F;&#x9010;&#x4E00;&#x5C1D;&#x8BD5;&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;:</p>
 <pre><code>gssapi-with-mic,hostbased,publickey,keyboard-interactive,password
-</code></pre><p>可以在配置文件<code>/etc/ssh_config</code>中增加配置项来调整尝试的方式、顺序，或者减少验证方式。 </p>
+</code></pre><p>&#x53EF;&#x4EE5;&#x5728;&#x914D;&#x7F6E;&#x6587;&#x4EF6;<code>/etc/ssh_config</code>&#x4E2D;&#x589E;&#x52A0;&#x914D;&#x7F6E;&#x9879;&#x6765;&#x8C03;&#x6574;&#x5C1D;&#x8BD5;&#x7684;&#x65B9;&#x5F0F;&#x3001;&#x987A;&#x5E8F;&#xFF0C;&#x6216;&#x8005;&#x51CF;&#x5C11;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;&#x3002; </p>
 <pre><code>PreferredAuthentications: gssapi-with-mic,hostbased,publickey,keyboard-interactive,password
-</code></pre><p>从默认值可以看出，第一个尝试的方式就是查找票据。 通过<code>ssh -v</code>打开更多信息输出，可以看到报错，找不到票据，最后使用了password验证的方式，提示输入密码。问题看起来是，能获取到票据，但无法使用到该票据。 它做了两个事情: </p>
-<p>在网上找到解决方法，安装<code>Kerberos Extras</code>，让kerberos支持基于CFM(Code Fragment Manager)的程序。</p>
+</code></pre><p>&#x4ECE;&#x9ED8;&#x8BA4;&#x503C;&#x53EF;&#x4EE5;&#x770B;&#x51FA;&#xFF0C;&#x7B2C;&#x4E00;&#x4E2A;&#x5C1D;&#x8BD5;&#x7684;&#x65B9;&#x5F0F;&#x5C31;&#x662F;&#x67E5;&#x627E;&#x7968;&#x636E;&#x3002; &#x901A;&#x8FC7;<code>ssh -v</code>&#x6253;&#x5F00;&#x66F4;&#x591A;&#x4FE1;&#x606F;&#x8F93;&#x51FA;&#xFF0C;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x62A5;&#x9519;&#xFF0C;&#x627E;&#x4E0D;&#x5230;&#x7968;&#x636E;&#xFF0C;&#x6700;&#x540E;&#x4F7F;&#x7528;&#x4E86;password&#x9A8C;&#x8BC1;&#x7684;&#x65B9;&#x5F0F;&#xFF0C;&#x63D0;&#x793A;&#x8F93;&#x5165;&#x5BC6;&#x7801;&#x3002;&#x95EE;&#x9898;&#x770B;&#x8D77;&#x6765;&#x662F;&#xFF0C;&#x80FD;&#x83B7;&#x53D6;&#x5230;&#x7968;&#x636E;&#xFF0C;&#x4F46;&#x65E0;&#x6CD5;&#x4F7F;&#x7528;&#x5230;&#x8BE5;&#x7968;&#x636E;&#x3002; &#x5B83;&#x505A;&#x4E86;&#x4E24;&#x4E2A;&#x4E8B;&#x60C5;: </p>
+<p>&#x5728;&#x7F51;&#x4E0A;&#x627E;&#x5230;&#x89E3;&#x51B3;&#x65B9;&#x6CD5;&#xFF0C;&#x5B89;&#x88C5;<code>Kerberos Extras</code>&#xFF0C;&#x8BA9;kerberos&#x652F;&#x6301;&#x57FA;&#x4E8E;CFM(Code Fragment Manager)&#x7684;&#x7A0B;&#x5E8F;&#x3002;</p>
 <ol>
-<li>安装<code>Kerberos CFM support library</code></li>
-<li>把/System/Library/CoreSevices/票据显示程序.app链接为/Applications/Utilities/Ticket Viewer.app</li>
+<li>&#x5B89;&#x88C5;<code>Kerberos CFM support library</code></li>
+<li>&#x628A;/System/Library/CoreSevices/&#x7968;&#x636E;&#x663E;&#x793A;&#x7A0B;&#x5E8F;.app&#x94FE;&#x63A5;&#x4E3A;/Applications/Utilities/Ticket Viewer.app</li>
 </ol>
-<p><strong>提示</strong>: 安装时注意有一个步骤，选择「自定义」，<strong>不要</strong>安装MIT自家的配置文件<code>edu.mit.Kerberos</code>。</p>
-<p>好啦，主要是步骤一，那些还在使用CFM的程序们就能够正确使用到kerberos，这时就能无密码连接了，在服务器端执行<code>klist</code>也能看到带上来的票据，票据初始化的时间，跟当前ssh连接的时间点是一致的；返回到本地再<code>klist</code>也能看到本地保存有服务器端的票据，票据交换成功。</p>
-<p>CFM和动态链接dyld是Mac os x上的两种运行时环境(<a href="http://osxbook.com/book/bonus/ancient/whatismacosx/programming.html" target="_blank" rel="external">Runtime Environment</a>)，摘录如下:</p>
+<p><strong>&#x63D0;&#x793A;</strong>: &#x5B89;&#x88C5;&#x65F6;&#x6CE8;&#x610F;&#x6709;&#x4E00;&#x4E2A;&#x6B65;&#x9AA4;&#xFF0C;&#x9009;&#x62E9;&#x300C;&#x81EA;&#x5B9A;&#x4E49;&#x300D;&#xFF0C;<strong>&#x4E0D;&#x8981;</strong>&#x5B89;&#x88C5;MIT&#x81EA;&#x5BB6;&#x7684;&#x914D;&#x7F6E;&#x6587;&#x4EF6;<code>edu.mit.Kerberos</code>&#x3002;</p>
+<p>&#x597D;&#x5566;&#xFF0C;&#x4E3B;&#x8981;&#x662F;&#x6B65;&#x9AA4;&#x4E00;&#xFF0C;&#x90A3;&#x4E9B;&#x8FD8;&#x5728;&#x4F7F;&#x7528;CFM&#x7684;&#x7A0B;&#x5E8F;&#x4EEC;&#x5C31;&#x80FD;&#x591F;&#x6B63;&#x786E;&#x4F7F;&#x7528;&#x5230;kerberos&#xFF0C;&#x8FD9;&#x65F6;&#x5C31;&#x80FD;&#x65E0;&#x5BC6;&#x7801;&#x8FDE;&#x63A5;&#x4E86;&#xFF0C;&#x5728;&#x670D;&#x52A1;&#x5668;&#x7AEF;&#x6267;&#x884C;<code>klist</code>&#x4E5F;&#x80FD;&#x770B;&#x5230;&#x5E26;&#x4E0A;&#x6765;&#x7684;&#x7968;&#x636E;&#xFF0C;&#x7968;&#x636E;&#x521D;&#x59CB;&#x5316;&#x7684;&#x65F6;&#x95F4;&#xFF0C;&#x8DDF;&#x5F53;&#x524D;ssh&#x8FDE;&#x63A5;&#x7684;&#x65F6;&#x95F4;&#x70B9;&#x662F;&#x4E00;&#x81F4;&#x7684;&#xFF1B;&#x8FD4;&#x56DE;&#x5230;&#x672C;&#x5730;&#x518D;<code>klist</code>&#x4E5F;&#x80FD;&#x770B;&#x5230;&#x672C;&#x5730;&#x4FDD;&#x5B58;&#x6709;&#x670D;&#x52A1;&#x5668;&#x7AEF;&#x7684;&#x7968;&#x636E;&#xFF0C;&#x7968;&#x636E;&#x4EA4;&#x6362;&#x6210;&#x529F;&#x3002;</p>
+<p>CFM&#x548C;&#x52A8;&#x6001;&#x94FE;&#x63A5;dyld&#x662F;Mac os x&#x4E0A;&#x7684;&#x4E24;&#x79CD;&#x8FD0;&#x884C;&#x65F6;&#x73AF;&#x5883;(<a href="http://osxbook.com/book/bonus/ancient/whatismacosx/programming.html" target="_blank" rel="external">Runtime Environment</a>)&#xFF0C;&#x6458;&#x5F55;&#x5982;&#x4E0B;:</p>
 <pre><code>CFM determines addresses for referenced symbols in executables at build time (a static approach). The executable format used is called PEF (Preferred Executable Format). dyld resolves undefined symbols at execution time. The executable format is Mach-O (Mach object-file-format).
-</code></pre><p>看起来CFM有点像静态链接，未深究。</p>
-<p><hr><br>额外的话题，每次本地kinit时要输入密码，可以把密码保存到keychain中，<code>kinit username</code>时直接回车就可以了。</p>
-<pre><code>security add-generic-password -a &quot;xiaojie.zhang1&quot; -l &quot;XXX.OPI.COM (your_user_name)&quot; -s &quot;xxx.OPI.COM&quot; -w “your_passwd&quot; -T &quot;/usr/bin/kinit”
-</code></pre><p>具体用法，<code>man security</code>，再找到<code>add-generic-password</code>的各个参数。</p>
+</code></pre><p>&#x770B;&#x8D77;&#x6765;CFM&#x6709;&#x70B9;&#x50CF;&#x9759;&#x6001;&#x94FE;&#x63A5;&#xFF0C;&#x672A;&#x6DF1;&#x7A76;&#x3002;</p>
+<p><hr><br>&#x989D;&#x5916;&#x7684;&#x8BDD;&#x9898;&#xFF0C;&#x6BCF;&#x6B21;&#x672C;&#x5730;kinit&#x65F6;&#x8981;&#x8F93;&#x5165;&#x5BC6;&#x7801;&#xFF0C;&#x53EF;&#x4EE5;&#x628A;&#x5BC6;&#x7801;&#x4FDD;&#x5B58;&#x5230;keychain&#x4E2D;&#xFF0C;<code>kinit username</code>&#x65F6;&#x76F4;&#x63A5;&#x56DE;&#x8F66;&#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#x3002;</p>
+<pre><code>security add-generic-password -a &quot;xiaojie.zhang1&quot; -l &quot;XXX.OPI.COM (your_user_name)&quot; -s &quot;xxx.OPI.COM&quot; -w &#x201C;your_passwd&quot; -T &quot;/usr/bin/kinit&#x201D;
+</code></pre><p>&#x5177;&#x4F53;&#x7528;&#x6CD5;&#xFF0C;<code>man security</code>&#xFF0C;&#x518D;&#x627E;&#x5230;<code>add-generic-password</code>&#x7684;&#x5404;&#x4E2A;&#x53C2;&#x6570;&#x3002;</p>
 <pre><code>add-generic-password [-h] [-a account] [-s service] [-w password] [options...] [keychain]
     Add a generic password item.
 
@@ -86,9 +86,9 @@
     -A              Allow any application to access this item without warning (insecure, not recommended!)
     -T appPath      Specify an application which may access this item (multiple -T options are allowed)
     -U              Update item if it already exists (if omitted, the item cannot already exist)
-</code></pre><p><hr><br>票据会过期，过期后重新kinit，但tmux的session不会自动加载这个新的票据。</p>
-<p>to be continue…</p>
-<p><br><br>– EOF –</p>
+</code></pre><p><hr><br>&#x7968;&#x636E;&#x4F1A;&#x8FC7;&#x671F;&#xFF0C;&#x8FC7;&#x671F;&#x540E;&#x91CD;&#x65B0;kinit&#xFF0C;&#x4F46;tmux&#x7684;session&#x4E0D;&#x4F1A;&#x81EA;&#x52A8;&#x52A0;&#x8F7D;&#x8FD9;&#x4E2A;&#x65B0;&#x7684;&#x7968;&#x636E;&#x3002;</p>
+<p>to be continue&#x2026;</p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -163,7 +163,7 @@
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

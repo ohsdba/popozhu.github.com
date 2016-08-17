@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -50,7 +50,7 @@
 	    
 	    
 
-	    <p>前2个星期使用hexo的<a href="http://zespia.tw/hexo/zh-CN/docs/tag-plugins.html" target="_blank" rel="external">标签插件</a>，在写文章内容，对于代码我都使用其中的<code>Code Block</code>来高亮显示。<br>Code Block在markdown中使用可以参考<a href="http://octopress.org/docs/plugins/codeblock/" target="_blank" rel="external">这里</a>，语法为：  </p>
+	    <p>&#x524D;2&#x4E2A;&#x661F;&#x671F;&#x4F7F;&#x7528;hexo&#x7684;<a href="http://zespia.tw/hexo/zh-CN/docs/tag-plugins.html" target="_blank" rel="external">&#x6807;&#x7B7E;&#x63D2;&#x4EF6;</a>&#xFF0C;&#x5728;&#x5199;&#x6587;&#x7AE0;&#x5185;&#x5BB9;&#xFF0C;&#x5BF9;&#x4E8E;&#x4EE3;&#x7801;&#x6211;&#x90FD;&#x4F7F;&#x7528;&#x5176;&#x4E2D;&#x7684;<code>Code Block</code>&#x6765;&#x9AD8;&#x4EAE;&#x663E;&#x793A;&#x3002;<br>Code Block&#x5728;markdown&#x4E2D;&#x4F7F;&#x7528;&#x53EF;&#x4EE5;&#x53C2;&#x8003;<a href="http://octopress.org/docs/plugins/codeblock/" target="_blank" rel="external">&#x8FD9;&#x91CC;</a>&#xFF0C;&#x8BED;&#x6CD5;&#x4E3A;&#xFF1A;  </p>
 
 ```
 {% codeblock [title] [lang:language] [url] [link text] %}
@@ -58,7 +58,7 @@ code snippet
 {% endcodeblock %}
 ```
 
-<p>最初我并没有在codeblock中指定<code>[lang:language]</code>：<br>
+<p>&#x6700;&#x521D;&#x6211;&#x5E76;&#x6CA1;&#x6709;&#x5728;codeblock&#x4E2D;&#x6307;&#x5B9A;<code>[lang:language]</code>&#xFF1A;<br>
 ```
 {% codeblock %}
   my code here...
@@ -67,10 +67,10 @@ code snippet
 {% endcodeblock %}
 ```
 </p>
-<p>于是代码高亮有时候不能正确显示，比如对于c的注释<code>/* some comment */</code>，单纯一行的注释是没问题的，但如果遇到多行的注释，则在注释开始<code>/*</code>之后的内容，甚至包括注释结尾<code>*/</code>之后的代码，就不能正常高亮显示，这困扰了我一个多星期。  </p>
-<p>今晚看了下hexo的<a href="https://github.com/tommy351/hexo/blob/master/lib/util/highlight.js" target="_blank" rel="external">highlight.js</a>这个js内容，它对代码高亮的语言类型做了点预处理和判断：在调用真实做代码高亮的脚本<a href="https://github.com/isagalaev/highlight.js" target="_blank" rel="external">in github</a>前，先判断codeblock是否带lang这个key，如果没有，就让highlight自动高亮代码，问题是这个<strong>自动</strong>不够智能。  </p>
-<p>于是手动在codeblock中增加<code>[lang:language]</code>来显式指定代码语言，问题是一开始我使用的是<code>lang:c++</code>，然而识别不到c++，代码高亮还是不正常，让我很迷惑。难道真的是highlight.js对于token的解析有错误吗？  </p>
-<p>后来，在highlight-&gt;github-&gt;readme中看到，如果要自定义高亮方案，说是参考文件<a href="https://github.com/isagalaev/highlight.js/blob/master/classref.txt" target="_blank" rel="external">classref.txt</a>，上面包含了它支持的语言的类型，其中：  </p>
+<p>&#x4E8E;&#x662F;&#x4EE3;&#x7801;&#x9AD8;&#x4EAE;&#x6709;&#x65F6;&#x5019;&#x4E0D;&#x80FD;&#x6B63;&#x786E;&#x663E;&#x793A;&#xFF0C;&#x6BD4;&#x5982;&#x5BF9;&#x4E8E;c&#x7684;&#x6CE8;&#x91CA;<code>/* some comment */</code>&#xFF0C;&#x5355;&#x7EAF;&#x4E00;&#x884C;&#x7684;&#x6CE8;&#x91CA;&#x662F;&#x6CA1;&#x95EE;&#x9898;&#x7684;&#xFF0C;&#x4F46;&#x5982;&#x679C;&#x9047;&#x5230;&#x591A;&#x884C;&#x7684;&#x6CE8;&#x91CA;&#xFF0C;&#x5219;&#x5728;&#x6CE8;&#x91CA;&#x5F00;&#x59CB;<code>/*</code>&#x4E4B;&#x540E;&#x7684;&#x5185;&#x5BB9;&#xFF0C;&#x751A;&#x81F3;&#x5305;&#x62EC;&#x6CE8;&#x91CA;&#x7ED3;&#x5C3E;<code>*/</code>&#x4E4B;&#x540E;&#x7684;&#x4EE3;&#x7801;&#xFF0C;&#x5C31;&#x4E0D;&#x80FD;&#x6B63;&#x5E38;&#x9AD8;&#x4EAE;&#x663E;&#x793A;&#xFF0C;&#x8FD9;&#x56F0;&#x6270;&#x4E86;&#x6211;&#x4E00;&#x4E2A;&#x591A;&#x661F;&#x671F;&#x3002;  </p>
+<p>&#x4ECA;&#x665A;&#x770B;&#x4E86;&#x4E0B;hexo&#x7684;<a href="https://github.com/tommy351/hexo/blob/master/lib/util/highlight.js" target="_blank" rel="external">highlight.js</a>&#x8FD9;&#x4E2A;js&#x5185;&#x5BB9;&#xFF0C;&#x5B83;&#x5BF9;&#x4EE3;&#x7801;&#x9AD8;&#x4EAE;&#x7684;&#x8BED;&#x8A00;&#x7C7B;&#x578B;&#x505A;&#x4E86;&#x70B9;&#x9884;&#x5904;&#x7406;&#x548C;&#x5224;&#x65AD;&#xFF1A;&#x5728;&#x8C03;&#x7528;&#x771F;&#x5B9E;&#x505A;&#x4EE3;&#x7801;&#x9AD8;&#x4EAE;&#x7684;&#x811A;&#x672C;<a href="https://github.com/isagalaev/highlight.js" target="_blank" rel="external">in github</a>&#x524D;&#xFF0C;&#x5148;&#x5224;&#x65AD;codeblock&#x662F;&#x5426;&#x5E26;lang&#x8FD9;&#x4E2A;key&#xFF0C;&#x5982;&#x679C;&#x6CA1;&#x6709;&#xFF0C;&#x5C31;&#x8BA9;highlight&#x81EA;&#x52A8;&#x9AD8;&#x4EAE;&#x4EE3;&#x7801;&#xFF0C;&#x95EE;&#x9898;&#x662F;&#x8FD9;&#x4E2A;<strong>&#x81EA;&#x52A8;</strong>&#x4E0D;&#x591F;&#x667A;&#x80FD;&#x3002;  </p>
+<p>&#x4E8E;&#x662F;&#x624B;&#x52A8;&#x5728;codeblock&#x4E2D;&#x589E;&#x52A0;<code>[lang:language]</code>&#x6765;&#x663E;&#x5F0F;&#x6307;&#x5B9A;&#x4EE3;&#x7801;&#x8BED;&#x8A00;&#xFF0C;&#x95EE;&#x9898;&#x662F;&#x4E00;&#x5F00;&#x59CB;&#x6211;&#x4F7F;&#x7528;&#x7684;&#x662F;<code>lang:c++</code>&#xFF0C;&#x7136;&#x800C;&#x8BC6;&#x522B;&#x4E0D;&#x5230;c++&#xFF0C;&#x4EE3;&#x7801;&#x9AD8;&#x4EAE;&#x8FD8;&#x662F;&#x4E0D;&#x6B63;&#x5E38;&#xFF0C;&#x8BA9;&#x6211;&#x5F88;&#x8FF7;&#x60D1;&#x3002;&#x96BE;&#x9053;&#x771F;&#x7684;&#x662F;highlight.js&#x5BF9;&#x4E8E;token&#x7684;&#x89E3;&#x6790;&#x6709;&#x9519;&#x8BEF;&#x5417;&#xFF1F;  </p>
+<p>&#x540E;&#x6765;&#xFF0C;&#x5728;highlight-&gt;github-&gt;readme&#x4E2D;&#x770B;&#x5230;&#xFF0C;&#x5982;&#x679C;&#x8981;&#x81EA;&#x5B9A;&#x4E49;&#x9AD8;&#x4EAE;&#x65B9;&#x6848;&#xFF0C;&#x8BF4;&#x662F;&#x53C2;&#x8003;&#x6587;&#x4EF6;<a href="https://github.com/isagalaev/highlight.js/blob/master/classref.txt" target="_blank" rel="external">classref.txt</a>&#xFF0C;&#x4E0A;&#x9762;&#x5305;&#x542B;&#x4E86;&#x5B83;&#x652F;&#x6301;&#x7684;&#x8BED;&#x8A00;&#x7684;&#x7C7B;&#x578B;&#xFF0C;&#x5176;&#x4E2D;&#xFF1A;  </p>
 <pre><code>C++ (&quot;cpp&quot;):
   keyword keyword
   number number
@@ -78,8 +78,8 @@ code snippet
   comment comment
   preprocessor preprocessor directive
   stl_container instantiation of STL containers (&quot;vector&lt;...&gt;&quot;)
-</code></pre><p><hr><br>sigh…在codeblock中应该添加<code>lang:cpp</code>来指明要高亮的语言，而不是<code>lang:c++</code>，其他语言也类似参考这份定义。  </p>
-<p>于是正常高亮代码。<br>
+</code></pre><p><hr><br>sigh&#x2026;&#x5728;codeblock&#x4E2D;&#x5E94;&#x8BE5;&#x6DFB;&#x52A0;<code>lang:cpp</code>&#x6765;&#x6307;&#x660E;&#x8981;&#x9AD8;&#x4EAE;&#x7684;&#x8BED;&#x8A00;&#xFF0C;&#x800C;&#x4E0D;&#x662F;<code>lang:c++</code>&#xFF0C;&#x5176;&#x4ED6;&#x8BED;&#x8A00;&#x4E5F;&#x7C7B;&#x4F3C;&#x53C2;&#x8003;&#x8FD9;&#x4EFD;&#x5B9A;&#x4E49;&#x3002;  </p>
+<p>&#x4E8E;&#x662F;&#x6B63;&#x5E38;&#x9AD8;&#x4EAE;&#x4EE3;&#x7801;&#x3002;<br>
 ```
 {% codeblock lang:cpp %}
   my code here...  
@@ -88,10 +88,10 @@ code snippet
 {% endcodeblock %}
 ```
 </p>
-<p>hexo的<a href="https://github.com/tommy351/hexo/blob/master/lib/util/highlight.js" target="_blank" rel="external">highlight.js</a>增加了<code>lang:plain</code>这个类型的支持：</p>
+<p>hexo&#x7684;<a href="https://github.com/tommy351/hexo/blob/master/lib/util/highlight.js" target="_blank" rel="external">highlight.js</a>&#x589E;&#x52A0;&#x4E86;<code>lang:plain</code>&#x8FD9;&#x4E2A;&#x7C7B;&#x578B;&#x7684;&#x652F;&#x6301;&#xFF1A;</p>
 <pre><code>  if (!options.lang){
     var compiled = hljs.highlightAuto(raw).value;
-  } else if (options.lang === &#39;plain&#39;){
+  } else if (options.lang === &apos;plain&apos;){
     var compiled = raw;
   } else {
     var lang = options.lang.toLowerCase();
@@ -104,9 +104,9 @@ code snippet
       var compiled = hljs.highlightAuto(raw).value;
     }
   }
-</code></pre><p>可以用这个类型来屏蔽一些代码高亮，比如写一些伪代码时就可以用上了。   </p>
-<p>根据<a href="https://github.com/isagalaev/highlight.js/tree/master/src/styles" target="_blank" rel="external">styles</a>使用了几个高亮颜色方案，最后还是恢复hexo默认主题自带的颜色。  </p>
-<p><br><br>– EOF –</p>
+</code></pre><p>&#x53EF;&#x4EE5;&#x7528;&#x8FD9;&#x4E2A;&#x7C7B;&#x578B;&#x6765;&#x5C4F;&#x853D;&#x4E00;&#x4E9B;&#x4EE3;&#x7801;&#x9AD8;&#x4EAE;&#xFF0C;&#x6BD4;&#x5982;&#x5199;&#x4E00;&#x4E9B;&#x4F2A;&#x4EE3;&#x7801;&#x65F6;&#x5C31;&#x53EF;&#x4EE5;&#x7528;&#x4E0A;&#x4E86;&#x3002;   </p>
+<p>&#x6839;&#x636E;<a href="https://github.com/isagalaev/highlight.js/tree/master/src/styles" target="_blank" rel="external">styles</a>&#x4F7F;&#x7528;&#x4E86;&#x51E0;&#x4E2A;&#x9AD8;&#x4EAE;&#x989C;&#x8272;&#x65B9;&#x6848;&#xFF0C;&#x6700;&#x540E;&#x8FD8;&#x662F;&#x6062;&#x590D;hexo&#x9ED8;&#x8BA4;&#x4E3B;&#x9898;&#x81EA;&#x5E26;&#x7684;&#x989C;&#x8272;&#x3002;  </p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -181,7 +181,7 @@ code snippet
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

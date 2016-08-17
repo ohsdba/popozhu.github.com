@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -49,16 +49,16 @@
 	
 	    
 	    
-		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#创建一个event_base"><span class="toc-text">创建一个event_base</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#event_base默认设置"><span class="toc-text">event_base默认设置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#event_base更多设置"><span class="toc-text">event_base更多设置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Example:_Preferring_edge-triggered_backends"><span class="toc-text">Example: Preferring edge-triggered backends</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Example:_Avoiding_priority-inversion"><span class="toc-text">Example: Avoiding priority-inversion</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检查event_base的后端函数"><span class="toc-text">检查event_base的后端函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example"><span class="toc-text">Example</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Inteface"><span class="toc-text">Inteface</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example-1"><span class="toc-text">Example</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#释放event_base"><span class="toc-text">释放event_base</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设置event_base优先级"><span class="toc-text">设置event_base优先级</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fock()之后重新初始化event_base"><span class="toc-text">fock()之后重新初始化event_base</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example-2"><span class="toc-text">Example</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不再使用event_base这个函数"><span class="toc-text">不再使用event_base这个函数</span></a></li></ol> </div>
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#创建一个event_base"><span class="toc-text">创建一个event_base</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#event_base默认设置"><span class="toc-text">event_base默认设置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#event_base更多设置"><span class="toc-text">event_base更多设置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#example-preferring-edge-triggered-backends"><span class="toc-text">Example: Preferring edge-triggered backends</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#example-avoiding-priority-inversion"><span class="toc-text">Example: Avoiding priority-inversion</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检查event_base的后端函数"><span class="toc-text">检查event_base的后端函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#example"><span class="toc-text">Example</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#inteface"><span class="toc-text">Inteface</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#example"><span class="toc-text">Example</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#释放event_base"><span class="toc-text">释放event_base</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#设置event_base优先级"><span class="toc-text">设置event_base优先级</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fock之后重新初始化event_base"><span class="toc-text">fock()之后重新初始化event_base</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#example"><span class="toc-text">Example</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不再使用event_base这个函数"><span class="toc-text">不再使用event_base这个函数</span></a></li></ol> </div>
 	    
 
 	    <blockquote>
-<p>原文：<a href="http://www.wangafu.net/~nickm/libevent-book/Ref2_eventbase.html" target="_blank" rel="external">R2: Getting an event_base</a></p>
+<p>&#x539F;&#x6587;&#xFF1A;<a href="http://www.wangafu.net/~nickm/libevent-book/Ref2_eventbase.html" target="_blank" rel="external">R2: Getting an event_base</a></p>
 </blockquote>
-<h2 id="创建一个event_base">创建一个event_base</h2><p>在使用Libevent的接口前，你需要先创建一个或多个event_base数据结构。每个event_base持有一个sock集，可以轮询这个集合的sock来检查可以激活哪些事件。  </p>
-<p>如果在event_base中设置使用锁，那在多个线程中可以使用这个event_base。 但是event_base只能在单个线程中进行轮询。 如果你想在多个线程中为你的IO做轮询，那你需要为每个线程创建一个event_base。  </p>
-<p><strong>提示</strong>： Libevent的未来版本中可能支持在多个线程中使用同个event_base进行轮询。  </p>
-<p>每个event_base有一个“方法”，或者说后端，用来检测哪个事件已经准备好了。 这个方法对应封装有（后文提到的“后端”，指代的是下面的一个或多个实现）：  </p>
+<h2 id="&#x521B;&#x5EFA;&#x4E00;&#x4E2A;event_base"><a href="#&#x521B;&#x5EFA;&#x4E00;&#x4E2A;event-base" class="headerlink" title="&#x521B;&#x5EFA;&#x4E00;&#x4E2A;event_base"></a>&#x521B;&#x5EFA;&#x4E00;&#x4E2A;event_base</h2><p>&#x5728;&#x4F7F;&#x7528;Libevent&#x7684;&#x63A5;&#x53E3;&#x524D;&#xFF0C;&#x4F60;&#x9700;&#x8981;&#x5148;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x6216;&#x591A;&#x4E2A;event_base&#x6570;&#x636E;&#x7ED3;&#x6784;&#x3002;&#x6BCF;&#x4E2A;event_base&#x6301;&#x6709;&#x4E00;&#x4E2A;sock&#x96C6;&#xFF0C;&#x53EF;&#x4EE5;&#x8F6E;&#x8BE2;&#x8FD9;&#x4E2A;&#x96C6;&#x5408;&#x7684;sock&#x6765;&#x68C0;&#x67E5;&#x53EF;&#x4EE5;&#x6FC0;&#x6D3B;&#x54EA;&#x4E9B;&#x4E8B;&#x4EF6;&#x3002;  </p>
+<p>&#x5982;&#x679C;&#x5728;event_base&#x4E2D;&#x8BBE;&#x7F6E;&#x4F7F;&#x7528;&#x9501;&#xFF0C;&#x90A3;&#x5728;&#x591A;&#x4E2A;&#x7EBF;&#x7A0B;&#x4E2D;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;&#x8FD9;&#x4E2A;event_base&#x3002; &#x4F46;&#x662F;event_base&#x53EA;&#x80FD;&#x5728;&#x5355;&#x4E2A;&#x7EBF;&#x7A0B;&#x4E2D;&#x8FDB;&#x884C;&#x8F6E;&#x8BE2;&#x3002; &#x5982;&#x679C;&#x4F60;&#x60F3;&#x5728;&#x591A;&#x4E2A;&#x7EBF;&#x7A0B;&#x4E2D;&#x4E3A;&#x4F60;&#x7684;IO&#x505A;&#x8F6E;&#x8BE2;&#xFF0C;&#x90A3;&#x4F60;&#x9700;&#x8981;&#x4E3A;&#x6BCF;&#x4E2A;&#x7EBF;&#x7A0B;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;event_base&#x3002;  </p>
+<p><strong>&#x63D0;&#x793A;</strong>&#xFF1A; Libevent&#x7684;&#x672A;&#x6765;&#x7248;&#x672C;&#x4E2D;&#x53EF;&#x80FD;&#x652F;&#x6301;&#x5728;&#x591A;&#x4E2A;&#x7EBF;&#x7A0B;&#x4E2D;&#x4F7F;&#x7528;&#x540C;&#x4E2A;event_base&#x8FDB;&#x884C;&#x8F6E;&#x8BE2;&#x3002;  </p>
+<p>&#x6BCF;&#x4E2A;event_base&#x6709;&#x4E00;&#x4E2A;&#x201C;&#x65B9;&#x6CD5;&#x201D;&#xFF0C;&#x6216;&#x8005;&#x8BF4;&#x540E;&#x7AEF;&#xFF0C;&#x7528;&#x6765;&#x68C0;&#x6D4B;&#x54EA;&#x4E2A;&#x4E8B;&#x4EF6;&#x5DF2;&#x7ECF;&#x51C6;&#x5907;&#x597D;&#x4E86;&#x3002; &#x8FD9;&#x4E2A;&#x65B9;&#x6CD5;&#x5BF9;&#x5E94;&#x5C01;&#x88C5;&#x6709;&#xFF08;&#x540E;&#x6587;&#x63D0;&#x5230;&#x7684;&#x201C;&#x540E;&#x7AEF;&#x201D;&#xFF0C;&#x6307;&#x4EE3;&#x7684;&#x662F;&#x4E0B;&#x9762;&#x7684;&#x4E00;&#x4E2A;&#x6216;&#x591A;&#x4E2A;&#x5B9E;&#x73B0;&#xFF09;&#xFF1A;  </p>
 <ol>
 <li>select</li>
 <li>poll</li>
@@ -68,18 +68,18 @@
 <li>evport</li>
 <li>win32</li>
 </ol>
-<p>用户可以通过设置环境变量来禁用某些后端。 比如你想要禁用kqueue这个后端， 可以通过设置<code>EVENT_NOKQUEUE</code>这个环境变量，其他的类似。如果你想在程序中禁用后端， 查看下面的<code>event_config_avoid_method()</code>.  </p>
+<p>&#x7528;&#x6237;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x8BBE;&#x7F6E;&#x73AF;&#x5883;&#x53D8;&#x91CF;&#x6765;&#x7981;&#x7528;&#x67D0;&#x4E9B;&#x540E;&#x7AEF;&#x3002; &#x6BD4;&#x5982;&#x4F60;&#x60F3;&#x8981;&#x7981;&#x7528;kqueue&#x8FD9;&#x4E2A;&#x540E;&#x7AEF;&#xFF0C; &#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x8BBE;&#x7F6E;<code>EVENT_NOKQUEUE</code>&#x8FD9;&#x4E2A;&#x73AF;&#x5883;&#x53D8;&#x91CF;&#xFF0C;&#x5176;&#x4ED6;&#x7684;&#x7C7B;&#x4F3C;&#x3002;&#x5982;&#x679C;&#x4F60;&#x60F3;&#x5728;&#x7A0B;&#x5E8F;&#x4E2D;&#x7981;&#x7528;&#x540E;&#x7AEF;&#xFF0C; &#x67E5;&#x770B;&#x4E0B;&#x9762;&#x7684;<code>event_config_avoid_method()</code>.  </p>
 <p><br></p>
-<h2 id="event_base默认设置">event_base默认设置</h2><p>函数<code>event_base_new()</code>创建并返回一个带有默认设置的event_base。 它先检查你的环境变量，然后返回一个指针，指向这个新创建的event_base。 如果出现错误，返回一个NULL指针。  </p>
-<p>对于上面提到的不同后端，它会选择一个当前系统支持的最高效率的后端来创建event_base。  </p>
+<h2 id="event_base&#x9ED8;&#x8BA4;&#x8BBE;&#x7F6E;"><a href="#event-base&#x9ED8;&#x8BA4;&#x8BBE;&#x7F6E;" class="headerlink" title="event_base&#x9ED8;&#x8BA4;&#x8BBE;&#x7F6E;"></a>event_base&#x9ED8;&#x8BA4;&#x8BBE;&#x7F6E;</h2><p>&#x51FD;&#x6570;<code>event_base_new()</code>&#x521B;&#x5EFA;&#x5E76;&#x8FD4;&#x56DE;&#x4E00;&#x4E2A;&#x5E26;&#x6709;&#x9ED8;&#x8BA4;&#x8BBE;&#x7F6E;&#x7684;event_base&#x3002; &#x5B83;&#x5148;&#x68C0;&#x67E5;&#x4F60;&#x7684;&#x73AF;&#x5883;&#x53D8;&#x91CF;&#xFF0C;&#x7136;&#x540E;&#x8FD4;&#x56DE;&#x4E00;&#x4E2A;&#x6307;&#x9488;&#xFF0C;&#x6307;&#x5411;&#x8FD9;&#x4E2A;&#x65B0;&#x521B;&#x5EFA;&#x7684;event_base&#x3002; &#x5982;&#x679C;&#x51FA;&#x73B0;&#x9519;&#x8BEF;&#xFF0C;&#x8FD4;&#x56DE;&#x4E00;&#x4E2A;NULL&#x6307;&#x9488;&#x3002;  </p>
+<p>&#x5BF9;&#x4E8E;&#x4E0A;&#x9762;&#x63D0;&#x5230;&#x7684;&#x4E0D;&#x540C;&#x540E;&#x7AEF;&#xFF0C;&#x5B83;&#x4F1A;&#x9009;&#x62E9;&#x4E00;&#x4E2A;&#x5F53;&#x524D;&#x7CFB;&#x7EDF;&#x652F;&#x6301;&#x7684;&#x6700;&#x9AD8;&#x6548;&#x7387;&#x7684;&#x540E;&#x7AEF;&#x6765;&#x521B;&#x5EFA;event_base&#x3002;  </p>
 <pre><code>struct event_base *event_base_new(void);
-</code></pre><p>对于多数程序，创建一个默认设置的event_base已经足够了。　　<br><code>event_base_new()</code>定义在头文件<code>&lt;event2/event.h&gt;</code>中，首次出现在Libevent 1.4.3.  </p>
+</code></pre><p>&#x5BF9;&#x4E8E;&#x591A;&#x6570;&#x7A0B;&#x5E8F;&#xFF0C;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x9ED8;&#x8BA4;&#x8BBE;&#x7F6E;&#x7684;event_base&#x5DF2;&#x7ECF;&#x8DB3;&#x591F;&#x4E86;&#x3002;&#x3000;&#x3000;<br><code>event_base_new()</code>&#x5B9A;&#x4E49;&#x5728;&#x5934;&#x6587;&#x4EF6;<code>&lt;event2/event.h&gt;</code>&#x4E2D;&#xFF0C;&#x9996;&#x6B21;&#x51FA;&#x73B0;&#x5728;Libevent 1.4.3.  </p>
 <p><br></p>
-<h2 id="event_base更多设置">event_base更多设置</h2><p>如果你想对于创建哪种event_base有更多操作，那需要使用event_config。 event_config这个数据结构屏蔽和封装了你对event_base的设置选项。   </p>
+<h2 id="event_base&#x66F4;&#x591A;&#x8BBE;&#x7F6E;"><a href="#event-base&#x66F4;&#x591A;&#x8BBE;&#x7F6E;" class="headerlink" title="event_base&#x66F4;&#x591A;&#x8BBE;&#x7F6E;"></a>event_base&#x66F4;&#x591A;&#x8BBE;&#x7F6E;</h2><p>&#x5982;&#x679C;&#x4F60;&#x60F3;&#x5BF9;&#x4E8E;&#x521B;&#x5EFA;&#x54EA;&#x79CD;event_base&#x6709;&#x66F4;&#x591A;&#x64CD;&#x4F5C;&#xFF0C;&#x90A3;&#x9700;&#x8981;&#x4F7F;&#x7528;event_config&#x3002; event_config&#x8FD9;&#x4E2A;&#x6570;&#x636E;&#x7ED3;&#x6784;&#x5C4F;&#x853D;&#x548C;&#x5C01;&#x88C5;&#x4E86;&#x4F60;&#x5BF9;event_base&#x7684;&#x8BBE;&#x7F6E;&#x9009;&#x9879;&#x3002;   </p>
 <pre><code>struct event_config *event_config_new(void);
 struct event_base *event_base_new_with_config(const struct event_config *cfg);
 void event_config_free(struct event_config *cfg);
-</code></pre><p>先调用<code>event_config_new()</code>创建一个event_config，再对event_config调用其他函数来进行你的设置，最后调用<code>event_base_new_with_config()</code>来创建一个event_base。最后调用<code>event_config_free()</code>来释放event_config。  </p>
+</code></pre><p>&#x5148;&#x8C03;&#x7528;<code>event_config_new()</code>&#x521B;&#x5EFA;&#x4E00;&#x4E2A;event_config&#xFF0C;&#x518D;&#x5BF9;event_config&#x8C03;&#x7528;&#x5176;&#x4ED6;&#x51FD;&#x6570;&#x6765;&#x8FDB;&#x884C;&#x4F60;&#x7684;&#x8BBE;&#x7F6E;&#xFF0C;&#x6700;&#x540E;&#x8C03;&#x7528;<code>event_base_new_with_config()</code>&#x6765;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;event_base&#x3002;&#x6700;&#x540E;&#x8C03;&#x7528;<code>event_config_free()</code>&#x6765;&#x91CA;&#x653E;event_config&#x3002;  </p>
 <pre><code>int event_config_avoid_method(struct event_config *cfg, const char *method);
 
 enum event_method_feature {
@@ -100,47 +100,47 @@ enum event_base_config_flag {
 };
 int event_config_set_flag(struct event_config *cfg,
     enum event_base_config_flag flag);
-</code></pre><p>调用<code>event_config_avoid_method()</code>来忽略指定名称的后端。调用<code>event_config_require_feature()</code>来设置Libevent不要使用不满足一些特性的那些后端。调用<code>event_config_set_flag()</code>来告诉Libevent使用一个或多个运行时标识来创建event_base。  </p>
-<p><code>event_config_require_features</code>可使用的特性有：  </p>
+</code></pre><p>&#x8C03;&#x7528;<code>event_config_avoid_method()</code>&#x6765;&#x5FFD;&#x7565;&#x6307;&#x5B9A;&#x540D;&#x79F0;&#x7684;&#x540E;&#x7AEF;&#x3002;&#x8C03;&#x7528;<code>event_config_require_feature()</code>&#x6765;&#x8BBE;&#x7F6E;Libevent&#x4E0D;&#x8981;&#x4F7F;&#x7528;&#x4E0D;&#x6EE1;&#x8DB3;&#x4E00;&#x4E9B;&#x7279;&#x6027;&#x7684;&#x90A3;&#x4E9B;&#x540E;&#x7AEF;&#x3002;&#x8C03;&#x7528;<code>event_config_set_flag()</code>&#x6765;&#x544A;&#x8BC9;Libevent&#x4F7F;&#x7528;&#x4E00;&#x4E2A;&#x6216;&#x591A;&#x4E2A;&#x8FD0;&#x884C;&#x65F6;&#x6807;&#x8BC6;&#x6765;&#x521B;&#x5EFA;event_base&#x3002;  </p>
+<p><code>event_config_require_features</code>&#x53EF;&#x4F7F;&#x7528;&#x7684;&#x7279;&#x6027;&#x6709;&#xFF1A;  </p>
 <ol>
-<li>EV_FEATURE_ET： 要求后端能支持边沿触发IO(edge-triggered IO)</li>
-<li>EV_FEATURE_O1： 要求增加活删除一个事件，或者激活事件时，后端要满足O(1)的效率</li>
-<li>EV_FEATURE_FDS： 要求后端能支持任意类型的文件描述符，而不仅仅是socket</li>
+<li>EV_FEATURE_ET&#xFF1A; &#x8981;&#x6C42;&#x540E;&#x7AEF;&#x80FD;&#x652F;&#x6301;&#x8FB9;&#x6CBF;&#x89E6;&#x53D1;IO(edge-triggered IO)</li>
+<li>EV_FEATURE_O1&#xFF1A; &#x8981;&#x6C42;&#x589E;&#x52A0;&#x6D3B;&#x5220;&#x9664;&#x4E00;&#x4E2A;&#x4E8B;&#x4EF6;&#xFF0C;&#x6216;&#x8005;&#x6FC0;&#x6D3B;&#x4E8B;&#x4EF6;&#x65F6;&#xFF0C;&#x540E;&#x7AEF;&#x8981;&#x6EE1;&#x8DB3;O(1)&#x7684;&#x6548;&#x7387;</li>
+<li>EV_FEATURE_FDS&#xFF1A; &#x8981;&#x6C42;&#x540E;&#x7AEF;&#x80FD;&#x652F;&#x6301;&#x4EFB;&#x610F;&#x7C7B;&#x578B;&#x7684;&#x6587;&#x4EF6;&#x63CF;&#x8FF0;&#x7B26;&#xFF0C;&#x800C;&#x4E0D;&#x4EC5;&#x4EC5;&#x662F;socket</li>
 </ol>
-<p><code>event_config_set_flag()</code>可使用的运行时标识有：  </p>
+<p><code>event_config_set_flag()</code>&#x53EF;&#x4F7F;&#x7528;&#x7684;&#x8FD0;&#x884C;&#x65F6;&#x6807;&#x8BC6;&#x6709;&#xFF1A;  </p>
 <ol>
-<li><p>EVENT_BASE_FLAG_NOLOCK<br> 设置event_base不要使用锁。使用这个标识可以在加锁和释放event_base时节省一些时间，但在多线程中使用同个event_base会变得不安全，也无法加锁其实。  </p>
+<li><p>EVENT_BASE_FLAG_NOLOCK<br> &#x8BBE;&#x7F6E;event_base&#x4E0D;&#x8981;&#x4F7F;&#x7528;&#x9501;&#x3002;&#x4F7F;&#x7528;&#x8FD9;&#x4E2A;&#x6807;&#x8BC6;&#x53EF;&#x4EE5;&#x5728;&#x52A0;&#x9501;&#x548C;&#x91CA;&#x653E;event_base&#x65F6;&#x8282;&#x7701;&#x4E00;&#x4E9B;&#x65F6;&#x95F4;&#xFF0C;&#x4F46;&#x5728;&#x591A;&#x7EBF;&#x7A0B;&#x4E2D;&#x4F7F;&#x7528;&#x540C;&#x4E2A;event_base&#x4F1A;&#x53D8;&#x5F97;&#x4E0D;&#x5B89;&#x5168;&#xFF0C;&#x4E5F;&#x65E0;&#x6CD5;&#x52A0;&#x9501;&#x5176;&#x5B9E;&#x3002;  </p>
 </li>
-<li><p>EVENT_BASE_FLAG_IGNORE<em>ENV<br> 在选择后端时不要检查以`EVENT</em>`开头的环境变量。谨慎使用这个标识，它将增加你调试代码和Libevent接口的难度。  </p>
+<li><p>EVENT_BASE_FLAG_IGNORE<em>ENV<br> &#x5728;&#x9009;&#x62E9;&#x540E;&#x7AEF;&#x65F6;&#x4E0D;&#x8981;&#x68C0;&#x67E5;&#x4EE5;`EVENT</em>`&#x5F00;&#x5934;&#x7684;&#x73AF;&#x5883;&#x53D8;&#x91CF;&#x3002;&#x8C28;&#x614E;&#x4F7F;&#x7528;&#x8FD9;&#x4E2A;&#x6807;&#x8BC6;&#xFF0C;&#x5B83;&#x5C06;&#x589E;&#x52A0;&#x4F60;&#x8C03;&#x8BD5;&#x4EE3;&#x7801;&#x548C;Libevent&#x63A5;&#x53E3;&#x7684;&#x96BE;&#x5EA6;&#x3002;  </p>
 </li>
-<li><p>EVENT_BASE_FLAG_STARTUP_IOCP<br>只限Windows上使用，让Libevent运行后自动在需要时使用IOCP分发逻辑。  </p>
+<li><p>EVENT_BASE_FLAG_STARTUP_IOCP<br>&#x53EA;&#x9650;Windows&#x4E0A;&#x4F7F;&#x7528;&#xFF0C;&#x8BA9;Libevent&#x8FD0;&#x884C;&#x540E;&#x81EA;&#x52A8;&#x5728;&#x9700;&#x8981;&#x65F6;&#x4F7F;&#x7528;IOCP&#x5206;&#x53D1;&#x903B;&#x8F91;&#x3002;  </p>
 </li>
-<li><p>EVENT_BASE_FLAG_NO_CACHE_TIME<br> 设置这个标识，则每次轮询超时之后检查当前时间，而不是每次在每次轮询超时时做检查。这将使用更多cpu，使用时注意一下。  </p>
+<li><p>EVENT_BASE_FLAG_NO_CACHE_TIME<br> &#x8BBE;&#x7F6E;&#x8FD9;&#x4E2A;&#x6807;&#x8BC6;&#xFF0C;&#x5219;&#x6BCF;&#x6B21;&#x8F6E;&#x8BE2;&#x8D85;&#x65F6;&#x4E4B;&#x540E;&#x68C0;&#x67E5;&#x5F53;&#x524D;&#x65F6;&#x95F4;&#xFF0C;&#x800C;&#x4E0D;&#x662F;&#x6BCF;&#x6B21;&#x5728;&#x6BCF;&#x6B21;&#x8F6E;&#x8BE2;&#x8D85;&#x65F6;&#x65F6;&#x505A;&#x68C0;&#x67E5;&#x3002;&#x8FD9;&#x5C06;&#x4F7F;&#x7528;&#x66F4;&#x591A;cpu&#xFF0C;&#x4F7F;&#x7528;&#x65F6;&#x6CE8;&#x610F;&#x4E00;&#x4E0B;&#x3002;  </p>
 </li>
-<li><p>EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST<br> 告诉Libevent，如果它决定使用epoll这个后端，那它可以安全使用这类基于”changelist”的后端。在后端的分发函数被调用期间，若同个fd的状态被多次修改，那这个epoll-changelist后端能够避免一些不必要系统调用；但它也触发一个内核的bug：如果传一个通过<code>dup()</code>或类似的函数来clone的fd给到Libevent，将导致错误的结果。如果你不是使用epoll这个后端，那这个标识没有效果。你也可以通过设置<code>EVENT_EPOLL_USE_CHANGELIST</code>这个环境变量来打开epoll-changelist选项。  </p>
+<li><p>EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST<br> &#x544A;&#x8BC9;Libevent&#xFF0C;&#x5982;&#x679C;&#x5B83;&#x51B3;&#x5B9A;&#x4F7F;&#x7528;epoll&#x8FD9;&#x4E2A;&#x540E;&#x7AEF;&#xFF0C;&#x90A3;&#x5B83;&#x53EF;&#x4EE5;&#x5B89;&#x5168;&#x4F7F;&#x7528;&#x8FD9;&#x7C7B;&#x57FA;&#x4E8E;&#x201D;changelist&#x201D;&#x7684;&#x540E;&#x7AEF;&#x3002;&#x5728;&#x540E;&#x7AEF;&#x7684;&#x5206;&#x53D1;&#x51FD;&#x6570;&#x88AB;&#x8C03;&#x7528;&#x671F;&#x95F4;&#xFF0C;&#x82E5;&#x540C;&#x4E2A;fd&#x7684;&#x72B6;&#x6001;&#x88AB;&#x591A;&#x6B21;&#x4FEE;&#x6539;&#xFF0C;&#x90A3;&#x8FD9;&#x4E2A;epoll-changelist&#x540E;&#x7AEF;&#x80FD;&#x591F;&#x907F;&#x514D;&#x4E00;&#x4E9B;&#x4E0D;&#x5FC5;&#x8981;&#x7CFB;&#x7EDF;&#x8C03;&#x7528;&#xFF1B;&#x4F46;&#x5B83;&#x4E5F;&#x89E6;&#x53D1;&#x4E00;&#x4E2A;&#x5185;&#x6838;&#x7684;bug&#xFF1A;&#x5982;&#x679C;&#x4F20;&#x4E00;&#x4E2A;&#x901A;&#x8FC7;<code>dup()</code>&#x6216;&#x7C7B;&#x4F3C;&#x7684;&#x51FD;&#x6570;&#x6765;clone&#x7684;fd&#x7ED9;&#x5230;Libevent&#xFF0C;&#x5C06;&#x5BFC;&#x81F4;&#x9519;&#x8BEF;&#x7684;&#x7ED3;&#x679C;&#x3002;&#x5982;&#x679C;&#x4F60;&#x4E0D;&#x662F;&#x4F7F;&#x7528;epoll&#x8FD9;&#x4E2A;&#x540E;&#x7AEF;&#xFF0C;&#x90A3;&#x8FD9;&#x4E2A;&#x6807;&#x8BC6;&#x6CA1;&#x6709;&#x6548;&#x679C;&#x3002;&#x4F60;&#x4E5F;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x8BBE;&#x7F6E;<code>EVENT_EPOLL_USE_CHANGELIST</code>&#x8FD9;&#x4E2A;&#x73AF;&#x5883;&#x53D8;&#x91CF;&#x6765;&#x6253;&#x5F00;epoll-changelist&#x9009;&#x9879;&#x3002;  </p>
 </li>
-<li><p>EVENT_BASE_FLAG_PRECISE_TIMER<br> Libevent默认尝试使用系统提供的快速分时机制。如果有一个慢一些的但能提供更为精细度的分时机制，那通过这个标识来告诉Libevent使用这个慢一些的。如果系统不支持”慢一些但更精细”的机制，则这个标识没有效果。  </p>
+<li><p>EVENT_BASE_FLAG_PRECISE_TIMER<br> Libevent&#x9ED8;&#x8BA4;&#x5C1D;&#x8BD5;&#x4F7F;&#x7528;&#x7CFB;&#x7EDF;&#x63D0;&#x4F9B;&#x7684;&#x5FEB;&#x901F;&#x5206;&#x65F6;&#x673A;&#x5236;&#x3002;&#x5982;&#x679C;&#x6709;&#x4E00;&#x4E2A;&#x6162;&#x4E00;&#x4E9B;&#x7684;&#x4F46;&#x80FD;&#x63D0;&#x4F9B;&#x66F4;&#x4E3A;&#x7CBE;&#x7EC6;&#x5EA6;&#x7684;&#x5206;&#x65F6;&#x673A;&#x5236;&#xFF0C;&#x90A3;&#x901A;&#x8FC7;&#x8FD9;&#x4E2A;&#x6807;&#x8BC6;&#x6765;&#x544A;&#x8BC9;Libevent&#x4F7F;&#x7528;&#x8FD9;&#x4E2A;&#x6162;&#x4E00;&#x4E9B;&#x7684;&#x3002;&#x5982;&#x679C;&#x7CFB;&#x7EDF;&#x4E0D;&#x652F;&#x6301;&#x201D;&#x6162;&#x4E00;&#x4E9B;&#x4F46;&#x66F4;&#x7CBE;&#x7EC6;&#x201D;&#x7684;&#x673A;&#x5236;&#xFF0C;&#x5219;&#x8FD9;&#x4E2A;&#x6807;&#x8BC6;&#x6CA1;&#x6709;&#x6548;&#x679C;&#x3002;  </p>
 </li>
 </ol>
-<p>上面设置event_config的函数，成功则返回0，失败返回-1。  </p>
-<p><strong>注意</strong><br>如果你通过event_config设置一个系统不支持的后端，那<code>event_base_new_with_config()</code>返回NULL指针。  </p>
+<p>&#x4E0A;&#x9762;&#x8BBE;&#x7F6E;event_config&#x7684;&#x51FD;&#x6570;&#xFF0C;&#x6210;&#x529F;&#x5219;&#x8FD4;&#x56DE;0&#xFF0C;&#x5931;&#x8D25;&#x8FD4;&#x56DE;-1&#x3002;  </p>
+<p><strong>&#x6CE8;&#x610F;</strong><br>&#x5982;&#x679C;&#x4F60;&#x901A;&#x8FC7;event_config&#x8BBE;&#x7F6E;&#x4E00;&#x4E2A;&#x7CFB;&#x7EDF;&#x4E0D;&#x652F;&#x6301;&#x7684;&#x540E;&#x7AEF;&#xFF0C;&#x90A3;<code>event_base_new_with_config()</code>&#x8FD4;&#x56DE;NULL&#x6307;&#x9488;&#x3002;  </p>
 <pre><code>int event_config_set_num_cpus_hint(struct event_config *cfg, int cpus)
-</code></pre><p>这个函数目前只当Windows使用IOCP时才有用，未来也许用于其他系统。 调用他来告诉event_config后续创建的event_base应该在多线程中尝试充分使用cpu的多核。 注意event_base可能使用比你设置的更多或更少的cpu。    </p>
+</code></pre><p>&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x76EE;&#x524D;&#x53EA;&#x5F53;Windows&#x4F7F;&#x7528;IOCP&#x65F6;&#x624D;&#x6709;&#x7528;&#xFF0C;&#x672A;&#x6765;&#x4E5F;&#x8BB8;&#x7528;&#x4E8E;&#x5176;&#x4ED6;&#x7CFB;&#x7EDF;&#x3002; &#x8C03;&#x7528;&#x4ED6;&#x6765;&#x544A;&#x8BC9;event_config&#x540E;&#x7EED;&#x521B;&#x5EFA;&#x7684;event_base&#x5E94;&#x8BE5;&#x5728;&#x591A;&#x7EBF;&#x7A0B;&#x4E2D;&#x5C1D;&#x8BD5;&#x5145;&#x5206;&#x4F7F;&#x7528;cpu&#x7684;&#x591A;&#x6838;&#x3002; &#x6CE8;&#x610F;event_base&#x53EF;&#x80FD;&#x4F7F;&#x7528;&#x6BD4;&#x4F60;&#x8BBE;&#x7F6E;&#x7684;&#x66F4;&#x591A;&#x6216;&#x66F4;&#x5C11;&#x7684;cpu&#x3002;    </p>
 <pre><code>int event_config_set_max_dispatch_interval(struct event_config *cfg,
     const struct timeval *max_interval, int max_callbacks,
     int min_priority);
-</code></pre><p>这个函数通过在检查高优先级事件之前，对低优先级回调函数可以被调用的次数进行限制，来防止优先级的逆转。如果最大时间间隔为空，则事件轮询会在每个回调之后检查时间；如果最大时间间隔不为空，则会在这个时间间隔之后重新扫描高优先级的事件。如果最多回调次数不为负数，那达到这个次数之后，事件继续轮询更多事件。这些规则适用于最小优先级或更高优先级的任何事件。</p>
-<h3 id="Example:_Preferring_edge-triggered_backends">Example: Preferring edge-triggered backends</h3><pre><code>struct event_config *cfg;
+</code></pre><p>&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x901A;&#x8FC7;&#x5728;&#x68C0;&#x67E5;&#x9AD8;&#x4F18;&#x5148;&#x7EA7;&#x4E8B;&#x4EF6;&#x4E4B;&#x524D;&#xFF0C;&#x5BF9;&#x4F4E;&#x4F18;&#x5148;&#x7EA7;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x53EF;&#x4EE5;&#x88AB;&#x8C03;&#x7528;&#x7684;&#x6B21;&#x6570;&#x8FDB;&#x884C;&#x9650;&#x5236;&#xFF0C;&#x6765;&#x9632;&#x6B62;&#x4F18;&#x5148;&#x7EA7;&#x7684;&#x9006;&#x8F6C;&#x3002;&#x5982;&#x679C;&#x6700;&#x5927;&#x65F6;&#x95F4;&#x95F4;&#x9694;&#x4E3A;&#x7A7A;&#xFF0C;&#x5219;&#x4E8B;&#x4EF6;&#x8F6E;&#x8BE2;&#x4F1A;&#x5728;&#x6BCF;&#x4E2A;&#x56DE;&#x8C03;&#x4E4B;&#x540E;&#x68C0;&#x67E5;&#x65F6;&#x95F4;&#xFF1B;&#x5982;&#x679C;&#x6700;&#x5927;&#x65F6;&#x95F4;&#x95F4;&#x9694;&#x4E0D;&#x4E3A;&#x7A7A;&#xFF0C;&#x5219;&#x4F1A;&#x5728;&#x8FD9;&#x4E2A;&#x65F6;&#x95F4;&#x95F4;&#x9694;&#x4E4B;&#x540E;&#x91CD;&#x65B0;&#x626B;&#x63CF;&#x9AD8;&#x4F18;&#x5148;&#x7EA7;&#x7684;&#x4E8B;&#x4EF6;&#x3002;&#x5982;&#x679C;&#x6700;&#x591A;&#x56DE;&#x8C03;&#x6B21;&#x6570;&#x4E0D;&#x4E3A;&#x8D1F;&#x6570;&#xFF0C;&#x90A3;&#x8FBE;&#x5230;&#x8FD9;&#x4E2A;&#x6B21;&#x6570;&#x4E4B;&#x540E;&#xFF0C;&#x4E8B;&#x4EF6;&#x7EE7;&#x7EED;&#x8F6E;&#x8BE2;&#x66F4;&#x591A;&#x4E8B;&#x4EF6;&#x3002;&#x8FD9;&#x4E9B;&#x89C4;&#x5219;&#x9002;&#x7528;&#x4E8E;&#x6700;&#x5C0F;&#x4F18;&#x5148;&#x7EA7;&#x6216;&#x66F4;&#x9AD8;&#x4F18;&#x5148;&#x7EA7;&#x7684;&#x4EFB;&#x4F55;&#x4E8B;&#x4EF6;&#x3002;</p>
+<h3 id="example-preferring-edge-triggered-backends"><a href="#Example-Preferring-edge-triggered-backends" class="headerlink" title="Example: Preferring edge-triggered backends"></a>Example: Preferring edge-triggered backends</h3><pre><code>struct event_config *cfg;
 struct event_base *base;
 int i;
 
 /* My program wants to use edge-triggered events if at all possible.  So
-   I&#39;ll try to get a base twice: Once insisting on edge-triggered IO, and
+   I&apos;ll try to get a base twice: Once insisting on edge-triggered IO, and
    once not. */
 for (i=0; i&lt;2; ++i) {
     cfg = event_config_new();
 
-    /* I don&#39;t like select. */
+    /* I don&apos;t like select. */
     event_config_avoid_method(cfg, &quot;select&quot;);
 
     if (i == 0)
@@ -152,20 +152,20 @@ for (i=0; i&lt;2; ++i) {
         break;
 
     /* If we get here, event_base_new_with_config() returned NULL.  If
-       this is the first time around the loop, we&#39;ll try again without
+       this is the first time around the loop, we&apos;ll try again without
        setting EV_FEATURE_ET.  If this is the second time around the
-       loop, we&#39;ll give up. */
+       loop, we&apos;ll give up. */
 }
-</code></pre><h3 id="Example:_Avoiding_priority-inversion">Example: Avoiding priority-inversion</h3><pre><code>struct event_config *cfg;
+</code></pre><h3 id="example-avoiding-priority-inversion"><a href="#Example-Avoiding-priority-inversion" class="headerlink" title="Example: Avoiding priority-inversion"></a>Example: Avoiding priority-inversion</h3><pre><code>struct event_config *cfg;
 struct event_base *base;
 
 cfg = event_config_new();
 if (!cfg)
    /* Handle error */;
 
-/* I&#39;m going to have events running at two priorities.  I expect that
+/* I&apos;m going to have events running at two priorities.  I expect that
    some of my priority-1 events are going to have pretty slow callbacks,
-   so I don&#39;t want more than 100 msec to elapse (or 5 callbacks) before
+   so I don&apos;t want more than 100 msec to elapse (or 5 callbacks) before
    checking for priority-0 events. */
 struct timeval msec_100 = { 0, 100*1000 };
 event_config_set_max_dispatch_interval(cfg, &amp;msec_100, 5, 1);
@@ -175,29 +175,29 @@ if (!base)
    /* Handle error */;
 
 event_base_priority_init(base, 2);
-</code></pre><p>这些函数和类型定义在头文件<code>&lt;event2/event.h&gt;</code>。  </p>
-<p>标识<code>EVENT_BASE_FLAG_IGNORE_ENV</code>首先出现在Libevent 2.0.2-alpha。<br>标识<code>EVENT_BASE_FLAG_PRECISE_TIMER</code>首次出现在Libevent 2.1.2-alpha。<br>函数<code>event_config_set_num_cpus_hint()</code>是在Libevent 2.0.7-rc才有，以及函数<code>event_config_set_max_dispatch_interval()</code>首先出现在2.1.1-alpha。<br>其他的则都是首次出现在Libevent 2.0.1-alpha。  </p>
+</code></pre><p>&#x8FD9;&#x4E9B;&#x51FD;&#x6570;&#x548C;&#x7C7B;&#x578B;&#x5B9A;&#x4E49;&#x5728;&#x5934;&#x6587;&#x4EF6;<code>&lt;event2/event.h&gt;</code>&#x3002;  </p>
+<p>&#x6807;&#x8BC6;<code>EVENT_BASE_FLAG_IGNORE_ENV</code>&#x9996;&#x5148;&#x51FA;&#x73B0;&#x5728;Libevent 2.0.2-alpha&#x3002;<br>&#x6807;&#x8BC6;<code>EVENT_BASE_FLAG_PRECISE_TIMER</code>&#x9996;&#x6B21;&#x51FA;&#x73B0;&#x5728;Libevent 2.1.2-alpha&#x3002;<br>&#x51FD;&#x6570;<code>event_config_set_num_cpus_hint()</code>&#x662F;&#x5728;Libevent 2.0.7-rc&#x624D;&#x6709;&#xFF0C;&#x4EE5;&#x53CA;&#x51FD;&#x6570;<code>event_config_set_max_dispatch_interval()</code>&#x9996;&#x5148;&#x51FA;&#x73B0;&#x5728;2.1.1-alpha&#x3002;<br>&#x5176;&#x4ED6;&#x7684;&#x5219;&#x90FD;&#x662F;&#x9996;&#x6B21;&#x51FA;&#x73B0;&#x5728;Libevent 2.0.1-alpha&#x3002;  </p>
 <p><br></p>
-<h2 id="检查event_base的后端函数">检查event_base的后端函数</h2><p>有时你想查看event_base有哪些特性，或者event_base使用了哪个后端函数。  </p>
+<h2 id="&#x68C0;&#x67E5;event_base&#x7684;&#x540E;&#x7AEF;&#x51FD;&#x6570;"><a href="#&#x68C0;&#x67E5;event-base&#x7684;&#x540E;&#x7AEF;&#x51FD;&#x6570;" class="headerlink" title="&#x68C0;&#x67E5;event_base&#x7684;&#x540E;&#x7AEF;&#x51FD;&#x6570;"></a>&#x68C0;&#x67E5;event_base&#x7684;&#x540E;&#x7AEF;&#x51FD;&#x6570;</h2><p>&#x6709;&#x65F6;&#x4F60;&#x60F3;&#x67E5;&#x770B;event_base&#x6709;&#x54EA;&#x4E9B;&#x7279;&#x6027;&#xFF0C;&#x6216;&#x8005;event_base&#x4F7F;&#x7528;&#x4E86;&#x54EA;&#x4E2A;&#x540E;&#x7AEF;&#x51FD;&#x6570;&#x3002;  </p>
 <pre><code>const char **event_get_supported_methods(void);
-</code></pre><p>函数返回一个数组指针，数组包含当前Libevent支持的后端函数。数组最后一个元素是NULL指针。  </p>
-<h4 id="Example">Example</h4><pre><code>int i;
+</code></pre><p>&#x51FD;&#x6570;&#x8FD4;&#x56DE;&#x4E00;&#x4E2A;&#x6570;&#x7EC4;&#x6307;&#x9488;&#xFF0C;&#x6570;&#x7EC4;&#x5305;&#x542B;&#x5F53;&#x524D;Libevent&#x652F;&#x6301;&#x7684;&#x540E;&#x7AEF;&#x51FD;&#x6570;&#x3002;&#x6570;&#x7EC4;&#x6700;&#x540E;&#x4E00;&#x4E2A;&#x5143;&#x7D20;&#x662F;NULL&#x6307;&#x9488;&#x3002;  </p>
+<h4 id="example"><a href="#Example" class="headerlink" title="Example"></a>Example</h4><pre><code>int i;
 const char **methods = event_get_supported_methods();
 printf(&quot;Starting Libevent %s.  Available methods are:\n&quot;,
     event_get_version());
 for (i=0; methods[i] != NULL; ++i) {
     printf(&quot;    %s\n&quot;, methods[i]);
 }
-</code></pre><p><strong>注意</strong>: 这个函数返回的是Libevent编译中支持的后端函数列表，</p>
-<h3 id="Inteface">Inteface</h3><pre><code>const char *event_base_get_method(const struct event_base *base);
+</code></pre><p><strong>&#x6CE8;&#x610F;</strong>: &#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x8FD4;&#x56DE;&#x7684;&#x662F;Libevent&#x7F16;&#x8BD1;&#x4E2D;&#x652F;&#x6301;&#x7684;&#x540E;&#x7AEF;&#x51FD;&#x6570;&#x5217;&#x8868;&#xFF0C;</p>
+<h3 id="inteface"><a href="#Inteface" class="headerlink" title="Inteface"></a>Inteface</h3><pre><code>const char *event_base_get_method(const struct event_base *base);
 enum event_method_feature event_base_get_features(const struct event_base *base);
-</code></pre><p><code>event_base_get_method()</code>返回event_base实际使用的后端函数。<br><code>The event_base_get_features()</code>返回一个位掩码，标识event_base支持的特性。  </p>
-<h4 id="Example-1">Example</h4><pre><code>struct event_base *base;
+</code></pre><p><code>event_base_get_method()</code>&#x8FD4;&#x56DE;event_base&#x5B9E;&#x9645;&#x4F7F;&#x7528;&#x7684;&#x540E;&#x7AEF;&#x51FD;&#x6570;&#x3002;<br><code>The event_base_get_features()</code>&#x8FD4;&#x56DE;&#x4E00;&#x4E2A;&#x4F4D;&#x63A9;&#x7801;&#xFF0C;&#x6807;&#x8BC6;event_base&#x652F;&#x6301;&#x7684;&#x7279;&#x6027;&#x3002;  </p>
+<h4 id="example"><a href="#Example-1" class="headerlink" title="Example"></a>Example</h4><pre><code>struct event_base *base;
 enum event_method_feature f;
 
 base = event_base_new();
 if (!base) {
-    puts(&quot;Couldn&#39;t get an event_base!&quot;);
+    puts(&quot;Couldn&apos;t get an event_base!&quot;);
 } else {
     printf(&quot;Using Libevent with backend method %s.&quot;,
         event_base_get_method(base));
@@ -211,20 +211,20 @@ if (!base) {
     puts(&quot;&quot;);
 }
 </code></pre><p><br></p>
-<h2 id="释放event_base">释放event_base</h2><p>event_base不再使用时，你可以释放它.  </p>
+<h2 id="&#x91CA;&#x653E;event_base"><a href="#&#x91CA;&#x653E;event-base" class="headerlink" title="&#x91CA;&#x653E;event_base"></a>&#x91CA;&#x653E;event_base</h2><p>event_base&#x4E0D;&#x518D;&#x4F7F;&#x7528;&#x65F6;&#xFF0C;&#x4F60;&#x53EF;&#x4EE5;&#x91CA;&#x653E;&#x5B83;.  </p>
 <pre><code>void event_base_free(struct event_base *base);
-</code></pre><p>注意这个函数并不会同时释放当前关联在这个event_base上的事件，不会关闭任何socket。  </p>
+</code></pre><p>&#x6CE8;&#x610F;&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x5E76;&#x4E0D;&#x4F1A;&#x540C;&#x65F6;&#x91CA;&#x653E;&#x5F53;&#x524D;&#x5173;&#x8054;&#x5728;&#x8FD9;&#x4E2A;event_base&#x4E0A;&#x7684;&#x4E8B;&#x4EF6;&#xFF0C;&#x4E0D;&#x4F1A;&#x5173;&#x95ED;&#x4EFB;&#x4F55;socket&#x3002;  </p>
 <p><br></p>
-<h2 id="设置event_base优先级">设置event_base优先级</h2><p>Libevent支持对一个event设置多个优先顺序，但是默认上一个event_base只支持一个优先等级。你可以调用<code>event_base_priority_init()</code>来设置event_base的优先级。  </p>
+<h2 id="&#x8BBE;&#x7F6E;event_base&#x4F18;&#x5148;&#x7EA7;"><a href="#&#x8BBE;&#x7F6E;event-base&#x4F18;&#x5148;&#x7EA7;" class="headerlink" title="&#x8BBE;&#x7F6E;event_base&#x4F18;&#x5148;&#x7EA7;"></a>&#x8BBE;&#x7F6E;event_base&#x4F18;&#x5148;&#x7EA7;</h2><p>Libevent&#x652F;&#x6301;&#x5BF9;&#x4E00;&#x4E2A;event&#x8BBE;&#x7F6E;&#x591A;&#x4E2A;&#x4F18;&#x5148;&#x987A;&#x5E8F;&#xFF0C;&#x4F46;&#x662F;&#x9ED8;&#x8BA4;&#x4E0A;&#x4E00;&#x4E2A;event_base&#x53EA;&#x652F;&#x6301;&#x4E00;&#x4E2A;&#x4F18;&#x5148;&#x7B49;&#x7EA7;&#x3002;&#x4F60;&#x53EF;&#x4EE5;&#x8C03;&#x7528;<code>event_base_priority_init()</code>&#x6765;&#x8BBE;&#x7F6E;event_base&#x7684;&#x4F18;&#x5148;&#x7EA7;&#x3002;  </p>
 <pre><code>int event_base_priority_init(struct event_base *base, int n_priorities);
-</code></pre><p>成功返回0，否则返回-1。 参数base指event_base，n_priorities是优先级对应的数字，至少为1。<br>新创建的事件的优先级则是从最重要的0到不重要的-1.<br>有一个常量<code>EVENT_MAX_PRIORITIES</code>, 是参数n_priorities的最大值，n_priorities不能超过这个值。<br><strong>注意</strong>： 你必须在激活任何事件之前调用这个函数，最好是在event_base创建之后马上调用。  </p>
+</code></pre><p>&#x6210;&#x529F;&#x8FD4;&#x56DE;0&#xFF0C;&#x5426;&#x5219;&#x8FD4;&#x56DE;-1&#x3002; &#x53C2;&#x6570;base&#x6307;event_base&#xFF0C;n_priorities&#x662F;&#x4F18;&#x5148;&#x7EA7;&#x5BF9;&#x5E94;&#x7684;&#x6570;&#x5B57;&#xFF0C;&#x81F3;&#x5C11;&#x4E3A;1&#x3002;<br>&#x65B0;&#x521B;&#x5EFA;&#x7684;&#x4E8B;&#x4EF6;&#x7684;&#x4F18;&#x5148;&#x7EA7;&#x5219;&#x662F;&#x4ECE;&#x6700;&#x91CD;&#x8981;&#x7684;0&#x5230;&#x4E0D;&#x91CD;&#x8981;&#x7684;-1.<br>&#x6709;&#x4E00;&#x4E2A;&#x5E38;&#x91CF;<code>EVENT_MAX_PRIORITIES</code>, &#x662F;&#x53C2;&#x6570;n_priorities&#x7684;&#x6700;&#x5927;&#x503C;&#xFF0C;n_priorities&#x4E0D;&#x80FD;&#x8D85;&#x8FC7;&#x8FD9;&#x4E2A;&#x503C;&#x3002;<br><strong>&#x6CE8;&#x610F;</strong>&#xFF1A; &#x4F60;&#x5FC5;&#x987B;&#x5728;&#x6FC0;&#x6D3B;&#x4EFB;&#x4F55;&#x4E8B;&#x4EF6;&#x4E4B;&#x524D;&#x8C03;&#x7528;&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#xFF0C;&#x6700;&#x597D;&#x662F;&#x5728;event_base&#x521B;&#x5EFA;&#x4E4B;&#x540E;&#x9A6C;&#x4E0A;&#x8C03;&#x7528;&#x3002;  </p>
 <pre><code>int event_base_get_npriorities(struct event_base *base);
-</code></pre><p>返回event_base的优先等级。例如：如果返回3，则有效的优先顺序范围为0，1，2.<br>新创建的事件关联到这个event_base后，事件的默认优先级初始化为<code>n_priorities / 2</code>.  </p>
+</code></pre><p>&#x8FD4;&#x56DE;event_base&#x7684;&#x4F18;&#x5148;&#x7B49;&#x7EA7;&#x3002;&#x4F8B;&#x5982;&#xFF1A;&#x5982;&#x679C;&#x8FD4;&#x56DE;3&#xFF0C;&#x5219;&#x6709;&#x6548;&#x7684;&#x4F18;&#x5148;&#x987A;&#x5E8F;&#x8303;&#x56F4;&#x4E3A;0&#xFF0C;1&#xFF0C;2.<br>&#x65B0;&#x521B;&#x5EFA;&#x7684;&#x4E8B;&#x4EF6;&#x5173;&#x8054;&#x5230;&#x8FD9;&#x4E2A;event_base&#x540E;&#xFF0C;&#x4E8B;&#x4EF6;&#x7684;&#x9ED8;&#x8BA4;&#x4F18;&#x5148;&#x7EA7;&#x521D;&#x59CB;&#x5316;&#x4E3A;<code>n_priorities / 2</code>.  </p>
 <p><br></p>
-<h2 id="fock()之后重新初始化event_base">fock()之后重新初始化event_base</h2><p>在fork()之后并不是所有的事件后端都能保持干净，所以，如果你的程序使用fork()或者相关联的系统调用来开始一个新的进程，而且你想继续使用之前的event_base，那你需要重新初始化event_base。  </p>
+<h2 id="fock&#x4E4B;&#x540E;&#x91CD;&#x65B0;&#x521D;&#x59CB;&#x5316;event_base"><a href="#fock-&#x4E4B;&#x540E;&#x91CD;&#x65B0;&#x521D;&#x59CB;&#x5316;event-base" class="headerlink" title="fock()&#x4E4B;&#x540E;&#x91CD;&#x65B0;&#x521D;&#x59CB;&#x5316;event_base"></a>fock()&#x4E4B;&#x540E;&#x91CD;&#x65B0;&#x521D;&#x59CB;&#x5316;event_base</h2><p>&#x5728;fork()&#x4E4B;&#x540E;&#x5E76;&#x4E0D;&#x662F;&#x6240;&#x6709;&#x7684;&#x4E8B;&#x4EF6;&#x540E;&#x7AEF;&#x90FD;&#x80FD;&#x4FDD;&#x6301;&#x5E72;&#x51C0;&#xFF0C;&#x6240;&#x4EE5;&#xFF0C;&#x5982;&#x679C;&#x4F60;&#x7684;&#x7A0B;&#x5E8F;&#x4F7F;&#x7528;fork()&#x6216;&#x8005;&#x76F8;&#x5173;&#x8054;&#x7684;&#x7CFB;&#x7EDF;&#x8C03;&#x7528;&#x6765;&#x5F00;&#x59CB;&#x4E00;&#x4E2A;&#x65B0;&#x7684;&#x8FDB;&#x7A0B;&#xFF0C;&#x800C;&#x4E14;&#x4F60;&#x60F3;&#x7EE7;&#x7EED;&#x4F7F;&#x7528;&#x4E4B;&#x524D;&#x7684;event_base&#xFF0C;&#x90A3;&#x4F60;&#x9700;&#x8981;&#x91CD;&#x65B0;&#x521D;&#x59CB;&#x5316;event_base&#x3002;  </p>
 <pre><code>int event_reinit(struct event_base *base);
-</code></pre><p>成功返回0，失败返回-1。  </p>
-<h4 id="Example-2">Example</h4><pre><code>struct event_base *base = event_base_new();
+</code></pre><p>&#x6210;&#x529F;&#x8FD4;&#x56DE;0&#xFF0C;&#x5931;&#x8D25;&#x8FD4;&#x56DE;-1&#x3002;  </p>
+<h4 id="example"><a href="#Example-2" class="headerlink" title="Example"></a>Example</h4><pre><code>struct event_base *base = event_base_new();
 
 /* ... add some events to the event_base ... */
 
@@ -237,8 +237,8 @@ if (fork()) {
     continue_running_child(base); /*...*/
 }
 </code></pre><p><br></p>
-<h2 id="不再使用event_base这个函数">不再使用event_base这个函数</h2><p>以前使用的是<code>struct event_base *event_init(void);</code><br>解释略。</p>
-<p><br><br>– EOF –</p>
+<h2 id="&#x4E0D;&#x518D;&#x4F7F;&#x7528;event_base&#x8FD9;&#x4E2A;&#x51FD;&#x6570;"><a href="#&#x4E0D;&#x518D;&#x4F7F;&#x7528;event-base&#x8FD9;&#x4E2A;&#x51FD;&#x6570;" class="headerlink" title="&#x4E0D;&#x518D;&#x4F7F;&#x7528;event_base&#x8FD9;&#x4E2A;&#x51FD;&#x6570;"></a>&#x4E0D;&#x518D;&#x4F7F;&#x7528;event_base&#x8FD9;&#x4E2A;&#x51FD;&#x6570;</h2><p>&#x4EE5;&#x524D;&#x4F7F;&#x7528;&#x7684;&#x662F;<code>struct event_base *event_init(void);</code><br>&#x89E3;&#x91CA;&#x7565;&#x3002;</p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -313,7 +313,7 @@ if (fork()) {
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

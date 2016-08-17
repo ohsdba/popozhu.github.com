@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -49,57 +49,57 @@
 	
 	    
 	    
-		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#provider_和_adapter"><span class="toc-text">provider 和 adapter</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#provider"><span class="toc-text">provider</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#adapter"><span class="toc-text">adapter</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#过程和工具"><span class="toc-text">过程和工具</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#last"><span class="toc-text">last</span></a></li></ol> </div>
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#背景"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#provider-和-adapter"><span class="toc-text">provider 和 adapter</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#provider"><span class="toc-text">provider</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#adapter"><span class="toc-text">adapter</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#过程和工具"><span class="toc-text">过程和工具</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#last"><span class="toc-text">last</span></a></li></ol> </div>
 	    
 
-	    <h1 id="背景">背景</h1><p>在团队中使用 phabricator 也有一段时间了，近期想让更多的人使用，为了让大家能够使用现有的帐号来便捷地登录 phabricator，需要修改验证方式，由默认的 <code>username/password</code> 修改为团队已有的统一登录接口，类似 <code>oauth</code> 的方式：</p>
+	    <h1 id="&#x80CC;&#x666F;"><a href="#&#x80CC;&#x666F;" class="headerlink" title="&#x80CC;&#x666F;"></a>&#x80CC;&#x666F;</h1><p>&#x5728;&#x56E2;&#x961F;&#x4E2D;&#x4F7F;&#x7528; phabricator &#x4E5F;&#x6709;&#x4E00;&#x6BB5;&#x65F6;&#x95F4;&#x4E86;&#xFF0C;&#x8FD1;&#x671F;&#x60F3;&#x8BA9;&#x66F4;&#x591A;&#x7684;&#x4EBA;&#x4F7F;&#x7528;&#xFF0C;&#x4E3A;&#x4E86;&#x8BA9;&#x5927;&#x5BB6;&#x80FD;&#x591F;&#x4F7F;&#x7528;&#x73B0;&#x6709;&#x7684;&#x5E10;&#x53F7;&#x6765;&#x4FBF;&#x6377;&#x5730;&#x767B;&#x5F55; phabricator&#xFF0C;&#x9700;&#x8981;&#x4FEE;&#x6539;&#x9A8C;&#x8BC1;&#x65B9;&#x5F0F;&#xFF0C;&#x7531;&#x9ED8;&#x8BA4;&#x7684; <code>username/password</code> &#x4FEE;&#x6539;&#x4E3A;&#x56E2;&#x961F;&#x5DF2;&#x6709;&#x7684;&#x7EDF;&#x4E00;&#x767B;&#x5F55;&#x63A5;&#x53E3;&#xFF0C;&#x7C7B;&#x4F3C; <code>oauth</code> &#x7684;&#x65B9;&#x5F0F;&#xFF1A;</p>
 <ul>
-<li>检验统一的帐号密码</li>
-<li>检验通过后获取到一个 ticket</li>
-<li>由 ticket 获取用户的具体信息</li>
-<li>把用户信息按约定的接口，提交给 phabricator ，再由框架保存到 db、缓存等</li>
-<li>用户完成登录</li>
+<li>&#x68C0;&#x9A8C;&#x7EDF;&#x4E00;&#x7684;&#x5E10;&#x53F7;&#x5BC6;&#x7801;</li>
+<li>&#x68C0;&#x9A8C;&#x901A;&#x8FC7;&#x540E;&#x83B7;&#x53D6;&#x5230;&#x4E00;&#x4E2A; ticket</li>
+<li>&#x7531; ticket &#x83B7;&#x53D6;&#x7528;&#x6237;&#x7684;&#x5177;&#x4F53;&#x4FE1;&#x606F;</li>
+<li>&#x628A;&#x7528;&#x6237;&#x4FE1;&#x606F;&#x6309;&#x7EA6;&#x5B9A;&#x7684;&#x63A5;&#x53E3;&#xFF0C;&#x63D0;&#x4EA4;&#x7ED9; phabricator &#xFF0C;&#x518D;&#x7531;&#x6846;&#x67B6;&#x4FDD;&#x5B58;&#x5230; db&#x3001;&#x7F13;&#x5B58;&#x7B49;</li>
+<li>&#x7528;&#x6237;&#x5B8C;&#x6210;&#x767B;&#x5F55;</li>
 </ul>
-<p>翻了一下源码，发现 phabricator 的扩展非常方便。其中一个出发点在于：phabricator 会把所有 src 源码都加载到框架中，在运行时由框架帮忙查找并决定使用哪个<strong>子类</strong>。</p>
-<p>依据 phabricator 的 <a href="https://secure.phabricator.com/book/phabcontrib/article/adding_new_classes/#fundamentals" target="_blank" rel="external">模块机制</a>，在扩展目录 <code>extensions</code> 中添加自己的类，继承指定的接口或类，phabricator 就能自动加载我们扩展的类，添加到 web 界面中作为新的可选项，迅速扩展功能。</p>
-<p>由于 phabricator 有 3 个部分，因此有 3 个扩展目录: </p>
+<p>&#x7FFB;&#x4E86;&#x4E00;&#x4E0B;&#x6E90;&#x7801;&#xFF0C;&#x53D1;&#x73B0; phabricator &#x7684;&#x6269;&#x5C55;&#x975E;&#x5E38;&#x65B9;&#x4FBF;&#x3002;&#x5176;&#x4E2D;&#x4E00;&#x4E2A;&#x51FA;&#x53D1;&#x70B9;&#x5728;&#x4E8E;&#xFF1A;phabricator &#x4F1A;&#x628A;&#x6240;&#x6709; src &#x6E90;&#x7801;&#x90FD;&#x52A0;&#x8F7D;&#x5230;&#x6846;&#x67B6;&#x4E2D;&#xFF0C;&#x5728;&#x8FD0;&#x884C;&#x65F6;&#x7531;&#x6846;&#x67B6;&#x5E2E;&#x5FD9;&#x67E5;&#x627E;&#x5E76;&#x51B3;&#x5B9A;&#x4F7F;&#x7528;&#x54EA;&#x4E2A;<strong>&#x5B50;&#x7C7B;</strong>&#x3002;</p>
+<p>&#x4F9D;&#x636E; phabricator &#x7684; <a href="https://secure.phabricator.com/book/phabcontrib/article/adding_new_classes/#fundamentals" target="_blank" rel="external">&#x6A21;&#x5757;&#x673A;&#x5236;</a>&#xFF0C;&#x5728;&#x6269;&#x5C55;&#x76EE;&#x5F55; <code>extensions</code> &#x4E2D;&#x6DFB;&#x52A0;&#x81EA;&#x5DF1;&#x7684;&#x7C7B;&#xFF0C;&#x7EE7;&#x627F;&#x6307;&#x5B9A;&#x7684;&#x63A5;&#x53E3;&#x6216;&#x7C7B;&#xFF0C;phabricator &#x5C31;&#x80FD;&#x81EA;&#x52A8;&#x52A0;&#x8F7D;&#x6211;&#x4EEC;&#x6269;&#x5C55;&#x7684;&#x7C7B;&#xFF0C;&#x6DFB;&#x52A0;&#x5230; web &#x754C;&#x9762;&#x4E2D;&#x4F5C;&#x4E3A;&#x65B0;&#x7684;&#x53EF;&#x9009;&#x9879;&#xFF0C;&#x8FC5;&#x901F;&#x6269;&#x5C55;&#x529F;&#x80FD;&#x3002;</p>
+<p>&#x7531;&#x4E8E; phabricator &#x6709; 3 &#x4E2A;&#x90E8;&#x5206;&#xFF0C;&#x56E0;&#x6B64;&#x6709; 3 &#x4E2A;&#x6269;&#x5C55;&#x76EE;&#x5F55;: </p>
 <ul>
 <li>phabricator/src/extensions/</li>
 <li>libphutil/src/extensions/</li>
 <li>arcanist/src/extensions/</li>
 </ul>
-<p>我本次扩展的功能需要用到前面两个目录。</p>
-<p>以下内容主要是结论性的描述文字，至于我对源码分析过程、框架实现细节并未展开，因此这里的内容更适合已经接触过 phabricator、对其源码有一定了解的同学。</p>
-<p>开始之前，有如下假设：</p>
+<p>&#x6211;&#x672C;&#x6B21;&#x6269;&#x5C55;&#x7684;&#x529F;&#x80FD;&#x9700;&#x8981;&#x7528;&#x5230;&#x524D;&#x9762;&#x4E24;&#x4E2A;&#x76EE;&#x5F55;&#x3002;</p>
+<p>&#x4EE5;&#x4E0B;&#x5185;&#x5BB9;&#x4E3B;&#x8981;&#x662F;&#x7ED3;&#x8BBA;&#x6027;&#x7684;&#x63CF;&#x8FF0;&#x6587;&#x5B57;&#xFF0C;&#x81F3;&#x4E8E;&#x6211;&#x5BF9;&#x6E90;&#x7801;&#x5206;&#x6790;&#x8FC7;&#x7A0B;&#x3001;&#x6846;&#x67B6;&#x5B9E;&#x73B0;&#x7EC6;&#x8282;&#x5E76;&#x672A;&#x5C55;&#x5F00;&#xFF0C;&#x56E0;&#x6B64;&#x8FD9;&#x91CC;&#x7684;&#x5185;&#x5BB9;&#x66F4;&#x9002;&#x5408;&#x5DF2;&#x7ECF;&#x63A5;&#x89E6;&#x8FC7; phabricator&#x3001;&#x5BF9;&#x5176;&#x6E90;&#x7801;&#x6709;&#x4E00;&#x5B9A;&#x4E86;&#x89E3;&#x7684;&#x540C;&#x5B66;&#x3002;</p>
+<p>&#x5F00;&#x59CB;&#x4E4B;&#x524D;&#xFF0C;&#x6709;&#x5982;&#x4E0B;&#x5047;&#x8BBE;&#xFF1A;</p>
 <ul>
-<li>phabricator 的 web server 域名为 <code>my.ph.com</code></li>
-<li>团队现有的认证中心域名为 <code>my.auth.com</code></li>
-<li>假设认证中心 <code>my.auth.com</code> 包含了： a) 帐号的检验，b) ticket的分发，c) 通过 ticket 获取用户信息</li>
+<li>phabricator &#x7684; web server &#x57DF;&#x540D;&#x4E3A; <code>my.ph.com</code></li>
+<li>&#x56E2;&#x961F;&#x73B0;&#x6709;&#x7684;&#x8BA4;&#x8BC1;&#x4E2D;&#x5FC3;&#x57DF;&#x540D;&#x4E3A; <code>my.auth.com</code></li>
+<li>&#x5047;&#x8BBE;&#x8BA4;&#x8BC1;&#x4E2D;&#x5FC3; <code>my.auth.com</code> &#x5305;&#x542B;&#x4E86;&#xFF1A; a) &#x5E10;&#x53F7;&#x7684;&#x68C0;&#x9A8C;&#xFF0C;b) ticket&#x7684;&#x5206;&#x53D1;&#xFF0C;c) &#x901A;&#x8FC7; ticket &#x83B7;&#x53D6;&#x7528;&#x6237;&#x4FE1;&#x606F;</li>
 </ul>
-<h1 id="provider_和_adapter">provider 和 adapter</h1><h2 id="provider">provider</h2><p>那么首先需要在<code>my.ph.com/auth/config/new/</code> 中新增一个新的认证方式，并启用它。</p>
-<p>从结论上来说，在目录 <code>phabricator/src/applications/auth/provider</code> 新增一个类 <code>PhabricatorMyAuthProvider</code>，继承类 <code>PhabricatorAuthProvider</code>，按需实现其约定的功能：</p>
+<h1 id="provider-&#x548C;-adapter"><a href="#provider-&#x548C;-adapter" class="headerlink" title="provider &#x548C; adapter"></a>provider &#x548C; adapter</h1><h2 id="provider"><a href="#provider" class="headerlink" title="provider"></a>provider</h2><p>&#x90A3;&#x4E48;&#x9996;&#x5148;&#x9700;&#x8981;&#x5728;<code>my.ph.com/auth/config/new/</code> &#x4E2D;&#x65B0;&#x589E;&#x4E00;&#x4E2A;&#x65B0;&#x7684;&#x8BA4;&#x8BC1;&#x65B9;&#x5F0F;&#xFF0C;&#x5E76;&#x542F;&#x7528;&#x5B83;&#x3002;</p>
+<p>&#x4ECE;&#x7ED3;&#x8BBA;&#x4E0A;&#x6765;&#x8BF4;&#xFF0C;&#x5728;&#x76EE;&#x5F55; <code>phabricator/src/applications/auth/provider</code> &#x65B0;&#x589E;&#x4E00;&#x4E2A;&#x7C7B; <code>PhabricatorMyAuthProvider</code>&#xFF0C;&#x7EE7;&#x627F;&#x7C7B; <code>PhabricatorAuthProvider</code>&#xFF0C;&#x6309;&#x9700;&#x5B9E;&#x73B0;&#x5176;&#x7EA6;&#x5B9A;&#x7684;&#x529F;&#x80FD;&#xFF1A;</p>
 <ul>
-<li>构造登录的表单，供用户输入其用户名、密码，由约定的函数 <code>renderLoginForm</code> 完成</li>
-<li>表单处理逻辑，提交用户帐号和密码到统一认证中心 <code>my.auth.com</code>，获取 ticket，根据 ticket 获取用户信息，用户信息经约定好的函数再由 phabricator 框架使用，完成用户的登录，由约定的函数 <code>processLoginRequest</code> 完成</li>
+<li>&#x6784;&#x9020;&#x767B;&#x5F55;&#x7684;&#x8868;&#x5355;&#xFF0C;&#x4F9B;&#x7528;&#x6237;&#x8F93;&#x5165;&#x5176;&#x7528;&#x6237;&#x540D;&#x3001;&#x5BC6;&#x7801;&#xFF0C;&#x7531;&#x7EA6;&#x5B9A;&#x7684;&#x51FD;&#x6570; <code>renderLoginForm</code> &#x5B8C;&#x6210;</li>
+<li>&#x8868;&#x5355;&#x5904;&#x7406;&#x903B;&#x8F91;&#xFF0C;&#x63D0;&#x4EA4;&#x7528;&#x6237;&#x5E10;&#x53F7;&#x548C;&#x5BC6;&#x7801;&#x5230;&#x7EDF;&#x4E00;&#x8BA4;&#x8BC1;&#x4E2D;&#x5FC3; <code>my.auth.com</code>&#xFF0C;&#x83B7;&#x53D6; ticket&#xFF0C;&#x6839;&#x636E; ticket &#x83B7;&#x53D6;&#x7528;&#x6237;&#x4FE1;&#x606F;&#xFF0C;&#x7528;&#x6237;&#x4FE1;&#x606F;&#x7ECF;&#x7EA6;&#x5B9A;&#x597D;&#x7684;&#x51FD;&#x6570;&#x518D;&#x7531; phabricator &#x6846;&#x67B6;&#x4F7F;&#x7528;&#xFF0C;&#x5B8C;&#x6210;&#x7528;&#x6237;&#x7684;&#x767B;&#x5F55;&#xFF0C;&#x7531;&#x7EA6;&#x5B9A;&#x7684;&#x51FD;&#x6570; <code>processLoginRequest</code> &#x5B8C;&#x6210;</li>
 </ul>
-<p>当然，这里的流程跟正规的 oauth 认证方式未必都一致，具体实现根据具体情况分析。伪代码如下：</p>
+<p>&#x5F53;&#x7136;&#xFF0C;&#x8FD9;&#x91CC;&#x7684;&#x6D41;&#x7A0B;&#x8DDF;&#x6B63;&#x89C4;&#x7684; oauth &#x8BA4;&#x8BC1;&#x65B9;&#x5F0F;&#x672A;&#x5FC5;&#x90FD;&#x4E00;&#x81F4;&#xFF0C;&#x5177;&#x4F53;&#x5B9E;&#x73B0;&#x6839;&#x636E;&#x5177;&#x4F53;&#x60C5;&#x51B5;&#x5206;&#x6790;&#x3002;&#x4F2A;&#x4EE3;&#x7801;&#x5982;&#x4E0B;&#xFF1A;</p>
 <pre><code>&lt;?php
 
 final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
     private $adapter;
 
-    // 名称，显示在「认证方式」列表中
+    // &#x540D;&#x79F0;&#xFF0C;&#x663E;&#x793A;&#x5728;&#x300C;&#x8BA4;&#x8BC1;&#x65B9;&#x5F0F;&#x300D;&#x5217;&#x8868;&#x4E2D;
     public function getProviderName() {
-        return pht(&#39;MyAuth&#39;);
+        return pht(&apos;MyAuth&apos;);
     }
 
-    // 描述，显示在「认证方式」列表中
+    // &#x63CF;&#x8FF0;&#xFF0C;&#x663E;&#x793A;&#x5728;&#x300C;&#x8BA4;&#x8BC1;&#x65B9;&#x5F0F;&#x300D;&#x5217;&#x8868;&#x4E2D;
     public function getDescriptionForCreate() {
         return pht(
-            &#39;Configure to use the MyAuth account to log in to Phabricator&#39;);
+            &apos;Configure to use the MyAuth account to log in to Phabricator&apos;);
     }
 
-    // 使用另一个我们扩展的类 PhutilMyAuthAdapter，后续继续说明
+    // &#x4F7F;&#x7528;&#x53E6;&#x4E00;&#x4E2A;&#x6211;&#x4EEC;&#x6269;&#x5C55;&#x7684;&#x7C7B; PhutilMyAuthAdapter&#xFF0C;&#x540E;&#x7EED;&#x7EE7;&#x7EED;&#x8BF4;&#x660E;
     public function getAdapter() {
         if (!$this-&gt;adapter) {
             $this-&gt;adapter = id(new PhutilMyAuthAdapter());
@@ -107,19 +107,19 @@ final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
         return $this-&gt;adapter;
     }
 
-    // 表单处理逻辑，提交用户名、密码到认证中心
-    // 若是认证成功，获取到一个 ticket
-    // 由 ticket 获取用户信息
-    // 把用户信息提交到框架
+    // &#x8868;&#x5355;&#x5904;&#x7406;&#x903B;&#x8F91;&#xFF0C;&#x63D0;&#x4EA4;&#x7528;&#x6237;&#x540D;&#x3001;&#x5BC6;&#x7801;&#x5230;&#x8BA4;&#x8BC1;&#x4E2D;&#x5FC3;
+    // &#x82E5;&#x662F;&#x8BA4;&#x8BC1;&#x6210;&#x529F;&#xFF0C;&#x83B7;&#x53D6;&#x5230;&#x4E00;&#x4E2A; ticket
+    // &#x7531; ticket &#x83B7;&#x53D6;&#x7528;&#x6237;&#x4FE1;&#x606F;
+    // &#x628A;&#x7528;&#x6237;&#x4FE1;&#x606F;&#x63D0;&#x4EA4;&#x5230;&#x6846;&#x67B6;
     public function processLoginRequest(PhabricatorAuthLoginController $controller) {
         //var_dump(debug_print_backtrace());
 
-        // 获取 url 上携带的参数，判断是否有 ticket
+        // &#x83B7;&#x53D6; url &#x4E0A;&#x643A;&#x5E26;&#x7684;&#x53C2;&#x6570;&#xFF0C;&#x5224;&#x65AD;&#x662F;&#x5426;&#x6709; ticket
         $request = $controller-&gt;getRequest();
-        $ticket = $request-&gt;getStr(&#39;LoginTicket&#39;, null);
+        $ticket = $request-&gt;getStr(&apos;LoginTicket&apos;, null);
         if ($ticket) {
-            // 由 ticket 获取用户信息
-            $url = &#39;http://my.auth.com/getUserInfo?LoginTicket=&#39; . $ticket;
+            // &#x7531; ticket &#x83B7;&#x53D6;&#x7528;&#x6237;&#x4FE1;&#x606F;
+            $url = &apos;http://my.auth.com/getUserInfo?LoginTicket=&apos; . $ticket;
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -129,29 +129,29 @@ final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
             $user = json_decode($result, true);
             print_r($user);
 
-            if ($user[&#39;returnCode&#39;] == 0) {
+            if ($user[&apos;returnCode&apos;] == 0) {
                 $adapter = $this-&gt;getAdapter();
-                // 保存用户信息
-                $adapter-&gt;setUserInfo($user[&#39;userInfo&#39;]);
-                // 提交到框架（判断是否已经 db 中，若没有，则创建一条记录，即为注册用户信息到 phabricator）
+                // &#x4FDD;&#x5B58;&#x7528;&#x6237;&#x4FE1;&#x606F;
+                $adapter-&gt;setUserInfo($user[&apos;userInfo&apos;]);
+                // &#x63D0;&#x4EA4;&#x5230;&#x6846;&#x67B6;&#xFF08;&#x5224;&#x65AD;&#x662F;&#x5426;&#x5DF2;&#x7ECF; db &#x4E2D;&#xFF0C;&#x82E5;&#x6CA1;&#x6709;&#xFF0C;&#x5219;&#x521B;&#x5EFA;&#x4E00;&#x6761;&#x8BB0;&#x5F55;&#xFF0C;&#x5373;&#x4E3A;&#x6CE8;&#x518C;&#x7528;&#x6237;&#x4FE1;&#x606F;&#x5230; phabricator&#xFF09;
                 return array($this-&gt;loadOrCreateAccount($adapter-&gt;getAccountId()), null);
             }
         }
 
-        // 表单提交 url
-        $url = &#39;http://my.auth.com?action=signin&#39;;
-        // 校验后重定向的 uri，还是当前的 uri
-        // 校验成功后，uri 会附带上 ticket 作为参数
-        // 此处重定向的实现细节是 my.auth.com 的校验逻辑
-        $r_url = &#39;http://&#39; . $request-&gt;getHost() . $request-&gt;getPath();
+        // &#x8868;&#x5355;&#x63D0;&#x4EA4; url
+        $url = &apos;http://my.auth.com?action=signin&apos;;
+        // &#x6821;&#x9A8C;&#x540E;&#x91CD;&#x5B9A;&#x5411;&#x7684; uri&#xFF0C;&#x8FD8;&#x662F;&#x5F53;&#x524D;&#x7684; uri
+        // &#x6821;&#x9A8C;&#x6210;&#x529F;&#x540E;&#xFF0C;uri &#x4F1A;&#x9644;&#x5E26;&#x4E0A; ticket &#x4F5C;&#x4E3A;&#x53C2;&#x6570;
+        // &#x6B64;&#x5904;&#x91CD;&#x5B9A;&#x5411;&#x7684;&#x5B9E;&#x73B0;&#x7EC6;&#x8282;&#x662F; my.auth.com &#x7684;&#x6821;&#x9A8C;&#x903B;&#x8F91;
+        $r_url = &apos;http://&apos; . $request-&gt;getHost() . $request-&gt;getPath();
 
-        // 获取表单中填写的用户名、密码
-        $username = $request-&gt;getStr(&#39;userName&#39;);
-        $password = $request-&gt;getStr(&#39;userPwd&#39;);
+        // &#x83B7;&#x53D6;&#x8868;&#x5355;&#x4E2D;&#x586B;&#x5199;&#x7684;&#x7528;&#x6237;&#x540D;&#x3001;&#x5BC6;&#x7801;
+        $username = $request-&gt;getStr(&apos;userName&apos;);
+        $password = $request-&gt;getStr(&apos;userPwd&apos;);
         $postData = array(
-            &#39;userName&#39; =&gt; $username,
-            &#39;userPwd&#39; =&gt; $password,
-            &#39;url&#39; =&gt; $r_url,
+            &apos;userName&apos; =&gt; $username,
+            &apos;userPwd&apos; =&gt; $password,
+            &apos;url&apos; =&gt; $r_url,
         );
 
         $ch = curl_init();
@@ -161,28 +161,28 @@ final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_exec($ch);
-        // 获取重定向的 uri 
+        // &#x83B7;&#x53D6;&#x91CD;&#x5B9A;&#x5411;&#x7684; uri 
         $last_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         curl_close($ch);
 
-        // 简单判断是否携带有 ticket，若有，重新跳转到本函数，由 ticket 获取用户信息
-        $pos = strpos($last_url, &#39;LoginTicket&#39;);
+        // &#x7B80;&#x5355;&#x5224;&#x65AD;&#x662F;&#x5426;&#x643A;&#x5E26;&#x6709; ticket&#xFF0C;&#x82E5;&#x6709;&#xFF0C;&#x91CD;&#x65B0;&#x8DF3;&#x8F6C;&#x5230;&#x672C;&#x51FD;&#x6570;&#xFF0C;&#x7531; ticket &#x83B7;&#x53D6;&#x7528;&#x6237;&#x4FE1;&#x606F;
+        $pos = strpos($last_url, &apos;LoginTicket&apos;);
         if ($pos) {
             // get the ticket
-            header(&#39;Location: &#39; . $last_url);
+            header(&apos;Location: &apos; . $last_url);
             exit;
         }
 
-        // 若检验失败，附带一个 errorMsg 到 url 中，跳转到表单输入界面
-        $request-&gt;setRequestData(array(&#39;errorMsg&#39; =&gt; &#39;用户名或密码错误&#39;));
+        // &#x82E5;&#x68C0;&#x9A8C;&#x5931;&#x8D25;&#xFF0C;&#x9644;&#x5E26;&#x4E00;&#x4E2A; errorMsg &#x5230; url &#x4E2D;&#xFF0C;&#x8DF3;&#x8F6C;&#x5230;&#x8868;&#x5355;&#x8F93;&#x5165;&#x754C;&#x9762;
+        $request-&gt;setRequestData(array(&apos;errorMsg&apos; =&gt; &apos;&#x7528;&#x6237;&#x540D;&#x6216;&#x5BC6;&#x7801;&#x9519;&#x8BEF;&apos;));
         $response = $controller-&gt;buildProviderPageResponse(
                 $this,
-                $this-&gt;renderLoginForm($request, &#39;login&#39;));
+                $this-&gt;renderLoginForm($request, &apos;login&apos;));
         return array(null, $response);
     }
 
-    // 构造一个表单，作为登录界面
-    // 当检验失败时，依然返回到此处
+    // &#x6784;&#x9020;&#x4E00;&#x4E2A;&#x8868;&#x5355;&#xFF0C;&#x4F5C;&#x4E3A;&#x767B;&#x5F55;&#x754C;&#x9762;
+    // &#x5F53;&#x68C0;&#x9A8C;&#x5931;&#x8D25;&#x65F6;&#xFF0C;&#x4F9D;&#x7136;&#x8FD4;&#x56DE;&#x5230;&#x6B64;&#x5904;
     protected function renderLoginForm(AphrontRequest $request, $mode) {
         //var_dump(debug_print_backtrace());
 
@@ -192,18 +192,18 @@ final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
             -&gt;setSubmitURI($this-&gt;getLoginURI())
             -&gt;setUser($viewer)
 
-            -&gt;setTitle(pht(&#39;Login with &#39; . $this-&gt;getProviderName()))
-            -&gt;addSubmitButton(pht(&#39;Login&#39;))
+            -&gt;setTitle(pht(&apos;Login with &apos; . $this-&gt;getProviderName()))
+            -&gt;addSubmitButton(pht(&apos;Login&apos;))
             //-&gt;addCancelButton($this-&gt;getStartURI());
             -&gt;addFooter(
                 phutil_tag(
-                    &#39;level&#39;,
+                    &apos;level&apos;,
                     array(),
-                    &#39;my.auth.com统一登录&#39;
+                    &apos;my.auth.com&#x7EDF;&#x4E00;&#x767B;&#x5F55;&apos;
                 ));
 
-        // 是否已经失败过，显示错误消息
-        $errMsg = $request-&gt;getStr(&#39;errorMsg&#39;);
+        // &#x662F;&#x5426;&#x5DF2;&#x7ECF;&#x5931;&#x8D25;&#x8FC7;&#xFF0C;&#x663E;&#x793A;&#x9519;&#x8BEF;&#x6D88;&#x606F;
+        $errMsg = $request-&gt;getStr(&apos;errorMsg&apos;);
         if (!empty($errMsg)) {
             $dialog-&gt;appendChild(
                 id(new PHUIInfoView())-&gt;setErrors(array($errMsg))
@@ -215,36 +215,36 @@ final class PhabricatorMyAuthProvider extends PhabricatorAuthProvider {
             -&gt;setFullWidth(true)
             -&gt;appendChild(
                     id(new AphrontFormTextControl())
-                    -&gt;setLabel(pht(&#39;my.auth.com Username&#39;))
-                    -&gt;setName(&#39;userName&#39;))
+                    -&gt;setLabel(pht(&apos;my.auth.com Username&apos;))
+                    -&gt;setName(&apos;userName&apos;))
             -&gt;appendChild(
                     id(new AphrontFormPasswordControl())
-                    -&gt;setLabel(pht(&#39;my.auth.com Password&#39;))
-                    -&gt;setName(&#39;userPwd&#39;));
+                    -&gt;setLabel(pht(&apos;my.auth.com Password&apos;))
+                    -&gt;setName(&apos;userPwd&apos;));
 
         $dialog-&gt;appendChild($form);
         return $dialog;
     }
 }
-</code></pre><h2 id="adapter">adapter</h2><p>adapter 的作用在于：把用户信息按约定的接口提供给 phabricator 框架。框架用到几个几个字段如下代码所示。</p>
-<p>在目录 <code>libphutil/src/auth/</code> 新增一个类 <code>PhutilMyAuthAdapter</code>，继承类 <code>PhutilAuthAdapter</code>，按需实现其约定的功能，返回框架需要的各个用户信息字段。</p>
+</code></pre><h2 id="adapter"><a href="#adapter" class="headerlink" title="adapter"></a>adapter</h2><p>adapter &#x7684;&#x4F5C;&#x7528;&#x5728;&#x4E8E;&#xFF1A;&#x628A;&#x7528;&#x6237;&#x4FE1;&#x606F;&#x6309;&#x7EA6;&#x5B9A;&#x7684;&#x63A5;&#x53E3;&#x63D0;&#x4F9B;&#x7ED9; phabricator &#x6846;&#x67B6;&#x3002;&#x6846;&#x67B6;&#x7528;&#x5230;&#x51E0;&#x4E2A;&#x51E0;&#x4E2A;&#x5B57;&#x6BB5;&#x5982;&#x4E0B;&#x4EE3;&#x7801;&#x6240;&#x793A;&#x3002;</p>
+<p>&#x5728;&#x76EE;&#x5F55; <code>libphutil/src/auth/</code> &#x65B0;&#x589E;&#x4E00;&#x4E2A;&#x7C7B; <code>PhutilMyAuthAdapter</code>&#xFF0C;&#x7EE7;&#x627F;&#x7C7B; <code>PhutilAuthAdapter</code>&#xFF0C;&#x6309;&#x9700;&#x5B9E;&#x73B0;&#x5176;&#x7EA6;&#x5B9A;&#x7684;&#x529F;&#x80FD;&#xFF0C;&#x8FD4;&#x56DE;&#x6846;&#x67B6;&#x9700;&#x8981;&#x7684;&#x5404;&#x4E2A;&#x7528;&#x6237;&#x4FE1;&#x606F;&#x5B57;&#x6BB5;&#x3002;</p>
 <pre><code>&lt;?php
 
 final class PhutilMyAuthAdapter extends PhutilAuthAdapter {
     private $userInfo;
 
     public function getAdapterType() {
-        return &#39;MyAuth&#39;;
+        return &apos;MyAuth&apos;;
     }
 
     public function getAdapterDomain() {
-        return &#39;my.auth.com&#39;;
+        return &apos;my.auth.com&apos;;
     }
 
     public function getAccountID() {
         if ($this-&gt;userInfo === null) 
             return null;
-        return idx($this-&gt;userInfo, &#39;userName&#39;);
+        return idx($this-&gt;userInfo, &apos;userName&apos;);
     }
 
     public function getAccountName() {
@@ -256,22 +256,22 @@ final class PhutilMyAuthAdapter extends PhutilAuthAdapter {
     public function getAccountRealName() {
         if ($this-&gt;userInfo === null)
             return null;
-        return idx($this-&gt;userInfo, &#39;chineseName&#39;);
+        return idx($this-&gt;userInfo, &apos;chineseName&apos;);
     }
 
     public function getAccountEmail() { 
         if ($this-&gt;userInfo === null)
             return null;
-        return idx($this-&gt;userInfo, &#39;email&#39;);
+        return idx($this-&gt;userInfo, &apos;email&apos;);
     }
 
     public function setUserInfo($user) {
         $this-&gt;userInfo = $user;
     }
 }
-</code></pre><h1 id="过程和工具">过程和工具</h1><ul>
-<li>web server 使用的是 nginx，根据 nginx 配置可找到入口 <code>phabricator/webroot/index.php</code></li>
-<li>借助 phabricator 自带的工具 <code>phabricator/scripts/aphront/aphrontpath.php</code> 可查询某个 uri 是由哪个 controller 处理的，controller 的 <code>handleRequest</code> 函数就是逻辑入口：</li>
+</code></pre><h1 id="&#x8FC7;&#x7A0B;&#x548C;&#x5DE5;&#x5177;"><a href="#&#x8FC7;&#x7A0B;&#x548C;&#x5DE5;&#x5177;" class="headerlink" title="&#x8FC7;&#x7A0B;&#x548C;&#x5DE5;&#x5177;"></a>&#x8FC7;&#x7A0B;&#x548C;&#x5DE5;&#x5177;</h1><ul>
+<li>web server &#x4F7F;&#x7528;&#x7684;&#x662F; nginx&#xFF0C;&#x6839;&#x636E; nginx &#x914D;&#x7F6E;&#x53EF;&#x627E;&#x5230;&#x5165;&#x53E3; <code>phabricator/webroot/index.php</code></li>
+<li>&#x501F;&#x52A9; phabricator &#x81EA;&#x5E26;&#x7684;&#x5DE5;&#x5177; <code>phabricator/scripts/aphront/aphrontpath.php</code> &#x53EF;&#x67E5;&#x8BE2;&#x67D0;&#x4E2A; uri &#x662F;&#x7531;&#x54EA;&#x4E2A; controller &#x5904;&#x7406;&#x7684;&#xFF0C;controller &#x7684; <code>handleRequest</code> &#x51FD;&#x6570;&#x5C31;&#x662F;&#x903B;&#x8F91;&#x5165;&#x53E3;&#xFF1A;</li>
 </ul>
 <pre><code>$ cd phabricator/scripts/aphront/
 
@@ -280,9 +280,9 @@ PhabricatorHomeMainController
 
 $ ./aphrontpath.php  /auth
 PhabricatorAuthListController
-</code></pre><p>有助分析源码或快速定位哪个类。</p>
-<h1 id="last">last</h1><p>其他功能的扩展，也是类似的逻辑，比如按自己的方式发送邮件。</p>
-<p>– EOF –<br><br></p>
+</code></pre><p>&#x6709;&#x52A9;&#x5206;&#x6790;&#x6E90;&#x7801;&#x6216;&#x5FEB;&#x901F;&#x5B9A;&#x4F4D;&#x54EA;&#x4E2A;&#x7C7B;&#x3002;</p>
+<h1 id="last"><a href="#last" class="headerlink" title="last"></a>last</h1><p>&#x5176;&#x4ED6;&#x529F;&#x80FD;&#x7684;&#x6269;&#x5C55;&#xFF0C;&#x4E5F;&#x662F;&#x7C7B;&#x4F3C;&#x7684;&#x903B;&#x8F91;&#xFF0C;&#x6BD4;&#x5982;&#x6309;&#x81EA;&#x5DF1;&#x7684;&#x65B9;&#x5F0F;&#x53D1;&#x9001;&#x90AE;&#x4EF6;&#x3002;</p>
+<p>&#x2013; EOF &#x2013;<br><br></p>
 
 	
 
@@ -348,7 +348,7 @@ PhabricatorAuthListController
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

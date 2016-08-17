@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -49,62 +49,62 @@
 	
 	    
 	    
-		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#背景"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#收集环节"><span class="toc-text">收集环节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分析、存储"><span class="toc-text">分析、存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hbase_的_row_key_考虑"><span class="toc-text">hbase 的 row key 考虑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#效率"><span class="toc-text">效率</span></a></li></ol> </div>
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#背景"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#收集环节"><span class="toc-text">收集环节</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#分析-存储"><span class="toc-text">分析、存储</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hbase-的-row-key-考虑"><span class="toc-text">hbase 的 row key 考虑</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#效率"><span class="toc-text">效率</span></a></li></ol> </div>
 	    
 
 	    <p><br></p>
-<h3 id="背景">背景</h3><p>因为用到了 hbase，也算第一次纯 java 开发，所以做一下笔记，</p>
-<p>小组内有个日志收集系统，最近一个月把日志的存储从 mysql 迁移到 hbase，这种写入后就不会再做修改的应用场景，非常适合切换到 hbase。</p>
-<p>改造之前存在的问题：</p>
+<h3 id="&#x80CC;&#x666F;"><a href="#&#x80CC;&#x666F;" class="headerlink" title="&#x80CC;&#x666F;"></a>&#x80CC;&#x666F;</h3><p>&#x56E0;&#x4E3A;&#x7528;&#x5230;&#x4E86; hbase&#xFF0C;&#x4E5F;&#x7B97;&#x7B2C;&#x4E00;&#x6B21;&#x7EAF; java &#x5F00;&#x53D1;&#xFF0C;&#x6240;&#x4EE5;&#x505A;&#x4E00;&#x4E0B;&#x7B14;&#x8BB0;&#xFF0C;</p>
+<p>&#x5C0F;&#x7EC4;&#x5185;&#x6709;&#x4E2A;&#x65E5;&#x5FD7;&#x6536;&#x96C6;&#x7CFB;&#x7EDF;&#xFF0C;&#x6700;&#x8FD1;&#x4E00;&#x4E2A;&#x6708;&#x628A;&#x65E5;&#x5FD7;&#x7684;&#x5B58;&#x50A8;&#x4ECE; mysql &#x8FC1;&#x79FB;&#x5230; hbase&#xFF0C;&#x8FD9;&#x79CD;&#x5199;&#x5165;&#x540E;&#x5C31;&#x4E0D;&#x4F1A;&#x518D;&#x505A;&#x4FEE;&#x6539;&#x7684;&#x5E94;&#x7528;&#x573A;&#x666F;&#xFF0C;&#x975E;&#x5E38;&#x9002;&#x5408;&#x5207;&#x6362;&#x5230; hbase&#x3002;</p>
+<p>&#x6539;&#x9020;&#x4E4B;&#x524D;&#x5B58;&#x5728;&#x7684;&#x95EE;&#x9898;&#xFF1A;</p>
 <ol>
-<li>每天能收集到500G+的日志，现有的方案只存储异常日志，当某种日志很多时，从mysql中查询时会超时</li>
-<li>收集上来的日志裸露存在普通硬盘，单个磁盘最大2T。由一个脚本每个小时做一次rsync，平均分散到4个机器的某个磁盘，当该磁盘写满后，需要手工修改脚本切换另一个磁盘</li>
-<li>存储冗余，磁盘裸露保存最近n天的日志，mysql里又保存最近m天的异常日志</li>
-<li>需要额外维护脚本定时删除磁盘、mysql里的日志</li>
-<li>未有存储所有日志</li>
+<li>&#x6BCF;&#x5929;&#x80FD;&#x6536;&#x96C6;&#x5230;500G+&#x7684;&#x65E5;&#x5FD7;&#xFF0C;&#x73B0;&#x6709;&#x7684;&#x65B9;&#x6848;&#x53EA;&#x5B58;&#x50A8;&#x5F02;&#x5E38;&#x65E5;&#x5FD7;&#xFF0C;&#x5F53;&#x67D0;&#x79CD;&#x65E5;&#x5FD7;&#x5F88;&#x591A;&#x65F6;&#xFF0C;&#x4ECE;mysql&#x4E2D;&#x67E5;&#x8BE2;&#x65F6;&#x4F1A;&#x8D85;&#x65F6;</li>
+<li>&#x6536;&#x96C6;&#x4E0A;&#x6765;&#x7684;&#x65E5;&#x5FD7;&#x88F8;&#x9732;&#x5B58;&#x5728;&#x666E;&#x901A;&#x786C;&#x76D8;&#xFF0C;&#x5355;&#x4E2A;&#x78C1;&#x76D8;&#x6700;&#x5927;2T&#x3002;&#x7531;&#x4E00;&#x4E2A;&#x811A;&#x672C;&#x6BCF;&#x4E2A;&#x5C0F;&#x65F6;&#x505A;&#x4E00;&#x6B21;rsync&#xFF0C;&#x5E73;&#x5747;&#x5206;&#x6563;&#x5230;4&#x4E2A;&#x673A;&#x5668;&#x7684;&#x67D0;&#x4E2A;&#x78C1;&#x76D8;&#xFF0C;&#x5F53;&#x8BE5;&#x78C1;&#x76D8;&#x5199;&#x6EE1;&#x540E;&#xFF0C;&#x9700;&#x8981;&#x624B;&#x5DE5;&#x4FEE;&#x6539;&#x811A;&#x672C;&#x5207;&#x6362;&#x53E6;&#x4E00;&#x4E2A;&#x78C1;&#x76D8;</li>
+<li>&#x5B58;&#x50A8;&#x5197;&#x4F59;&#xFF0C;&#x78C1;&#x76D8;&#x88F8;&#x9732;&#x4FDD;&#x5B58;&#x6700;&#x8FD1;n&#x5929;&#x7684;&#x65E5;&#x5FD7;&#xFF0C;mysql&#x91CC;&#x53C8;&#x4FDD;&#x5B58;&#x6700;&#x8FD1;m&#x5929;&#x7684;&#x5F02;&#x5E38;&#x65E5;&#x5FD7;</li>
+<li>&#x9700;&#x8981;&#x989D;&#x5916;&#x7EF4;&#x62A4;&#x811A;&#x672C;&#x5B9A;&#x65F6;&#x5220;&#x9664;&#x78C1;&#x76D8;&#x3001;mysql&#x91CC;&#x7684;&#x65E5;&#x5FD7;</li>
+<li>&#x672A;&#x6709;&#x5B58;&#x50A8;&#x6240;&#x6709;&#x65E5;&#x5FD7;</li>
 </ol>
-<p>简单来说，需要定期人工维护；存储层不容易横向扩展，后者是关键点。</p>
-<p>一个月前有新的需求，需要有一个大前提，要有最近n天的所有日志；快速读取日志查询日志。</p>
-<p>后来决定把存储从 mysql 切换到 hbase，搜索组那边有一个 hbase 集群，可直接使用。</p>
+<p>&#x7B80;&#x5355;&#x6765;&#x8BF4;&#xFF0C;&#x9700;&#x8981;&#x5B9A;&#x671F;&#x4EBA;&#x5DE5;&#x7EF4;&#x62A4;&#xFF1B;&#x5B58;&#x50A8;&#x5C42;&#x4E0D;&#x5BB9;&#x6613;&#x6A2A;&#x5411;&#x6269;&#x5C55;&#xFF0C;&#x540E;&#x8005;&#x662F;&#x5173;&#x952E;&#x70B9;&#x3002;</p>
+<p>&#x4E00;&#x4E2A;&#x6708;&#x524D;&#x6709;&#x65B0;&#x7684;&#x9700;&#x6C42;&#xFF0C;&#x9700;&#x8981;&#x6709;&#x4E00;&#x4E2A;&#x5927;&#x524D;&#x63D0;&#xFF0C;&#x8981;&#x6709;&#x6700;&#x8FD1;n&#x5929;&#x7684;&#x6240;&#x6709;&#x65E5;&#x5FD7;&#xFF1B;&#x5FEB;&#x901F;&#x8BFB;&#x53D6;&#x65E5;&#x5FD7;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x3002;</p>
+<p>&#x540E;&#x6765;&#x51B3;&#x5B9A;&#x628A;&#x5B58;&#x50A8;&#x4ECE; mysql &#x5207;&#x6362;&#x5230; hbase&#xFF0C;&#x641C;&#x7D22;&#x7EC4;&#x90A3;&#x8FB9;&#x6709;&#x4E00;&#x4E2A; hbase &#x96C6;&#x7FA4;&#xFF0C;&#x53EF;&#x76F4;&#x63A5;&#x4F7F;&#x7528;&#x3002;</p>
 <p><br></p>
-<h3 id="收集环节">收集环节</h3><p>这个小系统现在分为两个部分：收集、分析和存储。</p>
-<p>收集环节，由 master 端把收集任务下发到分布式的 agent，agent 拿到任务后，依赖 inotify 机制读取指定的日志文件，提交到 master。</p>
-<p>master 端实时接收agent的数据，每个小时创建新的文件，文件名带有「小时」段的时间戳。</p>
-<p>现有方案是另有一个写db的进程，把master吐出的文件写入 mysql， 它会分析日志内容，只保存异常日志。</p>
-<p>以上程序全部由C实现。</p>
+<h3 id="&#x6536;&#x96C6;&#x73AF;&#x8282;"><a href="#&#x6536;&#x96C6;&#x73AF;&#x8282;" class="headerlink" title="&#x6536;&#x96C6;&#x73AF;&#x8282;"></a>&#x6536;&#x96C6;&#x73AF;&#x8282;</h3><p>&#x8FD9;&#x4E2A;&#x5C0F;&#x7CFB;&#x7EDF;&#x73B0;&#x5728;&#x5206;&#x4E3A;&#x4E24;&#x4E2A;&#x90E8;&#x5206;&#xFF1A;&#x6536;&#x96C6;&#x3001;&#x5206;&#x6790;&#x548C;&#x5B58;&#x50A8;&#x3002;</p>
+<p>&#x6536;&#x96C6;&#x73AF;&#x8282;&#xFF0C;&#x7531; master &#x7AEF;&#x628A;&#x6536;&#x96C6;&#x4EFB;&#x52A1;&#x4E0B;&#x53D1;&#x5230;&#x5206;&#x5E03;&#x5F0F;&#x7684; agent&#xFF0C;agent &#x62FF;&#x5230;&#x4EFB;&#x52A1;&#x540E;&#xFF0C;&#x4F9D;&#x8D56; inotify &#x673A;&#x5236;&#x8BFB;&#x53D6;&#x6307;&#x5B9A;&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#xFF0C;&#x63D0;&#x4EA4;&#x5230; master&#x3002;</p>
+<p>master &#x7AEF;&#x5B9E;&#x65F6;&#x63A5;&#x6536;agent&#x7684;&#x6570;&#x636E;&#xFF0C;&#x6BCF;&#x4E2A;&#x5C0F;&#x65F6;&#x521B;&#x5EFA;&#x65B0;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x6587;&#x4EF6;&#x540D;&#x5E26;&#x6709;&#x300C;&#x5C0F;&#x65F6;&#x300D;&#x6BB5;&#x7684;&#x65F6;&#x95F4;&#x6233;&#x3002;</p>
+<p>&#x73B0;&#x6709;&#x65B9;&#x6848;&#x662F;&#x53E6;&#x6709;&#x4E00;&#x4E2A;&#x5199;db&#x7684;&#x8FDB;&#x7A0B;&#xFF0C;&#x628A;master&#x5410;&#x51FA;&#x7684;&#x6587;&#x4EF6;&#x5199;&#x5165; mysql&#xFF0C; &#x5B83;&#x4F1A;&#x5206;&#x6790;&#x65E5;&#x5FD7;&#x5185;&#x5BB9;&#xFF0C;&#x53EA;&#x4FDD;&#x5B58;&#x5F02;&#x5E38;&#x65E5;&#x5FD7;&#x3002;</p>
+<p>&#x4EE5;&#x4E0A;&#x7A0B;&#x5E8F;&#x5168;&#x90E8;&#x7531;C&#x5B9E;&#x73B0;&#x3002;</p>
 <p><br></p>
-<h3 id="分析、存储">分析、存储</h3><p>为了不影响现有的方案，实现平稳改造，继续依赖 inotify 。我另外用 java 写了个小程序，使用了一个叫 <a href="http://jnotify.sourceforge.net" target="_blank" rel="external">JNotify</a> 的jar包，该包封装了 inotify。</p>
+<h3 id="&#x5206;&#x6790;-&#x5B58;&#x50A8;"><a href="#&#x5206;&#x6790;&#x3001;&#x5B58;&#x50A8;" class="headerlink" title="&#x5206;&#x6790;&#x3001;&#x5B58;&#x50A8;"></a>&#x5206;&#x6790;&#x3001;&#x5B58;&#x50A8;</h3><p>&#x4E3A;&#x4E86;&#x4E0D;&#x5F71;&#x54CD;&#x73B0;&#x6709;&#x7684;&#x65B9;&#x6848;&#xFF0C;&#x5B9E;&#x73B0;&#x5E73;&#x7A33;&#x6539;&#x9020;&#xFF0C;&#x7EE7;&#x7EED;&#x4F9D;&#x8D56; inotify &#x3002;&#x6211;&#x53E6;&#x5916;&#x7528; java &#x5199;&#x4E86;&#x4E2A;&#x5C0F;&#x7A0B;&#x5E8F;&#xFF0C;&#x4F7F;&#x7528;&#x4E86;&#x4E00;&#x4E2A;&#x53EB; <a href="http://jnotify.sourceforge.net" target="_blank" rel="external">JNotify</a> &#x7684;jar&#x5305;&#xFF0C;&#x8BE5;&#x5305;&#x5C01;&#x88C5;&#x4E86; inotify&#x3002;</p>
 <ol>
-<li>在 java 进程中开一个 inoitfy 线程，检查 master 定时吐出的文件，当 inotify 检测到「新创建」的文件，回调 JNotifyListener 接口下的函数</li>
-<li>回调函数把新创建的文件，按轮训的策略，平均分发给 n 个 worker 线程中的其中一个，存入该 worker 线程的文件队列里，inotify 线程的逻辑到此为止</li>
-<li>每个 worker 线程通过检测文件位移 offset，判断是否有新的日志内容需要读取。这里没有继续依赖 inotify 了，有利有弊</li>
-<li>worker 线程把新增的日志内容 map 到内存中，一次最多读取 10M 内容</li>
-<li>worker 线程根据日志的种类，调用不同的分析器；为每种日志类型实现一个分析器 parser， 接口声明下的 parser 会做3个事情</li>
-<li>分析后由 worker 写入hbase，value为每行日志内容，考虑到 value 的长度，现在是每1000条提交一次，同时记录当前位移 offset</li>
-<li>worker 线程定时从队列中删除1个小时前的文件</li>
+<li>&#x5728; java &#x8FDB;&#x7A0B;&#x4E2D;&#x5F00;&#x4E00;&#x4E2A; inoitfy &#x7EBF;&#x7A0B;&#xFF0C;&#x68C0;&#x67E5; master &#x5B9A;&#x65F6;&#x5410;&#x51FA;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x5F53; inotify &#x68C0;&#x6D4B;&#x5230;&#x300C;&#x65B0;&#x521B;&#x5EFA;&#x300D;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x56DE;&#x8C03; JNotifyListener &#x63A5;&#x53E3;&#x4E0B;&#x7684;&#x51FD;&#x6570;</li>
+<li>&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x628A;&#x65B0;&#x521B;&#x5EFA;&#x7684;&#x6587;&#x4EF6;&#xFF0C;&#x6309;&#x8F6E;&#x8BAD;&#x7684;&#x7B56;&#x7565;&#xFF0C;&#x5E73;&#x5747;&#x5206;&#x53D1;&#x7ED9; n &#x4E2A; worker &#x7EBF;&#x7A0B;&#x4E2D;&#x7684;&#x5176;&#x4E2D;&#x4E00;&#x4E2A;&#xFF0C;&#x5B58;&#x5165;&#x8BE5; worker &#x7EBF;&#x7A0B;&#x7684;&#x6587;&#x4EF6;&#x961F;&#x5217;&#x91CC;&#xFF0C;inotify &#x7EBF;&#x7A0B;&#x7684;&#x903B;&#x8F91;&#x5230;&#x6B64;&#x4E3A;&#x6B62;</li>
+<li>&#x6BCF;&#x4E2A; worker &#x7EBF;&#x7A0B;&#x901A;&#x8FC7;&#x68C0;&#x6D4B;&#x6587;&#x4EF6;&#x4F4D;&#x79FB; offset&#xFF0C;&#x5224;&#x65AD;&#x662F;&#x5426;&#x6709;&#x65B0;&#x7684;&#x65E5;&#x5FD7;&#x5185;&#x5BB9;&#x9700;&#x8981;&#x8BFB;&#x53D6;&#x3002;&#x8FD9;&#x91CC;&#x6CA1;&#x6709;&#x7EE7;&#x7EED;&#x4F9D;&#x8D56; inotify &#x4E86;&#xFF0C;&#x6709;&#x5229;&#x6709;&#x5F0A;</li>
+<li>worker &#x7EBF;&#x7A0B;&#x628A;&#x65B0;&#x589E;&#x7684;&#x65E5;&#x5FD7;&#x5185;&#x5BB9; map &#x5230;&#x5185;&#x5B58;&#x4E2D;&#xFF0C;&#x4E00;&#x6B21;&#x6700;&#x591A;&#x8BFB;&#x53D6; 10M &#x5185;&#x5BB9;</li>
+<li>worker &#x7EBF;&#x7A0B;&#x6839;&#x636E;&#x65E5;&#x5FD7;&#x7684;&#x79CD;&#x7C7B;&#xFF0C;&#x8C03;&#x7528;&#x4E0D;&#x540C;&#x7684;&#x5206;&#x6790;&#x5668;&#xFF1B;&#x4E3A;&#x6BCF;&#x79CD;&#x65E5;&#x5FD7;&#x7C7B;&#x578B;&#x5B9E;&#x73B0;&#x4E00;&#x4E2A;&#x5206;&#x6790;&#x5668; parser&#xFF0C; &#x63A5;&#x53E3;&#x58F0;&#x660E;&#x4E0B;&#x7684; parser &#x4F1A;&#x505A;3&#x4E2A;&#x4E8B;&#x60C5;</li>
+<li>&#x5206;&#x6790;&#x540E;&#x7531; worker &#x5199;&#x5165;hbase&#xFF0C;value&#x4E3A;&#x6BCF;&#x884C;&#x65E5;&#x5FD7;&#x5185;&#x5BB9;&#xFF0C;&#x8003;&#x8651;&#x5230; value &#x7684;&#x957F;&#x5EA6;&#xFF0C;&#x73B0;&#x5728;&#x662F;&#x6BCF;1000&#x6761;&#x63D0;&#x4EA4;&#x4E00;&#x6B21;&#xFF0C;&#x540C;&#x65F6;&#x8BB0;&#x5F55;&#x5F53;&#x524D;&#x4F4D;&#x79FB; offset</li>
+<li>worker &#x7EBF;&#x7A0B;&#x5B9A;&#x65F6;&#x4ECE;&#x961F;&#x5217;&#x4E2D;&#x5220;&#x9664;1&#x4E2A;&#x5C0F;&#x65F6;&#x524D;&#x7684;&#x6587;&#x4EF6;</li>
 </ol>
-<p>在 worker 的流程中，只是在调用分析器这里需要对日志种类做一下判断，其余的逻辑跟文件类型无关。以后若有其他种类的日志，为该类日志新增一个分析器，worker 再增加对该分析器的调用就可以了。</p>
-<p>分析器 parser 做3个事情：</p>
+<p>&#x5728; worker &#x7684;&#x6D41;&#x7A0B;&#x4E2D;&#xFF0C;&#x53EA;&#x662F;&#x5728;&#x8C03;&#x7528;&#x5206;&#x6790;&#x5668;&#x8FD9;&#x91CC;&#x9700;&#x8981;&#x5BF9;&#x65E5;&#x5FD7;&#x79CD;&#x7C7B;&#x505A;&#x4E00;&#x4E0B;&#x5224;&#x65AD;&#xFF0C;&#x5176;&#x4F59;&#x7684;&#x903B;&#x8F91;&#x8DDF;&#x6587;&#x4EF6;&#x7C7B;&#x578B;&#x65E0;&#x5173;&#x3002;&#x4EE5;&#x540E;&#x82E5;&#x6709;&#x5176;&#x4ED6;&#x79CD;&#x7C7B;&#x7684;&#x65E5;&#x5FD7;&#xFF0C;&#x4E3A;&#x8BE5;&#x7C7B;&#x65E5;&#x5FD7;&#x65B0;&#x589E;&#x4E00;&#x4E2A;&#x5206;&#x6790;&#x5668;&#xFF0C;worker &#x518D;&#x589E;&#x52A0;&#x5BF9;&#x8BE5;&#x5206;&#x6790;&#x5668;&#x7684;&#x8C03;&#x7528;&#x5C31;&#x53EF;&#x4EE5;&#x4E86;&#x3002;</p>
+<p>&#x5206;&#x6790;&#x5668; parser &#x505A;3&#x4E2A;&#x4E8B;&#x60C5;&#xFF1A;</p>
 <ol>
-<li>维护它自己的正则表达式，使用该表达式分析日志，表达式可为空，可配置</li>
-<li>根据分析情况，返回一个字符串到 worker 线程，worker 线程使用这个字符串来拼接 hbase 的 row key，不能为空。后续从hbase查询时，会优先使用这个字符串，即为了方便查询</li>
-<li>保存统计信息，分析日志的过程可以顺便做简单统计，worker 线程调用该函数提交统计信息；该函数也可以什么都不做。因为一些简单的分析、统计任务，合并在一起后，后续就没必要由 map reduce 再次从 hbase 日志中读取日志来一次分析、统计。好吧，其实是搜索组说机器的计算资源不够，目前也才几百G的日志文件，统计的过程对导入过程的效率影响不大。</li>
+<li>&#x7EF4;&#x62A4;&#x5B83;&#x81EA;&#x5DF1;&#x7684;&#x6B63;&#x5219;&#x8868;&#x8FBE;&#x5F0F;&#xFF0C;&#x4F7F;&#x7528;&#x8BE5;&#x8868;&#x8FBE;&#x5F0F;&#x5206;&#x6790;&#x65E5;&#x5FD7;&#xFF0C;&#x8868;&#x8FBE;&#x5F0F;&#x53EF;&#x4E3A;&#x7A7A;&#xFF0C;&#x53EF;&#x914D;&#x7F6E;</li>
+<li>&#x6839;&#x636E;&#x5206;&#x6790;&#x60C5;&#x51B5;&#xFF0C;&#x8FD4;&#x56DE;&#x4E00;&#x4E2A;&#x5B57;&#x7B26;&#x4E32;&#x5230; worker &#x7EBF;&#x7A0B;&#xFF0C;worker &#x7EBF;&#x7A0B;&#x4F7F;&#x7528;&#x8FD9;&#x4E2A;&#x5B57;&#x7B26;&#x4E32;&#x6765;&#x62FC;&#x63A5; hbase &#x7684; row key&#xFF0C;&#x4E0D;&#x80FD;&#x4E3A;&#x7A7A;&#x3002;&#x540E;&#x7EED;&#x4ECE;hbase&#x67E5;&#x8BE2;&#x65F6;&#xFF0C;&#x4F1A;&#x4F18;&#x5148;&#x4F7F;&#x7528;&#x8FD9;&#x4E2A;&#x5B57;&#x7B26;&#x4E32;&#xFF0C;&#x5373;&#x4E3A;&#x4E86;&#x65B9;&#x4FBF;&#x67E5;&#x8BE2;</li>
+<li>&#x4FDD;&#x5B58;&#x7EDF;&#x8BA1;&#x4FE1;&#x606F;&#xFF0C;&#x5206;&#x6790;&#x65E5;&#x5FD7;&#x7684;&#x8FC7;&#x7A0B;&#x53EF;&#x4EE5;&#x987A;&#x4FBF;&#x505A;&#x7B80;&#x5355;&#x7EDF;&#x8BA1;&#xFF0C;worker &#x7EBF;&#x7A0B;&#x8C03;&#x7528;&#x8BE5;&#x51FD;&#x6570;&#x63D0;&#x4EA4;&#x7EDF;&#x8BA1;&#x4FE1;&#x606F;&#xFF1B;&#x8BE5;&#x51FD;&#x6570;&#x4E5F;&#x53EF;&#x4EE5;&#x4EC0;&#x4E48;&#x90FD;&#x4E0D;&#x505A;&#x3002;&#x56E0;&#x4E3A;&#x4E00;&#x4E9B;&#x7B80;&#x5355;&#x7684;&#x5206;&#x6790;&#x3001;&#x7EDF;&#x8BA1;&#x4EFB;&#x52A1;&#xFF0C;&#x5408;&#x5E76;&#x5728;&#x4E00;&#x8D77;&#x540E;&#xFF0C;&#x540E;&#x7EED;&#x5C31;&#x6CA1;&#x5FC5;&#x8981;&#x7531; map reduce &#x518D;&#x6B21;&#x4ECE; hbase &#x65E5;&#x5FD7;&#x4E2D;&#x8BFB;&#x53D6;&#x65E5;&#x5FD7;&#x6765;&#x4E00;&#x6B21;&#x5206;&#x6790;&#x3001;&#x7EDF;&#x8BA1;&#x3002;&#x597D;&#x5427;&#xFF0C;&#x5176;&#x5B9E;&#x662F;&#x641C;&#x7D22;&#x7EC4;&#x8BF4;&#x673A;&#x5668;&#x7684;&#x8BA1;&#x7B97;&#x8D44;&#x6E90;&#x4E0D;&#x591F;&#xFF0C;&#x76EE;&#x524D;&#x4E5F;&#x624D;&#x51E0;&#x767E;G&#x7684;&#x65E5;&#x5FD7;&#x6587;&#x4EF6;&#xFF0C;&#x7EDF;&#x8BA1;&#x7684;&#x8FC7;&#x7A0B;&#x5BF9;&#x5BFC;&#x5165;&#x8FC7;&#x7A0B;&#x7684;&#x6548;&#x7387;&#x5F71;&#x54CD;&#x4E0D;&#x5927;&#x3002;</li>
 </ol>
 <p><br></p>
-<h3 id="hbase_的_row_key_考虑">hbase 的 row key 考虑</h3><p>hbase 里的数据表预先创建好，设置了 TTL， 暂时日志保存3天，后续根据需要再做调整，减轻人工维护存储成本。</p>
-<pre><code>hbase(main):001:0&gt; describe &#39;table_name_xxx&#39;
+<h3 id="hbase-&#x7684;-row-key-&#x8003;&#x8651;"><a href="#hbase-&#x7684;-row-key-&#x8003;&#x8651;" class="headerlink" title="hbase &#x7684; row key &#x8003;&#x8651;"></a>hbase &#x7684; row key &#x8003;&#x8651;</h3><p>hbase &#x91CC;&#x7684;&#x6570;&#x636E;&#x8868;&#x9884;&#x5148;&#x521B;&#x5EFA;&#x597D;&#xFF0C;&#x8BBE;&#x7F6E;&#x4E86; TTL&#xFF0C; &#x6682;&#x65F6;&#x65E5;&#x5FD7;&#x4FDD;&#x5B58;3&#x5929;&#xFF0C;&#x540E;&#x7EED;&#x6839;&#x636E;&#x9700;&#x8981;&#x518D;&#x505A;&#x8C03;&#x6574;&#xFF0C;&#x51CF;&#x8F7B;&#x4EBA;&#x5DE5;&#x7EF4;&#x62A4;&#x5B58;&#x50A8;&#x6210;&#x672C;&#x3002;</p>
+<pre><code>hbase(main):001:0&gt; describe &apos;table_name_xxx&apos;
 DESCRIPTION                                                                                       ENABLED
- &#39;table_name_xxx&#39;, {NAME =&gt; &#39;l&#39;, DATA_BLOCK_ENCODING =&gt; &#39;NONE&#39;, BLOOMFILTER =&gt; &#39;ROW&#39;, REPLICATION_ true
- SCOPE =&gt; &#39;0&#39;, VERSIONS =&gt; &#39;1&#39;, COMPRESSION =&gt; &#39;SNAPPY&#39;, MIN_VERSIONS =&gt; &#39;0&#39;, TTL =&gt; &#39;259200 SECO
- NDS (3 DAYS)&#39;, KEEP_DELETED_CELLS =&gt; &#39;false&#39;, BLOCKSIZE =&gt; &#39;65536&#39;, IN_MEMORY =&gt; &#39;false&#39;, BLOCKC
- ACHE =&gt; &#39;true&#39;}
-</code></pre><p>在 row key 的固定位置，保存有上面提到的各个分析器生成的字符串，以及毫秒级别的时间戳，为了避免相同时间戳，还有固定长度的 index 最为整个 row key 的后缀，目的就是为了保证 row key 的唯一。</p>
-<p>row key 的开始部分，则根据业务情况，让连续的日志尽可能多的连续写在一块，但不同的日志，则尽可能地分散到各个 region。</p>
-<p>而从 hbase 查询时，指定 start row 提供给到 hbase 一个开始查询的位置，再通过前缀匹配过滤，比如，按我的row key 设计，对于字符串<code>810552074_29_0</code>，表示某个服务器上的某种日志（这个串是属于已有的配置信息，查询之前是已知的），那我要查询这种日志在某个时间点之后的日志，就很简单了：</p>
-<pre><code>scan &#39;table_name_xxx&#39;, STARTROW=&gt;&#39;810552074_29_0_1409296887375&#39;, FILTER=&gt;&quot;PrefixFilter(&#39;810552074_29_0&#39;)&quot;, LIMIT=&gt;10
-</code></pre><p>查询后，记录下最后一行的 row key（完整的key，比如810552074_27_0_1409380765531_00000495），作为下次查询的start key， 第2、3、4…次查询所花费的时间，比第1次快了很多。</p>
-<p>因为有一个查询日志的页面给到其他团队的开发同学，他们在页面上可以实现类似<code>tail -f xx日志</code>或<code>tail -n 100 xx日志</code>的功能，无需登录服务器就可以看到他们项目的日志了（没权限…）</p>
-<p>查询样例:</p>
+ &apos;table_name_xxx&apos;, {NAME =&gt; &apos;l&apos;, DATA_BLOCK_ENCODING =&gt; &apos;NONE&apos;, BLOOMFILTER =&gt; &apos;ROW&apos;, REPLICATION_ true
+ SCOPE =&gt; &apos;0&apos;, VERSIONS =&gt; &apos;1&apos;, COMPRESSION =&gt; &apos;SNAPPY&apos;, MIN_VERSIONS =&gt; &apos;0&apos;, TTL =&gt; &apos;259200 SECO
+ NDS (3 DAYS)&apos;, KEEP_DELETED_CELLS =&gt; &apos;false&apos;, BLOCKSIZE =&gt; &apos;65536&apos;, IN_MEMORY =&gt; &apos;false&apos;, BLOCKC
+ ACHE =&gt; &apos;true&apos;}
+</code></pre><p>&#x5728; row key &#x7684;&#x56FA;&#x5B9A;&#x4F4D;&#x7F6E;&#xFF0C;&#x4FDD;&#x5B58;&#x6709;&#x4E0A;&#x9762;&#x63D0;&#x5230;&#x7684;&#x5404;&#x4E2A;&#x5206;&#x6790;&#x5668;&#x751F;&#x6210;&#x7684;&#x5B57;&#x7B26;&#x4E32;&#xFF0C;&#x4EE5;&#x53CA;&#x6BEB;&#x79D2;&#x7EA7;&#x522B;&#x7684;&#x65F6;&#x95F4;&#x6233;&#xFF0C;&#x4E3A;&#x4E86;&#x907F;&#x514D;&#x76F8;&#x540C;&#x65F6;&#x95F4;&#x6233;&#xFF0C;&#x8FD8;&#x6709;&#x56FA;&#x5B9A;&#x957F;&#x5EA6;&#x7684; index &#x6700;&#x4E3A;&#x6574;&#x4E2A; row key &#x7684;&#x540E;&#x7F00;&#xFF0C;&#x76EE;&#x7684;&#x5C31;&#x662F;&#x4E3A;&#x4E86;&#x4FDD;&#x8BC1; row key &#x7684;&#x552F;&#x4E00;&#x3002;</p>
+<p>row key &#x7684;&#x5F00;&#x59CB;&#x90E8;&#x5206;&#xFF0C;&#x5219;&#x6839;&#x636E;&#x4E1A;&#x52A1;&#x60C5;&#x51B5;&#xFF0C;&#x8BA9;&#x8FDE;&#x7EED;&#x7684;&#x65E5;&#x5FD7;&#x5C3D;&#x53EF;&#x80FD;&#x591A;&#x7684;&#x8FDE;&#x7EED;&#x5199;&#x5728;&#x4E00;&#x5757;&#xFF0C;&#x4F46;&#x4E0D;&#x540C;&#x7684;&#x65E5;&#x5FD7;&#xFF0C;&#x5219;&#x5C3D;&#x53EF;&#x80FD;&#x5730;&#x5206;&#x6563;&#x5230;&#x5404;&#x4E2A; region&#x3002;</p>
+<p>&#x800C;&#x4ECE; hbase &#x67E5;&#x8BE2;&#x65F6;&#xFF0C;&#x6307;&#x5B9A; start row &#x63D0;&#x4F9B;&#x7ED9;&#x5230; hbase &#x4E00;&#x4E2A;&#x5F00;&#x59CB;&#x67E5;&#x8BE2;&#x7684;&#x4F4D;&#x7F6E;&#xFF0C;&#x518D;&#x901A;&#x8FC7;&#x524D;&#x7F00;&#x5339;&#x914D;&#x8FC7;&#x6EE4;&#xFF0C;&#x6BD4;&#x5982;&#xFF0C;&#x6309;&#x6211;&#x7684;row key &#x8BBE;&#x8BA1;&#xFF0C;&#x5BF9;&#x4E8E;&#x5B57;&#x7B26;&#x4E32;<code>810552074_29_0</code>&#xFF0C;&#x8868;&#x793A;&#x67D0;&#x4E2A;&#x670D;&#x52A1;&#x5668;&#x4E0A;&#x7684;&#x67D0;&#x79CD;&#x65E5;&#x5FD7;&#xFF08;&#x8FD9;&#x4E2A;&#x4E32;&#x662F;&#x5C5E;&#x4E8E;&#x5DF2;&#x6709;&#x7684;&#x914D;&#x7F6E;&#x4FE1;&#x606F;&#xFF0C;&#x67E5;&#x8BE2;&#x4E4B;&#x524D;&#x662F;&#x5DF2;&#x77E5;&#x7684;&#xFF09;&#xFF0C;&#x90A3;&#x6211;&#x8981;&#x67E5;&#x8BE2;&#x8FD9;&#x79CD;&#x65E5;&#x5FD7;&#x5728;&#x67D0;&#x4E2A;&#x65F6;&#x95F4;&#x70B9;&#x4E4B;&#x540E;&#x7684;&#x65E5;&#x5FD7;&#xFF0C;&#x5C31;&#x5F88;&#x7B80;&#x5355;&#x4E86;&#xFF1A;</p>
+<pre><code>scan &apos;table_name_xxx&apos;, STARTROW=&gt;&apos;810552074_29_0_1409296887375&apos;, FILTER=&gt;&quot;PrefixFilter(&apos;810552074_29_0&apos;)&quot;, LIMIT=&gt;10
+</code></pre><p>&#x67E5;&#x8BE2;&#x540E;&#xFF0C;&#x8BB0;&#x5F55;&#x4E0B;&#x6700;&#x540E;&#x4E00;&#x884C;&#x7684; row key&#xFF08;&#x5B8C;&#x6574;&#x7684;key&#xFF0C;&#x6BD4;&#x5982;810552074_27_0_1409380765531_00000495&#xFF09;&#xFF0C;&#x4F5C;&#x4E3A;&#x4E0B;&#x6B21;&#x67E5;&#x8BE2;&#x7684;start key&#xFF0C; &#x7B2C;2&#x3001;3&#x3001;4&#x2026;&#x6B21;&#x67E5;&#x8BE2;&#x6240;&#x82B1;&#x8D39;&#x7684;&#x65F6;&#x95F4;&#xFF0C;&#x6BD4;&#x7B2C;1&#x6B21;&#x5FEB;&#x4E86;&#x5F88;&#x591A;&#x3002;</p>
+<p>&#x56E0;&#x4E3A;&#x6709;&#x4E00;&#x4E2A;&#x67E5;&#x8BE2;&#x65E5;&#x5FD7;&#x7684;&#x9875;&#x9762;&#x7ED9;&#x5230;&#x5176;&#x4ED6;&#x56E2;&#x961F;&#x7684;&#x5F00;&#x53D1;&#x540C;&#x5B66;&#xFF0C;&#x4ED6;&#x4EEC;&#x5728;&#x9875;&#x9762;&#x4E0A;&#x53EF;&#x4EE5;&#x5B9E;&#x73B0;&#x7C7B;&#x4F3C;<code>tail -f xx&#x65E5;&#x5FD7;</code>&#x6216;<code>tail -n 100 xx&#x65E5;&#x5FD7;</code>&#x7684;&#x529F;&#x80FD;&#xFF0C;&#x65E0;&#x9700;&#x767B;&#x5F55;&#x670D;&#x52A1;&#x5668;&#x5C31;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#x4ED6;&#x4EEC;&#x9879;&#x76EE;&#x7684;&#x65E5;&#x5FD7;&#x4E86;&#xFF08;&#x6CA1;&#x6743;&#x9650;&#x2026;&#xFF09;</p>
+<p>&#x67E5;&#x8BE2;&#x6837;&#x4F8B;:</p>
 <pre><code>String query_demo(String startKey, String prefixFilter, String qualifier, int limit)
 {
     Scan scan = new Scan();
@@ -159,17 +159,17 @@ DESCRIPTION                                                                     
     return lastRowKey;
 }
 </code></pre><p><br></p>
-<h3 id="效率">效率</h3><ol>
-<li>导入 hbase 时，平均 ?KB/ms</li>
-<li>从 hbase 查询，第一次查询 ?ms，后续查询平均 ?ms</li>
+<h3 id="&#x6548;&#x7387;"><a href="#&#x6548;&#x7387;" class="headerlink" title="&#x6548;&#x7387;"></a>&#x6548;&#x7387;</h3><ol>
+<li>&#x5BFC;&#x5165; hbase &#x65F6;&#xFF0C;&#x5E73;&#x5747; ?KB/ms</li>
+<li>&#x4ECE; hbase &#x67E5;&#x8BE2;&#xFF0C;&#x7B2C;&#x4E00;&#x6B21;&#x67E5;&#x8BE2; ?ms&#xFF0C;&#x540E;&#x7EED;&#x67E5;&#x8BE2;&#x5E73;&#x5747; ?ms</li>
 </ol>
 <p><br></p>
 <p>link: </p>
 <ol>
 <li>JNotify: <a href="http://jnotify.sourceforge.net" target="_blank" rel="external">http://jnotify.sourceforge.net</a></li>
-<li>The Apache HBase™ Reference Guide: <a href="http://hbase.apache.org/book.html" target="_blank" rel="external">http://hbase.apache.org/book.html</a></li>
+<li>The Apache HBase&#x2122; Reference Guide: <a href="http://hbase.apache.org/book.html" target="_blank" rel="external">http://hbase.apache.org/book.html</a></li>
 </ol>
-<p><br><br>– EOF –</p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -244,7 +244,7 @@ DESCRIPTION                                                                     
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

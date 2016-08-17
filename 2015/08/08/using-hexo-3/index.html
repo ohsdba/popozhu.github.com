@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -52,28 +52,28 @@
 		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#起因"><span class="toc-text">起因</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#主题简介"><span class="toc-text">主题简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#理念"><span class="toc-text">理念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#功能"><span class="toc-text">功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#特色"><span class="toc-text">特色</span></a></li></ol></li></ol></li></ol> </div>
 	    
 
-	    <h1 id="起因">起因</h1><p>使用 hexo 2.x 有两年多了，也改了一个主题自用着，但一直未去填坑完善主题，里面的代码也较多冗余，拖拖拉拉，兴（喜）趣（新）不（厌）高（旧）。 </p>
-<p>随着 hexo 3.x 版本的发布，其使用文档已相当健全了，翻了一下，其模块更独立化、 api 更简洁，可以很方便地建立新的主题，便动了再造轮子的想法。</p>
-<p>上周周末干脆重新安装了 hexo：由 nvm 安装 npm， 再由 npm 安装 hexo 及 hexo 的各个模块（各个模块独立后，可按需安装）。这次指定了安装目录，统一了目录，后续删除就方便了。</p>
-<p>这周大（粗）刀（鄙）阔（简）斧（陋）地完成了我的第二个主题，开发代号为 <code>flexin</code>，名称为 <code>blueberry</code>。 至此，闲置半年的记录博客习惯预计将会恢复。</p>
-<h1 id="主题简介">主题简介</h1><h3 id="理念">理念</h3><ol>
-<li>更关注内容和文章质量，去掉周边功能，比如统计、搜索</li>
-<li>类 unix 文本的直白展示方式，代码不加高亮</li>
-<li>关注阅读体验，关注字体，优先使用开源的 open sans 无衬线字体</li>
-<li>打开要快，使用国内 cdn 的源来加载 jquery，同时不再使用前端框架 Bootstrap，不使用图标字体</li>
+	    <h1 id="&#x8D77;&#x56E0;"><a href="#&#x8D77;&#x56E0;" class="headerlink" title="&#x8D77;&#x56E0;"></a>&#x8D77;&#x56E0;</h1><p>&#x4F7F;&#x7528; hexo 2.x &#x6709;&#x4E24;&#x5E74;&#x591A;&#x4E86;&#xFF0C;&#x4E5F;&#x6539;&#x4E86;&#x4E00;&#x4E2A;&#x4E3B;&#x9898;&#x81EA;&#x7528;&#x7740;&#xFF0C;&#x4F46;&#x4E00;&#x76F4;&#x672A;&#x53BB;&#x586B;&#x5751;&#x5B8C;&#x5584;&#x4E3B;&#x9898;&#xFF0C;&#x91CC;&#x9762;&#x7684;&#x4EE3;&#x7801;&#x4E5F;&#x8F83;&#x591A;&#x5197;&#x4F59;&#xFF0C;&#x62D6;&#x62D6;&#x62C9;&#x62C9;&#xFF0C;&#x5174;&#xFF08;&#x559C;&#xFF09;&#x8DA3;&#xFF08;&#x65B0;&#xFF09;&#x4E0D;&#xFF08;&#x538C;&#xFF09;&#x9AD8;&#xFF08;&#x65E7;&#xFF09;&#x3002; </p>
+<p>&#x968F;&#x7740; hexo 3.x &#x7248;&#x672C;&#x7684;&#x53D1;&#x5E03;&#xFF0C;&#x5176;&#x4F7F;&#x7528;&#x6587;&#x6863;&#x5DF2;&#x76F8;&#x5F53;&#x5065;&#x5168;&#x4E86;&#xFF0C;&#x7FFB;&#x4E86;&#x4E00;&#x4E0B;&#xFF0C;&#x5176;&#x6A21;&#x5757;&#x66F4;&#x72EC;&#x7ACB;&#x5316;&#x3001; api &#x66F4;&#x7B80;&#x6D01;&#xFF0C;&#x53EF;&#x4EE5;&#x5F88;&#x65B9;&#x4FBF;&#x5730;&#x5EFA;&#x7ACB;&#x65B0;&#x7684;&#x4E3B;&#x9898;&#xFF0C;&#x4FBF;&#x52A8;&#x4E86;&#x518D;&#x9020;&#x8F6E;&#x5B50;&#x7684;&#x60F3;&#x6CD5;&#x3002;</p>
+<p>&#x4E0A;&#x5468;&#x5468;&#x672B;&#x5E72;&#x8106;&#x91CD;&#x65B0;&#x5B89;&#x88C5;&#x4E86; hexo&#xFF1A;&#x7531; nvm &#x5B89;&#x88C5; npm&#xFF0C; &#x518D;&#x7531; npm &#x5B89;&#x88C5; hexo &#x53CA; hexo &#x7684;&#x5404;&#x4E2A;&#x6A21;&#x5757;&#xFF08;&#x5404;&#x4E2A;&#x6A21;&#x5757;&#x72EC;&#x7ACB;&#x540E;&#xFF0C;&#x53EF;&#x6309;&#x9700;&#x5B89;&#x88C5;&#xFF09;&#x3002;&#x8FD9;&#x6B21;&#x6307;&#x5B9A;&#x4E86;&#x5B89;&#x88C5;&#x76EE;&#x5F55;&#xFF0C;&#x7EDF;&#x4E00;&#x4E86;&#x76EE;&#x5F55;&#xFF0C;&#x540E;&#x7EED;&#x5220;&#x9664;&#x5C31;&#x65B9;&#x4FBF;&#x4E86;&#x3002;</p>
+<p>&#x8FD9;&#x5468;&#x5927;&#xFF08;&#x7C97;&#xFF09;&#x5200;&#xFF08;&#x9119;&#xFF09;&#x9614;&#xFF08;&#x7B80;&#xFF09;&#x65A7;&#xFF08;&#x964B;&#xFF09;&#x5730;&#x5B8C;&#x6210;&#x4E86;&#x6211;&#x7684;&#x7B2C;&#x4E8C;&#x4E2A;&#x4E3B;&#x9898;&#xFF0C;&#x5F00;&#x53D1;&#x4EE3;&#x53F7;&#x4E3A; <code>flexin</code>&#xFF0C;&#x540D;&#x79F0;&#x4E3A; <code>blueberry</code>&#x3002; &#x81F3;&#x6B64;&#xFF0C;&#x95F2;&#x7F6E;&#x534A;&#x5E74;&#x7684;&#x8BB0;&#x5F55;&#x535A;&#x5BA2;&#x4E60;&#x60EF;&#x9884;&#x8BA1;&#x5C06;&#x4F1A;&#x6062;&#x590D;&#x3002;</p>
+<h1 id="&#x4E3B;&#x9898;&#x7B80;&#x4ECB;"><a href="#&#x4E3B;&#x9898;&#x7B80;&#x4ECB;" class="headerlink" title="&#x4E3B;&#x9898;&#x7B80;&#x4ECB;"></a>&#x4E3B;&#x9898;&#x7B80;&#x4ECB;</h1><h3 id="&#x7406;&#x5FF5;"><a href="#&#x7406;&#x5FF5;" class="headerlink" title="&#x7406;&#x5FF5;"></a>&#x7406;&#x5FF5;</h3><ol>
+<li>&#x66F4;&#x5173;&#x6CE8;&#x5185;&#x5BB9;&#x548C;&#x6587;&#x7AE0;&#x8D28;&#x91CF;&#xFF0C;&#x53BB;&#x6389;&#x5468;&#x8FB9;&#x529F;&#x80FD;&#xFF0C;&#x6BD4;&#x5982;&#x7EDF;&#x8BA1;&#x3001;&#x641C;&#x7D22;</li>
+<li>&#x7C7B; unix &#x6587;&#x672C;&#x7684;&#x76F4;&#x767D;&#x5C55;&#x793A;&#x65B9;&#x5F0F;&#xFF0C;&#x4EE3;&#x7801;&#x4E0D;&#x52A0;&#x9AD8;&#x4EAE;</li>
+<li>&#x5173;&#x6CE8;&#x9605;&#x8BFB;&#x4F53;&#x9A8C;&#xFF0C;&#x5173;&#x6CE8;&#x5B57;&#x4F53;&#xFF0C;&#x4F18;&#x5148;&#x4F7F;&#x7528;&#x5F00;&#x6E90;&#x7684; open sans &#x65E0;&#x886C;&#x7EBF;&#x5B57;&#x4F53;</li>
+<li>&#x6253;&#x5F00;&#x8981;&#x5FEB;&#xFF0C;&#x4F7F;&#x7528;&#x56FD;&#x5185; cdn &#x7684;&#x6E90;&#x6765;&#x52A0;&#x8F7D; jquery&#xFF0C;&#x540C;&#x65F6;&#x4E0D;&#x518D;&#x4F7F;&#x7528;&#x524D;&#x7AEF;&#x6846;&#x67B6; Bootstrap&#xFF0C;&#x4E0D;&#x4F7F;&#x7528;&#x56FE;&#x6807;&#x5B57;&#x4F53;</li>
 </ol>
-<h3 id="功能">功能</h3><ol>
-<li>首页做成归档的形式，大字报列出最近几篇文章</li>
-<li>首页的每个文章标题下方，又列出文章生成时间、所属目录、所打标签，这也是我管理内容的三个维度</li>
-<li>把菜单链接放到页面右下角，减少阅读干扰</li>
-<li>分页功能，下一页，或下一篇文章</li>
-<li>文章右上角增加目录</li>
-<li>图片居中</li>
+<h3 id="&#x529F;&#x80FD;"><a href="#&#x529F;&#x80FD;" class="headerlink" title="&#x529F;&#x80FD;"></a>&#x529F;&#x80FD;</h3><ol>
+<li>&#x9996;&#x9875;&#x505A;&#x6210;&#x5F52;&#x6863;&#x7684;&#x5F62;&#x5F0F;&#xFF0C;&#x5927;&#x5B57;&#x62A5;&#x5217;&#x51FA;&#x6700;&#x8FD1;&#x51E0;&#x7BC7;&#x6587;&#x7AE0;</li>
+<li>&#x9996;&#x9875;&#x7684;&#x6BCF;&#x4E2A;&#x6587;&#x7AE0;&#x6807;&#x9898;&#x4E0B;&#x65B9;&#xFF0C;&#x53C8;&#x5217;&#x51FA;&#x6587;&#x7AE0;&#x751F;&#x6210;&#x65F6;&#x95F4;&#x3001;&#x6240;&#x5C5E;&#x76EE;&#x5F55;&#x3001;&#x6240;&#x6253;&#x6807;&#x7B7E;&#xFF0C;&#x8FD9;&#x4E5F;&#x662F;&#x6211;&#x7BA1;&#x7406;&#x5185;&#x5BB9;&#x7684;&#x4E09;&#x4E2A;&#x7EF4;&#x5EA6;</li>
+<li>&#x628A;&#x83DC;&#x5355;&#x94FE;&#x63A5;&#x653E;&#x5230;&#x9875;&#x9762;&#x53F3;&#x4E0B;&#x89D2;&#xFF0C;&#x51CF;&#x5C11;&#x9605;&#x8BFB;&#x5E72;&#x6270;</li>
+<li>&#x5206;&#x9875;&#x529F;&#x80FD;&#xFF0C;&#x4E0B;&#x4E00;&#x9875;&#xFF0C;&#x6216;&#x4E0B;&#x4E00;&#x7BC7;&#x6587;&#x7AE0;</li>
+<li>&#x6587;&#x7AE0;&#x53F3;&#x4E0A;&#x89D2;&#x589E;&#x52A0;&#x76EE;&#x5F55;</li>
+<li>&#x56FE;&#x7247;&#x5C45;&#x4E2D;</li>
 </ol>
-<h3 id="特色">特色</h3><ol>
-<li>不支持 IE</li>
+<h3 id="&#x7279;&#x8272;"><a href="#&#x7279;&#x8272;" class="headerlink" title="&#x7279;&#x8272;"></a>&#x7279;&#x8272;</h3><ol>
+<li>&#x4E0D;&#x652F;&#x6301; IE</li>
 </ol>
-<p>– EOF –<br><br></p>
+<p>&#x2013; EOF &#x2013;<br><br></p>
 
 	
 
@@ -148,7 +148,7 @@
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

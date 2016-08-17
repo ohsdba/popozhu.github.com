@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -49,45 +49,45 @@
 	
 	    
 	    
-		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#初衷"><span class="toc-text">初衷</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Karabiner"><span class="toc-text">Karabiner</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#模式"><span class="toc-text">模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#激活"><span class="toc-text">激活</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参数"><span class="toc-text">参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#辅助快捷键"><span class="toc-text">辅助快捷键</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#配置文件"><span class="toc-text">配置文件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#题外话"><span class="toc-text">题外话</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#模拟_HHKB"><span class="toc-text">模拟 HHKB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#启动模式"><span class="toc-text">启动模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他"><span class="toc-text">其他</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ref"><span class="toc-text">ref</span></a></li></ol> </div>
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#初衷"><span class="toc-text">初衷</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#karabiner"><span class="toc-text">Karabiner</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#模式"><span class="toc-text">模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#激活"><span class="toc-text">激活</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参数"><span class="toc-text">参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#辅助快捷键"><span class="toc-text">辅助快捷键</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#配置文件"><span class="toc-text">配置文件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#题外话"><span class="toc-text">题外话</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#模拟-hhkb"><span class="toc-text">模拟 HHKB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#启动模式"><span class="toc-text">启动模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他"><span class="toc-text">其他</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ref"><span class="toc-text">ref</span></a></li></ol> </div>
 	    
 
-	    <h1 id="初衷">初衷</h1><p>一开始是左手手指有点酸，估计是尾指按键盘左边的<code>Ctrl</code>键次数有点多，为此把左边的<code>Ctrl</code>键盘跟<code>CapsLock</code>对换了一下，这样用了有一年，使用的软件是<code>karabiner</code>和它的一个组件<code>Seil</code>，之所以需要<code>Seil</code>，<code>Karabiner</code>说是<code>CapsLock</code>键的<a href="https://pqrs.org/osx/karabiner/faq.html.en#capslock" target="_blank" rel="external">替换（重新映射）需要特殊处理</a>，偶尔还会在 OSX 系统升级后出现映射失效，需要等待作者来做软件升级。</p>
-<p>症状基本解决，而且也认同：<code>Ctrl</code>键位置调换后，一定程度上让各种快捷键用起来更为舒适。工作中是在系统自带终端下，启动<code>tmux</code> + <code>vim</code>，<code>tmux</code>的前缀键我使用的是<code>ctrl+a</code>。</p>
-<p>因此大约一年后，这次是右手手臂酸了，是我坐姿的问题，也另发现，当我几条不用触摸板（我是触摸板的重度用户，各种手势，操作还算挺快挺频繁），改用鼠标，症状又有所缓解。用回触摸板，又恢复，依次循环几次后，觉得可以试试不用触摸板。</p>
-<p>极端一些，能不能不用触摸板也不用鼠标？嗯，使用<code>karabiner</code>一年后才发现它也有提供这功能：<code>mouse keys mode</code>.</p>
-<h1 id="Karabiner">Karabiner</h1><p><code>Karabiner</code> 是一个修改键位映射的软件。由于我需要修改到<code>CapsLock</code>键盘，也安装有组件<code>Seil</code>。并把两者都加到我的开机启动项里。</p>
-<h2 id="模式">模式</h2><p><code>Karabiner</code>预先设置后了多种模式，比如<code>vim</code>模式、<code>emacs</code>模式等，再加上最近发现的<code>mouse keys mode</code>模式，用于解放触摸板和鼠标。</p>
-<p>在<code>Karabiner</code>设置里的第一个tab：<code>Change key</code>里搜索<code>mouse keys</code>就能看到这种模式了，当前是<code>Mouse Keys Mode V2</code>，相比 V1 版本，这个版本相对更容易触发这种模式，对输入干扰也相对少一些（考虑输入过程中突然需要移动鼠标到其他位置）。以下只说 V2 版本的使用，当然，先要在设置里选中<code>Mouse Keys Mode V2</code>，后续的各种快捷键才能生效。</p>
-<h2 id="激活">激活</h2><p>按住<code>d</code>键，再按 <code>hjkl</code> 中的任何一个键位来<strong>左下上右</strong>地移动鼠标。比如我要向上移动鼠标，只需按住<code>d</code>不放开，再按一下<code>k</code>。</p>
-<p>鼠标移动后，光标并没移动，需要在鼠标确定位置后，再按一次<strong>鼠标左键</strong>，默认是<code>d+v</code>。比如我需要在当前文本里修改第10行第3列的错别字，需要两个步骤，先<code>d+hjkl</code>多次移动鼠标到第10行第3列这里，再按<code>d+v</code>，让光标定位在错别字后面，删除这个错别字，输入正确的字。</p>
-<p>相应地，右键是<code>d+n</code>。</p>
-<p>浏览网页一般需要向下滚动页面，即 scroll，取首字母<code>s</code>，跟<code>d+hjkl</code>的前缀键<code>d</code>组合，即<code>d+s</code>，再通过<code>hjkl</code>决定滚动的方向。在网页向下滚动的例子中，则是<code>d+s+j</code>。个人使用起来，先按住<code>d</code>，<code>s</code>稍微慢几百毫秒，成功率更高，需要时间适应。</p>
-<p>组合起来后，当我操作鼠标时，基本需要一直按住<code>d</code>键……</p>
-<p>老实说，无论是 v1 或 v2 版本，直接由字符键来激活模式，都觉得很不理想，影响输入。我在输入时需要用到d、s这几个键，都需要稍微滞钝一下，避免激活了模式，一旦激活，当前输入就无法获得我预期的词组。</p>
-<h2 id="参数">参数</h2><p>根据<code>karabiner</code>设置里的提示，我修改了两个参数：</p>
+	    <h1 id="&#x521D;&#x8877;"><a href="#&#x521D;&#x8877;" class="headerlink" title="&#x521D;&#x8877;"></a>&#x521D;&#x8877;</h1><p>&#x4E00;&#x5F00;&#x59CB;&#x662F;&#x5DE6;&#x624B;&#x624B;&#x6307;&#x6709;&#x70B9;&#x9178;&#xFF0C;&#x4F30;&#x8BA1;&#x662F;&#x5C3E;&#x6307;&#x6309;&#x952E;&#x76D8;&#x5DE6;&#x8FB9;&#x7684;<code>Ctrl</code>&#x952E;&#x6B21;&#x6570;&#x6709;&#x70B9;&#x591A;&#xFF0C;&#x4E3A;&#x6B64;&#x628A;&#x5DE6;&#x8FB9;&#x7684;<code>Ctrl</code>&#x952E;&#x76D8;&#x8DDF;<code>CapsLock</code>&#x5BF9;&#x6362;&#x4E86;&#x4E00;&#x4E0B;&#xFF0C;&#x8FD9;&#x6837;&#x7528;&#x4E86;&#x6709;&#x4E00;&#x5E74;&#xFF0C;&#x4F7F;&#x7528;&#x7684;&#x8F6F;&#x4EF6;&#x662F;<code>karabiner</code>&#x548C;&#x5B83;&#x7684;&#x4E00;&#x4E2A;&#x7EC4;&#x4EF6;<code>Seil</code>&#xFF0C;&#x4E4B;&#x6240;&#x4EE5;&#x9700;&#x8981;<code>Seil</code>&#xFF0C;<code>Karabiner</code>&#x8BF4;&#x662F;<code>CapsLock</code>&#x952E;&#x7684;<a href="https://pqrs.org/osx/karabiner/faq.html.en#capslock" target="_blank" rel="external">&#x66FF;&#x6362;&#xFF08;&#x91CD;&#x65B0;&#x6620;&#x5C04;&#xFF09;&#x9700;&#x8981;&#x7279;&#x6B8A;&#x5904;&#x7406;</a>&#xFF0C;&#x5076;&#x5C14;&#x8FD8;&#x4F1A;&#x5728; OSX &#x7CFB;&#x7EDF;&#x5347;&#x7EA7;&#x540E;&#x51FA;&#x73B0;&#x6620;&#x5C04;&#x5931;&#x6548;&#xFF0C;&#x9700;&#x8981;&#x7B49;&#x5F85;&#x4F5C;&#x8005;&#x6765;&#x505A;&#x8F6F;&#x4EF6;&#x5347;&#x7EA7;&#x3002;</p>
+<p>&#x75C7;&#x72B6;&#x57FA;&#x672C;&#x89E3;&#x51B3;&#xFF0C;&#x800C;&#x4E14;&#x4E5F;&#x8BA4;&#x540C;&#xFF1A;<code>Ctrl</code>&#x952E;&#x4F4D;&#x7F6E;&#x8C03;&#x6362;&#x540E;&#xFF0C;&#x4E00;&#x5B9A;&#x7A0B;&#x5EA6;&#x4E0A;&#x8BA9;&#x5404;&#x79CD;&#x5FEB;&#x6377;&#x952E;&#x7528;&#x8D77;&#x6765;&#x66F4;&#x4E3A;&#x8212;&#x9002;&#x3002;&#x5DE5;&#x4F5C;&#x4E2D;&#x662F;&#x5728;&#x7CFB;&#x7EDF;&#x81EA;&#x5E26;&#x7EC8;&#x7AEF;&#x4E0B;&#xFF0C;&#x542F;&#x52A8;<code>tmux</code> + <code>vim</code>&#xFF0C;<code>tmux</code>&#x7684;&#x524D;&#x7F00;&#x952E;&#x6211;&#x4F7F;&#x7528;&#x7684;&#x662F;<code>ctrl+a</code>&#x3002;</p>
+<p>&#x56E0;&#x6B64;&#x5927;&#x7EA6;&#x4E00;&#x5E74;&#x540E;&#xFF0C;&#x8FD9;&#x6B21;&#x662F;&#x53F3;&#x624B;&#x624B;&#x81C2;&#x9178;&#x4E86;&#xFF0C;&#x662F;&#x6211;&#x5750;&#x59FF;&#x7684;&#x95EE;&#x9898;&#xFF0C;&#x4E5F;&#x53E6;&#x53D1;&#x73B0;&#xFF0C;&#x5F53;&#x6211;&#x51E0;&#x6761;&#x4E0D;&#x7528;&#x89E6;&#x6478;&#x677F;&#xFF08;&#x6211;&#x662F;&#x89E6;&#x6478;&#x677F;&#x7684;&#x91CD;&#x5EA6;&#x7528;&#x6237;&#xFF0C;&#x5404;&#x79CD;&#x624B;&#x52BF;&#xFF0C;&#x64CD;&#x4F5C;&#x8FD8;&#x7B97;&#x633A;&#x5FEB;&#x633A;&#x9891;&#x7E41;&#xFF09;&#xFF0C;&#x6539;&#x7528;&#x9F20;&#x6807;&#xFF0C;&#x75C7;&#x72B6;&#x53C8;&#x6709;&#x6240;&#x7F13;&#x89E3;&#x3002;&#x7528;&#x56DE;&#x89E6;&#x6478;&#x677F;&#xFF0C;&#x53C8;&#x6062;&#x590D;&#xFF0C;&#x4F9D;&#x6B21;&#x5FAA;&#x73AF;&#x51E0;&#x6B21;&#x540E;&#xFF0C;&#x89C9;&#x5F97;&#x53EF;&#x4EE5;&#x8BD5;&#x8BD5;&#x4E0D;&#x7528;&#x89E6;&#x6478;&#x677F;&#x3002;</p>
+<p>&#x6781;&#x7AEF;&#x4E00;&#x4E9B;&#xFF0C;&#x80FD;&#x4E0D;&#x80FD;&#x4E0D;&#x7528;&#x89E6;&#x6478;&#x677F;&#x4E5F;&#x4E0D;&#x7528;&#x9F20;&#x6807;&#xFF1F;&#x55EF;&#xFF0C;&#x4F7F;&#x7528;<code>karabiner</code>&#x4E00;&#x5E74;&#x540E;&#x624D;&#x53D1;&#x73B0;&#x5B83;&#x4E5F;&#x6709;&#x63D0;&#x4F9B;&#x8FD9;&#x529F;&#x80FD;&#xFF1A;<code>mouse keys mode</code>.</p>
+<h1 id="karabiner"><a href="#Karabiner" class="headerlink" title="Karabiner"></a>Karabiner</h1><p><code>Karabiner</code> &#x662F;&#x4E00;&#x4E2A;&#x4FEE;&#x6539;&#x952E;&#x4F4D;&#x6620;&#x5C04;&#x7684;&#x8F6F;&#x4EF6;&#x3002;&#x7531;&#x4E8E;&#x6211;&#x9700;&#x8981;&#x4FEE;&#x6539;&#x5230;<code>CapsLock</code>&#x952E;&#x76D8;&#xFF0C;&#x4E5F;&#x5B89;&#x88C5;&#x6709;&#x7EC4;&#x4EF6;<code>Seil</code>&#x3002;&#x5E76;&#x628A;&#x4E24;&#x8005;&#x90FD;&#x52A0;&#x5230;&#x6211;&#x7684;&#x5F00;&#x673A;&#x542F;&#x52A8;&#x9879;&#x91CC;&#x3002;</p>
+<h2 id="&#x6A21;&#x5F0F;"><a href="#&#x6A21;&#x5F0F;" class="headerlink" title="&#x6A21;&#x5F0F;"></a>&#x6A21;&#x5F0F;</h2><p><code>Karabiner</code>&#x9884;&#x5148;&#x8BBE;&#x7F6E;&#x540E;&#x4E86;&#x591A;&#x79CD;&#x6A21;&#x5F0F;&#xFF0C;&#x6BD4;&#x5982;<code>vim</code>&#x6A21;&#x5F0F;&#x3001;<code>emacs</code>&#x6A21;&#x5F0F;&#x7B49;&#xFF0C;&#x518D;&#x52A0;&#x4E0A;&#x6700;&#x8FD1;&#x53D1;&#x73B0;&#x7684;<code>mouse keys mode</code>&#x6A21;&#x5F0F;&#xFF0C;&#x7528;&#x4E8E;&#x89E3;&#x653E;&#x89E6;&#x6478;&#x677F;&#x548C;&#x9F20;&#x6807;&#x3002;</p>
+<p>&#x5728;<code>Karabiner</code>&#x8BBE;&#x7F6E;&#x91CC;&#x7684;&#x7B2C;&#x4E00;&#x4E2A;tab&#xFF1A;<code>Change key</code>&#x91CC;&#x641C;&#x7D22;<code>mouse keys</code>&#x5C31;&#x80FD;&#x770B;&#x5230;&#x8FD9;&#x79CD;&#x6A21;&#x5F0F;&#x4E86;&#xFF0C;&#x5F53;&#x524D;&#x662F;<code>Mouse Keys Mode V2</code>&#xFF0C;&#x76F8;&#x6BD4; V1 &#x7248;&#x672C;&#xFF0C;&#x8FD9;&#x4E2A;&#x7248;&#x672C;&#x76F8;&#x5BF9;&#x66F4;&#x5BB9;&#x6613;&#x89E6;&#x53D1;&#x8FD9;&#x79CD;&#x6A21;&#x5F0F;&#xFF0C;&#x5BF9;&#x8F93;&#x5165;&#x5E72;&#x6270;&#x4E5F;&#x76F8;&#x5BF9;&#x5C11;&#x4E00;&#x4E9B;&#xFF08;&#x8003;&#x8651;&#x8F93;&#x5165;&#x8FC7;&#x7A0B;&#x4E2D;&#x7A81;&#x7136;&#x9700;&#x8981;&#x79FB;&#x52A8;&#x9F20;&#x6807;&#x5230;&#x5176;&#x4ED6;&#x4F4D;&#x7F6E;&#xFF09;&#x3002;&#x4EE5;&#x4E0B;&#x53EA;&#x8BF4; V2 &#x7248;&#x672C;&#x7684;&#x4F7F;&#x7528;&#xFF0C;&#x5F53;&#x7136;&#xFF0C;&#x5148;&#x8981;&#x5728;&#x8BBE;&#x7F6E;&#x91CC;&#x9009;&#x4E2D;<code>Mouse Keys Mode V2</code>&#xFF0C;&#x540E;&#x7EED;&#x7684;&#x5404;&#x79CD;&#x5FEB;&#x6377;&#x952E;&#x624D;&#x80FD;&#x751F;&#x6548;&#x3002;</p>
+<h2 id="&#x6FC0;&#x6D3B;"><a href="#&#x6FC0;&#x6D3B;" class="headerlink" title="&#x6FC0;&#x6D3B;"></a>&#x6FC0;&#x6D3B;</h2><p>&#x6309;&#x4F4F;<code>d</code>&#x952E;&#xFF0C;&#x518D;&#x6309; <code>hjkl</code> &#x4E2D;&#x7684;&#x4EFB;&#x4F55;&#x4E00;&#x4E2A;&#x952E;&#x4F4D;&#x6765;<strong>&#x5DE6;&#x4E0B;&#x4E0A;&#x53F3;</strong>&#x5730;&#x79FB;&#x52A8;&#x9F20;&#x6807;&#x3002;&#x6BD4;&#x5982;&#x6211;&#x8981;&#x5411;&#x4E0A;&#x79FB;&#x52A8;&#x9F20;&#x6807;&#xFF0C;&#x53EA;&#x9700;&#x6309;&#x4F4F;<code>d</code>&#x4E0D;&#x653E;&#x5F00;&#xFF0C;&#x518D;&#x6309;&#x4E00;&#x4E0B;<code>k</code>&#x3002;</p>
+<p>&#x9F20;&#x6807;&#x79FB;&#x52A8;&#x540E;&#xFF0C;&#x5149;&#x6807;&#x5E76;&#x6CA1;&#x79FB;&#x52A8;&#xFF0C;&#x9700;&#x8981;&#x5728;&#x9F20;&#x6807;&#x786E;&#x5B9A;&#x4F4D;&#x7F6E;&#x540E;&#xFF0C;&#x518D;&#x6309;&#x4E00;&#x6B21;<strong>&#x9F20;&#x6807;&#x5DE6;&#x952E;</strong>&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;<code>d+v</code>&#x3002;&#x6BD4;&#x5982;&#x6211;&#x9700;&#x8981;&#x5728;&#x5F53;&#x524D;&#x6587;&#x672C;&#x91CC;&#x4FEE;&#x6539;&#x7B2C;10&#x884C;&#x7B2C;3&#x5217;&#x7684;&#x9519;&#x522B;&#x5B57;&#xFF0C;&#x9700;&#x8981;&#x4E24;&#x4E2A;&#x6B65;&#x9AA4;&#xFF0C;&#x5148;<code>d+hjkl</code>&#x591A;&#x6B21;&#x79FB;&#x52A8;&#x9F20;&#x6807;&#x5230;&#x7B2C;10&#x884C;&#x7B2C;3&#x5217;&#x8FD9;&#x91CC;&#xFF0C;&#x518D;&#x6309;<code>d+v</code>&#xFF0C;&#x8BA9;&#x5149;&#x6807;&#x5B9A;&#x4F4D;&#x5728;&#x9519;&#x522B;&#x5B57;&#x540E;&#x9762;&#xFF0C;&#x5220;&#x9664;&#x8FD9;&#x4E2A;&#x9519;&#x522B;&#x5B57;&#xFF0C;&#x8F93;&#x5165;&#x6B63;&#x786E;&#x7684;&#x5B57;&#x3002;</p>
+<p>&#x76F8;&#x5E94;&#x5730;&#xFF0C;&#x53F3;&#x952E;&#x662F;<code>d+n</code>&#x3002;</p>
+<p>&#x6D4F;&#x89C8;&#x7F51;&#x9875;&#x4E00;&#x822C;&#x9700;&#x8981;&#x5411;&#x4E0B;&#x6EDA;&#x52A8;&#x9875;&#x9762;&#xFF0C;&#x5373; scroll&#xFF0C;&#x53D6;&#x9996;&#x5B57;&#x6BCD;<code>s</code>&#xFF0C;&#x8DDF;<code>d+hjkl</code>&#x7684;&#x524D;&#x7F00;&#x952E;<code>d</code>&#x7EC4;&#x5408;&#xFF0C;&#x5373;<code>d+s</code>&#xFF0C;&#x518D;&#x901A;&#x8FC7;<code>hjkl</code>&#x51B3;&#x5B9A;&#x6EDA;&#x52A8;&#x7684;&#x65B9;&#x5411;&#x3002;&#x5728;&#x7F51;&#x9875;&#x5411;&#x4E0B;&#x6EDA;&#x52A8;&#x7684;&#x4F8B;&#x5B50;&#x4E2D;&#xFF0C;&#x5219;&#x662F;<code>d+s+j</code>&#x3002;&#x4E2A;&#x4EBA;&#x4F7F;&#x7528;&#x8D77;&#x6765;&#xFF0C;&#x5148;&#x6309;&#x4F4F;<code>d</code>&#xFF0C;<code>s</code>&#x7A0D;&#x5FAE;&#x6162;&#x51E0;&#x767E;&#x6BEB;&#x79D2;&#xFF0C;&#x6210;&#x529F;&#x7387;&#x66F4;&#x9AD8;&#xFF0C;&#x9700;&#x8981;&#x65F6;&#x95F4;&#x9002;&#x5E94;&#x3002;</p>
+<p>&#x7EC4;&#x5408;&#x8D77;&#x6765;&#x540E;&#xFF0C;&#x5F53;&#x6211;&#x64CD;&#x4F5C;&#x9F20;&#x6807;&#x65F6;&#xFF0C;&#x57FA;&#x672C;&#x9700;&#x8981;&#x4E00;&#x76F4;&#x6309;&#x4F4F;<code>d</code>&#x952E;&#x2026;&#x2026;</p>
+<p>&#x8001;&#x5B9E;&#x8BF4;&#xFF0C;&#x65E0;&#x8BBA;&#x662F; v1 &#x6216; v2 &#x7248;&#x672C;&#xFF0C;&#x76F4;&#x63A5;&#x7531;&#x5B57;&#x7B26;&#x952E;&#x6765;&#x6FC0;&#x6D3B;&#x6A21;&#x5F0F;&#xFF0C;&#x90FD;&#x89C9;&#x5F97;&#x5F88;&#x4E0D;&#x7406;&#x60F3;&#xFF0C;&#x5F71;&#x54CD;&#x8F93;&#x5165;&#x3002;&#x6211;&#x5728;&#x8F93;&#x5165;&#x65F6;&#x9700;&#x8981;&#x7528;&#x5230;d&#x3001;s&#x8FD9;&#x51E0;&#x4E2A;&#x952E;&#xFF0C;&#x90FD;&#x9700;&#x8981;&#x7A0D;&#x5FAE;&#x6EDE;&#x949D;&#x4E00;&#x4E0B;&#xFF0C;&#x907F;&#x514D;&#x6FC0;&#x6D3B;&#x4E86;&#x6A21;&#x5F0F;&#xFF0C;&#x4E00;&#x65E6;&#x6FC0;&#x6D3B;&#xFF0C;&#x5F53;&#x524D;&#x8F93;&#x5165;&#x5C31;&#x65E0;&#x6CD5;&#x83B7;&#x5F97;&#x6211;&#x9884;&#x671F;&#x7684;&#x8BCD;&#x7EC4;&#x3002;</p>
+<h2 id="&#x53C2;&#x6570;"><a href="#&#x53C2;&#x6570;" class="headerlink" title="&#x53C2;&#x6570;"></a>&#x53C2;&#x6570;</h2><p>&#x6839;&#x636E;<code>karabiner</code>&#x8BBE;&#x7F6E;&#x91CC;&#x7684;&#x63D0;&#x793A;&#xFF0C;&#x6211;&#x4FEE;&#x6539;&#x4E86;&#x4E24;&#x4E2A;&#x53C2;&#x6570;&#xFF1A;</p>
 <ul>
-<li><code>__BlockUntilKeyUp__</code>，其<code>Timeout</code>默认值是 200ms，我修改为 100ms，减少阻塞</li>
-<li><code>Holding Key to Key</code>，其<code>Holding Threshold</code>默认直是 200ms，也修改为 100ms，降低阀值，更迅速地激活模式，这个参数还在测试中。</li>
+<li><code>__BlockUntilKeyUp__</code>&#xFF0C;&#x5176;<code>Timeout</code>&#x9ED8;&#x8BA4;&#x503C;&#x662F; 200ms&#xFF0C;&#x6211;&#x4FEE;&#x6539;&#x4E3A; 100ms&#xFF0C;&#x51CF;&#x5C11;&#x963B;&#x585E;</li>
+<li><code>Holding Key to Key</code>&#xFF0C;&#x5176;<code>Holding Threshold</code>&#x9ED8;&#x8BA4;&#x76F4;&#x662F; 200ms&#xFF0C;&#x4E5F;&#x4FEE;&#x6539;&#x4E3A; 100ms&#xFF0C;&#x964D;&#x4F4E;&#x9600;&#x503C;&#xFF0C;&#x66F4;&#x8FC5;&#x901F;&#x5730;&#x6FC0;&#x6D3B;&#x6A21;&#x5F0F;&#xFF0C;&#x8FD9;&#x4E2A;&#x53C2;&#x6570;&#x8FD8;&#x5728;&#x6D4B;&#x8BD5;&#x4E2D;&#x3002;</li>
 </ul>
-<h2 id="辅助快捷键">辅助快捷键</h2><p>有时候只需要在字里行间稍微移动一下，通过<code>emacs</code>风格的几个快捷键，更为方便: <code>control+pnbf</code>，分别是上、下、左、右。</p>
-<p>同时另有<code>contrl+a</code>移动到行首，<code>control+e</code>移动好行末。</p>
-<p>搜索<code>emacs mode</code>，可按需开启更多快捷键。</p>
-<h1 id="配置文件">配置文件</h1><p><code>karabiner</code>的配置文件放在 <a href="https://github.com/popozhu/karabiner" target="_blank" rel="external">github</a> 上。</p>
-<p><code>karabiner</code>先加载<code>private.xml</code>文件，路径默认为：</p>
-<pre><code>${HOME}&#39;/Library/Application Support/Karabiner&#39;/private.xml
-</code></pre><p>在该配置文件中，我再包含了<code>hhkb.xml</code>和<code>launch_app.xml</code>相关的两个配置文件。</p>
-<h1 id="题外话">题外话</h1><p>后续是题外话了。</p>
-<h2 id="模拟_HHKB">模拟 HHKB</h2><p>一个是我一直想买个hhkb键，假若我能适应这种无触摸板无鼠标的操作，那就可以剁手了。为此我也提前按hhkb的键位分布设置了一些映射。</p>
+<h2 id="&#x8F85;&#x52A9;&#x5FEB;&#x6377;&#x952E;"><a href="#&#x8F85;&#x52A9;&#x5FEB;&#x6377;&#x952E;" class="headerlink" title="&#x8F85;&#x52A9;&#x5FEB;&#x6377;&#x952E;"></a>&#x8F85;&#x52A9;&#x5FEB;&#x6377;&#x952E;</h2><p>&#x6709;&#x65F6;&#x5019;&#x53EA;&#x9700;&#x8981;&#x5728;&#x5B57;&#x91CC;&#x884C;&#x95F4;&#x7A0D;&#x5FAE;&#x79FB;&#x52A8;&#x4E00;&#x4E0B;&#xFF0C;&#x901A;&#x8FC7;<code>emacs</code>&#x98CE;&#x683C;&#x7684;&#x51E0;&#x4E2A;&#x5FEB;&#x6377;&#x952E;&#xFF0C;&#x66F4;&#x4E3A;&#x65B9;&#x4FBF;: <code>control+pnbf</code>&#xFF0C;&#x5206;&#x522B;&#x662F;&#x4E0A;&#x3001;&#x4E0B;&#x3001;&#x5DE6;&#x3001;&#x53F3;&#x3002;</p>
+<p>&#x540C;&#x65F6;&#x53E6;&#x6709;<code>contrl+a</code>&#x79FB;&#x52A8;&#x5230;&#x884C;&#x9996;&#xFF0C;<code>control+e</code>&#x79FB;&#x52A8;&#x597D;&#x884C;&#x672B;&#x3002;</p>
+<p>&#x641C;&#x7D22;<code>emacs mode</code>&#xFF0C;&#x53EF;&#x6309;&#x9700;&#x5F00;&#x542F;&#x66F4;&#x591A;&#x5FEB;&#x6377;&#x952E;&#x3002;</p>
+<h1 id="&#x914D;&#x7F6E;&#x6587;&#x4EF6;"><a href="#&#x914D;&#x7F6E;&#x6587;&#x4EF6;" class="headerlink" title="&#x914D;&#x7F6E;&#x6587;&#x4EF6;"></a>&#x914D;&#x7F6E;&#x6587;&#x4EF6;</h1><p><code>karabiner</code>&#x7684;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x653E;&#x5728; <a href="https://github.com/popozhu/karabiner" target="_blank" rel="external">github</a> &#x4E0A;&#x3002;</p>
+<p><code>karabiner</code>&#x5148;&#x52A0;&#x8F7D;<code>private.xml</code>&#x6587;&#x4EF6;&#xFF0C;&#x8DEF;&#x5F84;&#x9ED8;&#x8BA4;&#x4E3A;&#xFF1A;</p>
+<pre><code>${HOME}&apos;/Library/Application Support/Karabiner&apos;/private.xml
+</code></pre><p>&#x5728;&#x8BE5;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x4E2D;&#xFF0C;&#x6211;&#x518D;&#x5305;&#x542B;&#x4E86;<code>hhkb.xml</code>&#x548C;<code>launch_app.xml</code>&#x76F8;&#x5173;&#x7684;&#x4E24;&#x4E2A;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#x3002;</p>
+<h1 id="&#x9898;&#x5916;&#x8BDD;"><a href="#&#x9898;&#x5916;&#x8BDD;" class="headerlink" title="&#x9898;&#x5916;&#x8BDD;"></a>&#x9898;&#x5916;&#x8BDD;</h1><p>&#x540E;&#x7EED;&#x662F;&#x9898;&#x5916;&#x8BDD;&#x4E86;&#x3002;</p>
+<h2 id="&#x6A21;&#x62DF;-hhkb"><a href="#&#x6A21;&#x62DF;-HHKB" class="headerlink" title="&#x6A21;&#x62DF; HHKB"></a>&#x6A21;&#x62DF; HHKB</h2><p>&#x4E00;&#x4E2A;&#x662F;&#x6211;&#x4E00;&#x76F4;&#x60F3;&#x4E70;&#x4E2A;hhkb&#x952E;&#xFF0C;&#x5047;&#x82E5;&#x6211;&#x80FD;&#x9002;&#x5E94;&#x8FD9;&#x79CD;&#x65E0;&#x89E6;&#x6478;&#x677F;&#x65E0;&#x9F20;&#x6807;&#x7684;&#x64CD;&#x4F5C;&#xFF0C;&#x90A3;&#x5C31;&#x53EF;&#x4EE5;&#x5241;&#x624B;&#x4E86;&#x3002;&#x4E3A;&#x6B64;&#x6211;&#x4E5F;&#x63D0;&#x524D;&#x6309;hhkb&#x7684;&#x952E;&#x4F4D;&#x5206;&#x5E03;&#x8BBE;&#x7F6E;&#x4E86;&#x4E00;&#x4E9B;&#x6620;&#x5C04;&#x3002;</p>
 <ul>
-<li>fn+asd：分别是音量减少、增大、静音</li>
-<li>fn+1~9：分别对应 F1~F9 的功能键</li>
-<li>fn+k、fn+,：分别对应首页、页末</li>
-<li>fn+l、fn+.：分别对应上一页、下一页</li>
-<li>fn+[、fn+/：分别是上、下</li>
-<li>fn+;、fn+’：分别是左、右</li>
+<li>fn+asd&#xFF1A;&#x5206;&#x522B;&#x662F;&#x97F3;&#x91CF;&#x51CF;&#x5C11;&#x3001;&#x589E;&#x5927;&#x3001;&#x9759;&#x97F3;</li>
+<li>fn+1~9&#xFF1A;&#x5206;&#x522B;&#x5BF9;&#x5E94; F1~F9 &#x7684;&#x529F;&#x80FD;&#x952E;</li>
+<li>fn+k&#x3001;fn+,&#xFF1A;&#x5206;&#x522B;&#x5BF9;&#x5E94;&#x9996;&#x9875;&#x3001;&#x9875;&#x672B;</li>
+<li>fn+l&#x3001;fn+.&#xFF1A;&#x5206;&#x522B;&#x5BF9;&#x5E94;&#x4E0A;&#x4E00;&#x9875;&#x3001;&#x4E0B;&#x4E00;&#x9875;</li>
+<li>fn+[&#x3001;fn+/&#xFF1A;&#x5206;&#x522B;&#x662F;&#x4E0A;&#x3001;&#x4E0B;</li>
+<li>fn+;&#x3001;fn+&#x2019;&#xFF1A;&#x5206;&#x522B;&#x662F;&#x5DE6;&#x3001;&#x53F3;</li>
 </ul>
-<h2 id="启动模式">启动模式</h2><p>开启<code>karabiner</code>的<code>Launcher mode</code>，以字母键<code>o</code>为前缀，再加一个其他键，来启动某个软件、或打开一个url，或执行一句shell。<br>自带的有：</p>
+<h2 id="&#x542F;&#x52A8;&#x6A21;&#x5F0F;"><a href="#&#x542F;&#x52A8;&#x6A21;&#x5F0F;" class="headerlink" title="&#x542F;&#x52A8;&#x6A21;&#x5F0F;"></a>&#x542F;&#x52A8;&#x6A21;&#x5F0F;</h2><p>&#x5F00;&#x542F;<code>karabiner</code>&#x7684;<code>Launcher mode</code>&#xFF0C;&#x4EE5;&#x5B57;&#x6BCD;&#x952E;<code>o</code>&#x4E3A;&#x524D;&#x7F00;&#xFF0C;&#x518D;&#x52A0;&#x4E00;&#x4E2A;&#x5176;&#x4ED6;&#x952E;&#xFF0C;&#x6765;&#x542F;&#x52A8;&#x67D0;&#x4E2A;&#x8F6F;&#x4EF6;&#x3001;&#x6216;&#x6253;&#x5F00;&#x4E00;&#x4E2A;url&#xFF0C;&#x6216;&#x6267;&#x884C;&#x4E00;&#x53E5;shell&#x3002;<br>&#x81EA;&#x5E26;&#x7684;&#x6709;&#xFF1A;</p>
 <ul>
 <li>O+A: Activity Monitor </li>
 <li>O+Q: Dictionary </li>
@@ -101,15 +101,15 @@
 <li>O+S: Safari </li>
 <li>O+T: Terminal </li>
 </ul>
-<h2 id="其他">其他</h2><ul>
-<li>把<code>CapsLock</code>键修改为<code>Control</code>键之外，设置双击<code>Control</code>键来切换<code>CapsLock</code></li>
-<li><code>shift+F1</code>来启动<code>Dashboard</code>，Dashboard 中有豆瓣fm</li>
+<h2 id="&#x5176;&#x4ED6;"><a href="#&#x5176;&#x4ED6;" class="headerlink" title="&#x5176;&#x4ED6;"></a>&#x5176;&#x4ED6;</h2><ul>
+<li>&#x628A;<code>CapsLock</code>&#x952E;&#x4FEE;&#x6539;&#x4E3A;<code>Control</code>&#x952E;&#x4E4B;&#x5916;&#xFF0C;&#x8BBE;&#x7F6E;&#x53CC;&#x51FB;<code>Control</code>&#x952E;&#x6765;&#x5207;&#x6362;<code>CapsLock</code></li>
+<li><code>shift+F1</code>&#x6765;&#x542F;&#x52A8;<code>Dashboard</code>&#xFF0C;Dashboard &#x4E2D;&#x6709;&#x8C46;&#x74E3;fm</li>
 </ul>
-<p>同时另有<code>escape</code>键跟<code>backquote</code>键对换，<code>delete</code>键跟<code>backslash</code>键对换，则直接从<code>karabiner</code>自带的方案中启动即可。</p>
-<h1 id="ref">ref</h1><ul>
+<p>&#x540C;&#x65F6;&#x53E6;&#x6709;<code>escape</code>&#x952E;&#x8DDF;<code>backquote</code>&#x952E;&#x5BF9;&#x6362;&#xFF0C;<code>delete</code>&#x952E;&#x8DDF;<code>backslash</code>&#x952E;&#x5BF9;&#x6362;&#xFF0C;&#x5219;&#x76F4;&#x63A5;&#x4ECE;<code>karabiner</code>&#x81EA;&#x5E26;&#x7684;&#x65B9;&#x6848;&#x4E2D;&#x542F;&#x52A8;&#x5373;&#x53EF;&#x3002;</p>
+<h1 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h1><ul>
 <li><a href="https://github.com/tekezo/Karabiner/blob/master/src/bridge/generator/keycode/data/ConsumerKeyCode.data" target="_blank" rel="external">ConsumerKeyCode</a></li>
 </ul>
-<p>– EOF –<br><br></p>
+<p>&#x2013; EOF &#x2013;<br><br></p>
 
 	
 
@@ -184,7 +184,7 @@
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

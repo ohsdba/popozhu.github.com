@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -49,79 +49,79 @@
 	
 	    
 	    
-		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#bufferevent和缓存"><span class="toc-text">bufferevent和缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回调函数和水位标志(watermark)"><span class="toc-text">回调函数和水位标志(watermark)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#延迟的回调"><span class="toc-text">延迟的回调</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bufferevent可选的标志"><span class="toc-text">bufferevent可选的标志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用基于socket的bufferevent"><span class="toc-text">使用基于socket的bufferevent</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建一个基于socket的bufferevent"><span class="toc-text">创建一个基于socket的bufferevent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在bufferevent上启用连接"><span class="toc-text">在bufferevent上启用连接</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example"><span class="toc-text">Example</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用hostname来建立连接"><span class="toc-text">使用hostname来建立连接</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Example:_Trivial_HTTP_v0_client"><span class="toc-text">Example: Trivial HTTP v0 client</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bufferevent通用操作"><span class="toc-text">bufferevent通用操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#释放一个bufferevent"><span class="toc-text">释放一个bufferevent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#操作回调、设置水位和启用功能"><span class="toc-text">操作回调、设置水位和启用功能</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#启用/禁用"><span class="toc-text">启用/禁用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#设置水位"><span class="toc-text">设置水位</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Example-1"><span class="toc-text">Example</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#操作bufferevent里的数据"><span class="toc-text">操作bufferevent里的数据</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-1"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-2"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Example-2"><span class="toc-text">Example</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#读和写的超时"><span class="toc-text">读和写的超时</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-3"><span class="toc-text">Interface</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#刷新bufferevent"><span class="toc-text">刷新bufferevent</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-4"><span class="toc-text">Interface</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#类型相关的bufferevent函数"><span class="toc-text">类型相关的bufferevent函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-5"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-6"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-7"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-8"><span class="toc-text">Interface</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#手工加锁或解锁bufferevent"><span class="toc-text">手工加锁或解锁bufferevent</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Interface-9"><span class="toc-text">Interface</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#废弃的bufferevent功能"><span class="toc-text">废弃的bufferevent功能</span></a></li></ol> </div>
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#bufferevent和缓存"><span class="toc-text">bufferevent和缓存</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#回调函数和水位标志watermark"><span class="toc-text">回调函数和水位标志(watermark)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#延迟的回调"><span class="toc-text">延迟的回调</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bufferevent可选的标志"><span class="toc-text">bufferevent可选的标志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用基于socket的bufferevent"><span class="toc-text">使用基于socket的bufferevent</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#创建一个基于socket的bufferevent"><span class="toc-text">创建一个基于socket的bufferevent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在bufferevent上启用连接"><span class="toc-text">在bufferevent上启用连接</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#example"><span class="toc-text">Example</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用hostname来建立连接"><span class="toc-text">使用hostname来建立连接</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#example-trivial-http-v0-client"><span class="toc-text">Example: Trivial HTTP v0 client</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bufferevent通用操作"><span class="toc-text">bufferevent通用操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#释放一个bufferevent"><span class="toc-text">释放一个bufferevent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#操作回调-设置水位和启用功能"><span class="toc-text">操作回调、设置水位和启用功能</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#启用禁用"><span class="toc-text">启用/禁用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#设置水位"><span class="toc-text">设置水位</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#example"><span class="toc-text">Example</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#操作bufferevent里的数据"><span class="toc-text">操作bufferevent里的数据</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#example"><span class="toc-text">Example</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#读和写的超时"><span class="toc-text">读和写的超时</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#刷新bufferevent"><span class="toc-text">刷新bufferevent</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#类型相关的bufferevent函数"><span class="toc-text">类型相关的bufferevent函数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#手工加锁或解锁bufferevent"><span class="toc-text">手工加锁或解锁bufferevent</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#interface"><span class="toc-text">Interface</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#废弃的bufferevent功能"><span class="toc-text">废弃的bufferevent功能</span></a></li></ol> </div>
 	    
 
 	    <blockquote>
-<p>原文：<a href="http://www.wangafu.net/~nickm/libevent-book/Ref6_bufferevent.html" target="_blank" rel="external">http://www.wangafu.net/~nickm/libevent-book/Ref6_bufferevent.html</a></p>
+<p>&#x539F;&#x6587;&#xFF1A;<a href="http://www.wangafu.net/~nickm/libevent-book/Ref6_bufferevent.html" target="_blank" rel="external">http://www.wangafu.net/~nickm/libevent-book/Ref6_bufferevent.html</a></p>
 </blockquote>
-<p>很多时候， 一个程序除了响应事件之外还想缓存一些数据。比如当我们想写数据，通常会用这样的模式：  </p>
+<p>&#x5F88;&#x591A;&#x65F6;&#x5019;&#xFF0C; &#x4E00;&#x4E2A;&#x7A0B;&#x5E8F;&#x9664;&#x4E86;&#x54CD;&#x5E94;&#x4E8B;&#x4EF6;&#x4E4B;&#x5916;&#x8FD8;&#x60F3;&#x7F13;&#x5B58;&#x4E00;&#x4E9B;&#x6570;&#x636E;&#x3002;&#x6BD4;&#x5982;&#x5F53;&#x6211;&#x4EEC;&#x60F3;&#x5199;&#x6570;&#x636E;&#xFF0C;&#x901A;&#x5E38;&#x4F1A;&#x7528;&#x8FD9;&#x6837;&#x7684;&#x6A21;&#x5F0F;&#xFF1A;  </p>
 <ol>
-<li>向一个连接写一些数据，先把数据存放到一个buffer里  </li>
-<li>等待连接变成可写状态  </li>
-<li>尽可能写入数据  </li>
-<li>记住我们写了多少数据，以及还有多少数据未写，然后等待下次连接再变成可写状态。  </li>
+<li>&#x5411;&#x4E00;&#x4E2A;&#x8FDE;&#x63A5;&#x5199;&#x4E00;&#x4E9B;&#x6570;&#x636E;&#xFF0C;&#x5148;&#x628A;&#x6570;&#x636E;&#x5B58;&#x653E;&#x5230;&#x4E00;&#x4E2A;buffer&#x91CC;  </li>
+<li>&#x7B49;&#x5F85;&#x8FDE;&#x63A5;&#x53D8;&#x6210;&#x53EF;&#x5199;&#x72B6;&#x6001;  </li>
+<li>&#x5C3D;&#x53EF;&#x80FD;&#x5199;&#x5165;&#x6570;&#x636E;  </li>
+<li>&#x8BB0;&#x4F4F;&#x6211;&#x4EEC;&#x5199;&#x4E86;&#x591A;&#x5C11;&#x6570;&#x636E;&#xFF0C;&#x4EE5;&#x53CA;&#x8FD8;&#x6709;&#x591A;&#x5C11;&#x6570;&#x636E;&#x672A;&#x5199;&#xFF0C;&#x7136;&#x540E;&#x7B49;&#x5F85;&#x4E0B;&#x6B21;&#x8FDE;&#x63A5;&#x518D;&#x53D8;&#x6210;&#x53EF;&#x5199;&#x72B6;&#x6001;&#x3002;  </li>
 </ol>
-<p>Libevent为这种带缓存的IO模式提供了一个通用的机制。一个”bufferevent”包含一个底层传输（比如socket），一个读buffer和一个写buffer。当底层传输可读写时就调用回调函数，这是普通事件的处理，而bufferevent是在读或写足够的数据时才调用用户指定的回调函数。  </p>
-<p>有多种类型的bufferevent使用相同的接口，比如下面的类型：</p>
+<p>Libevent&#x4E3A;&#x8FD9;&#x79CD;&#x5E26;&#x7F13;&#x5B58;&#x7684;IO&#x6A21;&#x5F0F;&#x63D0;&#x4F9B;&#x4E86;&#x4E00;&#x4E2A;&#x901A;&#x7528;&#x7684;&#x673A;&#x5236;&#x3002;&#x4E00;&#x4E2A;&#x201D;bufferevent&#x201D;&#x5305;&#x542B;&#x4E00;&#x4E2A;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#xFF08;&#x6BD4;&#x5982;socket&#xFF09;&#xFF0C;&#x4E00;&#x4E2A;&#x8BFB;buffer&#x548C;&#x4E00;&#x4E2A;&#x5199;buffer&#x3002;&#x5F53;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#x53EF;&#x8BFB;&#x5199;&#x65F6;&#x5C31;&#x8C03;&#x7528;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#xFF0C;&#x8FD9;&#x662F;&#x666E;&#x901A;&#x4E8B;&#x4EF6;&#x7684;&#x5904;&#x7406;&#xFF0C;&#x800C;bufferevent&#x662F;&#x5728;&#x8BFB;&#x6216;&#x5199;&#x8DB3;&#x591F;&#x7684;&#x6570;&#x636E;&#x65F6;&#x624D;&#x8C03;&#x7528;&#x7528;&#x6237;&#x6307;&#x5B9A;&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x3002;  </p>
+<p>&#x6709;&#x591A;&#x79CD;&#x7C7B;&#x578B;&#x7684;bufferevent&#x4F7F;&#x7528;&#x76F8;&#x540C;&#x7684;&#x63A5;&#x53E3;&#xFF0C;&#x6BD4;&#x5982;&#x4E0B;&#x9762;&#x7684;&#x7C7B;&#x578B;&#xFF1A;</p>
 <ol>
-<li>socket-based bufferevents<br> 这种bufferevent的底层传输为<strong>stream socket</strong>，使用<code>event_*</code>这种接口作为它的后端。  </li>
-<li>asynchronous-IO bufferevents<br> 限于Windows，实验中。这种类型的bufferevent使用<strong>Windows IOCP</strong>接口来读写数据。  </li>
-<li>filtering bufferevents<br>在数据被传送到bufferevent事件对象之前，这种buffevent会对将要读或写的数据进行预处理，比如压缩或转换数据。  </li>
-<li>paired bufferevents<br> 相互之间传输数据的一对bufferevent。  </li>
+<li>socket-based bufferevents<br> &#x8FD9;&#x79CD;bufferevent&#x7684;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#x4E3A;<strong>stream socket</strong>&#xFF0C;&#x4F7F;&#x7528;<code>event_*</code>&#x8FD9;&#x79CD;&#x63A5;&#x53E3;&#x4F5C;&#x4E3A;&#x5B83;&#x7684;&#x540E;&#x7AEF;&#x3002;  </li>
+<li>asynchronous-IO bufferevents<br> &#x9650;&#x4E8E;Windows&#xFF0C;&#x5B9E;&#x9A8C;&#x4E2D;&#x3002;&#x8FD9;&#x79CD;&#x7C7B;&#x578B;&#x7684;bufferevent&#x4F7F;&#x7528;<strong>Windows IOCP</strong>&#x63A5;&#x53E3;&#x6765;&#x8BFB;&#x5199;&#x6570;&#x636E;&#x3002;  </li>
+<li>filtering bufferevents<br>&#x5728;&#x6570;&#x636E;&#x88AB;&#x4F20;&#x9001;&#x5230;bufferevent&#x4E8B;&#x4EF6;&#x5BF9;&#x8C61;&#x4E4B;&#x524D;&#xFF0C;&#x8FD9;&#x79CD;buffevent&#x4F1A;&#x5BF9;&#x5C06;&#x8981;&#x8BFB;&#x6216;&#x5199;&#x7684;&#x6570;&#x636E;&#x8FDB;&#x884C;&#x9884;&#x5904;&#x7406;&#xFF0C;&#x6BD4;&#x5982;&#x538B;&#x7F29;&#x6216;&#x8F6C;&#x6362;&#x6570;&#x636E;&#x3002;  </li>
+<li>paired bufferevents<br> &#x76F8;&#x4E92;&#x4E4B;&#x95F4;&#x4F20;&#x8F93;&#x6570;&#x636E;&#x7684;&#x4E00;&#x5BF9;bufferevent&#x3002;  </li>
 </ol>
-<p>注意：<br>在Libevent 2.0.2-alpha这个版本，bufferevent的接口还不能通用于上面列出的bufferevent类型，也就是说，下面列出的每个接口不一定适用于所有bufferevent类型。未来版本中可能会改善。  </p>
-<p>再次注意：<br>bufferevent当前只能适用于面向流的协议，比如TCP，而面向数据报文的协议，比如UDP，未来可能也会支持。  </p>
+<p>&#x6CE8;&#x610F;&#xFF1A;<br>&#x5728;Libevent 2.0.2-alpha&#x8FD9;&#x4E2A;&#x7248;&#x672C;&#xFF0C;bufferevent&#x7684;&#x63A5;&#x53E3;&#x8FD8;&#x4E0D;&#x80FD;&#x901A;&#x7528;&#x4E8E;&#x4E0A;&#x9762;&#x5217;&#x51FA;&#x7684;bufferevent&#x7C7B;&#x578B;&#xFF0C;&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#xFF0C;&#x4E0B;&#x9762;&#x5217;&#x51FA;&#x7684;&#x6BCF;&#x4E2A;&#x63A5;&#x53E3;&#x4E0D;&#x4E00;&#x5B9A;&#x9002;&#x7528;&#x4E8E;&#x6240;&#x6709;bufferevent&#x7C7B;&#x578B;&#x3002;&#x672A;&#x6765;&#x7248;&#x672C;&#x4E2D;&#x53EF;&#x80FD;&#x4F1A;&#x6539;&#x5584;&#x3002;  </p>
+<p>&#x518D;&#x6B21;&#x6CE8;&#x610F;&#xFF1A;<br>bufferevent&#x5F53;&#x524D;&#x53EA;&#x80FD;&#x9002;&#x7528;&#x4E8E;&#x9762;&#x5411;&#x6D41;&#x7684;&#x534F;&#x8BAE;&#xFF0C;&#x6BD4;&#x5982;TCP&#xFF0C;&#x800C;&#x9762;&#x5411;&#x6570;&#x636E;&#x62A5;&#x6587;&#x7684;&#x534F;&#x8BAE;&#xFF0C;&#x6BD4;&#x5982;UDP&#xFF0C;&#x672A;&#x6765;&#x53EF;&#x80FD;&#x4E5F;&#x4F1A;&#x652F;&#x6301;&#x3002;  </p>
 <p><br></p>
-<h2 id="bufferevent和缓存">bufferevent和缓存</h2><p>每个bufferevent都有一个输入缓存和一个输出缓存，对应的数据结构为<code>struct evbuffer</code>。当你对一个bufferevent写数据，数据写入到输出缓存；当有数据可读时，你是从输入缓存中提取数据。  </p>
-<p>evbuffer的接口支持多种操作，后一节中会讨论到。  </p>
+<h2 id="bufferevent&#x548C;&#x7F13;&#x5B58;"><a href="#bufferevent&#x548C;&#x7F13;&#x5B58;" class="headerlink" title="bufferevent&#x548C;&#x7F13;&#x5B58;"></a>bufferevent&#x548C;&#x7F13;&#x5B58;</h2><p>&#x6BCF;&#x4E2A;bufferevent&#x90FD;&#x6709;&#x4E00;&#x4E2A;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x548C;&#x4E00;&#x4E2A;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#xFF0C;&#x5BF9;&#x5E94;&#x7684;&#x6570;&#x636E;&#x7ED3;&#x6784;&#x4E3A;<code>struct evbuffer</code>&#x3002;&#x5F53;&#x4F60;&#x5BF9;&#x4E00;&#x4E2A;bufferevent&#x5199;&#x6570;&#x636E;&#xFF0C;&#x6570;&#x636E;&#x5199;&#x5165;&#x5230;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#xFF1B;&#x5F53;&#x6709;&#x6570;&#x636E;&#x53EF;&#x8BFB;&#x65F6;&#xFF0C;&#x4F60;&#x662F;&#x4ECE;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x4E2D;&#x63D0;&#x53D6;&#x6570;&#x636E;&#x3002;  </p>
+<p>evbuffer&#x7684;&#x63A5;&#x53E3;&#x652F;&#x6301;&#x591A;&#x79CD;&#x64CD;&#x4F5C;&#xFF0C;&#x540E;&#x4E00;&#x8282;&#x4E2D;&#x4F1A;&#x8BA8;&#x8BBA;&#x5230;&#x3002;  </p>
 <p><br></p>
-<h2 id="回调函数和水位标志(watermark)">回调函数和水位标志(watermark)</h2><p>每个bufferevent有2个相关连的回调函数：读回调和写回调。默认地，当从底层传输读到数据，读回调就被调用，当输出缓存的数据被清空，写回调就调用。但你可以调整bufferevent的“水位标志”来覆盖这些函数的默认行为。  </p>
-<p>每个bufferevent有4个水位标志：  </p>
+<h2 id="&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x548C;&#x6C34;&#x4F4D;&#x6807;&#x5FD7;watermark"><a href="#&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x548C;&#x6C34;&#x4F4D;&#x6807;&#x5FD7;-watermark" class="headerlink" title="&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x548C;&#x6C34;&#x4F4D;&#x6807;&#x5FD7;(watermark)"></a>&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x548C;&#x6C34;&#x4F4D;&#x6807;&#x5FD7;(watermark)</h2><p>&#x6BCF;&#x4E2A;bufferevent&#x6709;2&#x4E2A;&#x76F8;&#x5173;&#x8FDE;&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#xFF1A;&#x8BFB;&#x56DE;&#x8C03;&#x548C;&#x5199;&#x56DE;&#x8C03;&#x3002;&#x9ED8;&#x8BA4;&#x5730;&#xFF0C;&#x5F53;&#x4ECE;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#x8BFB;&#x5230;&#x6570;&#x636E;&#xFF0C;&#x8BFB;&#x56DE;&#x8C03;&#x5C31;&#x88AB;&#x8C03;&#x7528;&#xFF0C;&#x5F53;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x7684;&#x6570;&#x636E;&#x88AB;&#x6E05;&#x7A7A;&#xFF0C;&#x5199;&#x56DE;&#x8C03;&#x5C31;&#x8C03;&#x7528;&#x3002;&#x4F46;&#x4F60;&#x53EF;&#x4EE5;&#x8C03;&#x6574;bufferevent&#x7684;&#x201C;&#x6C34;&#x4F4D;&#x6807;&#x5FD7;&#x201D;&#x6765;&#x8986;&#x76D6;&#x8FD9;&#x4E9B;&#x51FD;&#x6570;&#x7684;&#x9ED8;&#x8BA4;&#x884C;&#x4E3A;&#x3002;  </p>
+<p>&#x6BCF;&#x4E2A;bufferevent&#x6709;4&#x4E2A;&#x6C34;&#x4F4D;&#x6807;&#x5FD7;&#xFF1A;  </p>
 <ol>
-<li>读低水位Read low-water mark<br> 当一个读操作让bufferevent的输入缓存达到或超出这个水位，读回调就被调用。默认为0，所以每个读操作都会导致读回调被执行。  </li>
-<li>读高水位Read high-water mark<br> 当bufferevent的输入缓存达到这个水位，bufferevent停止读取数据，直到数据被取出，再次低于这个水位为止。 默认是不做限制，所以会不停地读取数据到输入缓存里。  </li>
-<li>写低水位Write low-water mark<br> 当一个输出缓存达到或低于这个水位，写回调就被调用。默认为0，所以只有当输出缓存的数据全部发送出去之后，写回调才被调用。  </li>
-<li>写高水位Write high-water mark<br> bufferevent不直接使用这个水位，当一个bufferevent被用于另一个bufferevent的地层传输时，这个标志可以有特殊的含义。见下面的filtering bufferevents。  </li>
+<li>&#x8BFB;&#x4F4E;&#x6C34;&#x4F4D;Read low-water mark<br> &#x5F53;&#x4E00;&#x4E2A;&#x8BFB;&#x64CD;&#x4F5C;&#x8BA9;bufferevent&#x7684;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x8FBE;&#x5230;&#x6216;&#x8D85;&#x51FA;&#x8FD9;&#x4E2A;&#x6C34;&#x4F4D;&#xFF0C;&#x8BFB;&#x56DE;&#x8C03;&#x5C31;&#x88AB;&#x8C03;&#x7528;&#x3002;&#x9ED8;&#x8BA4;&#x4E3A;0&#xFF0C;&#x6240;&#x4EE5;&#x6BCF;&#x4E2A;&#x8BFB;&#x64CD;&#x4F5C;&#x90FD;&#x4F1A;&#x5BFC;&#x81F4;&#x8BFB;&#x56DE;&#x8C03;&#x88AB;&#x6267;&#x884C;&#x3002;  </li>
+<li>&#x8BFB;&#x9AD8;&#x6C34;&#x4F4D;Read high-water mark<br> &#x5F53;bufferevent&#x7684;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x8FBE;&#x5230;&#x8FD9;&#x4E2A;&#x6C34;&#x4F4D;&#xFF0C;bufferevent&#x505C;&#x6B62;&#x8BFB;&#x53D6;&#x6570;&#x636E;&#xFF0C;&#x76F4;&#x5230;&#x6570;&#x636E;&#x88AB;&#x53D6;&#x51FA;&#xFF0C;&#x518D;&#x6B21;&#x4F4E;&#x4E8E;&#x8FD9;&#x4E2A;&#x6C34;&#x4F4D;&#x4E3A;&#x6B62;&#x3002; &#x9ED8;&#x8BA4;&#x662F;&#x4E0D;&#x505A;&#x9650;&#x5236;&#xFF0C;&#x6240;&#x4EE5;&#x4F1A;&#x4E0D;&#x505C;&#x5730;&#x8BFB;&#x53D6;&#x6570;&#x636E;&#x5230;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x91CC;&#x3002;  </li>
+<li>&#x5199;&#x4F4E;&#x6C34;&#x4F4D;Write low-water mark<br> &#x5F53;&#x4E00;&#x4E2A;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x8FBE;&#x5230;&#x6216;&#x4F4E;&#x4E8E;&#x8FD9;&#x4E2A;&#x6C34;&#x4F4D;&#xFF0C;&#x5199;&#x56DE;&#x8C03;&#x5C31;&#x88AB;&#x8C03;&#x7528;&#x3002;&#x9ED8;&#x8BA4;&#x4E3A;0&#xFF0C;&#x6240;&#x4EE5;&#x53EA;&#x6709;&#x5F53;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x7684;&#x6570;&#x636E;&#x5168;&#x90E8;&#x53D1;&#x9001;&#x51FA;&#x53BB;&#x4E4B;&#x540E;&#xFF0C;&#x5199;&#x56DE;&#x8C03;&#x624D;&#x88AB;&#x8C03;&#x7528;&#x3002;  </li>
+<li>&#x5199;&#x9AD8;&#x6C34;&#x4F4D;Write high-water mark<br> bufferevent&#x4E0D;&#x76F4;&#x63A5;&#x4F7F;&#x7528;&#x8FD9;&#x4E2A;&#x6C34;&#x4F4D;&#xFF0C;&#x5F53;&#x4E00;&#x4E2A;bufferevent&#x88AB;&#x7528;&#x4E8E;&#x53E6;&#x4E00;&#x4E2A;bufferevent&#x7684;&#x5730;&#x5C42;&#x4F20;&#x8F93;&#x65F6;&#xFF0C;&#x8FD9;&#x4E2A;&#x6807;&#x5FD7;&#x53EF;&#x4EE5;&#x6709;&#x7279;&#x6B8A;&#x7684;&#x542B;&#x4E49;&#x3002;&#x89C1;&#x4E0B;&#x9762;&#x7684;filtering bufferevents&#x3002;  </li>
 </ol>
-<p>一个bufferevent也有一个<code>error</code>和<code>event</code>回调函数，这2个函数与数据无关，当一个连接被关闭或出现错误，它们会被调用来通知到应用程序。定义了如下的事件标志：</p>
+<p>&#x4E00;&#x4E2A;bufferevent&#x4E5F;&#x6709;&#x4E00;&#x4E2A;<code>error</code>&#x548C;<code>event</code>&#x56DE;&#x8C03;&#x51FD;&#x6570;&#xFF0C;&#x8FD9;2&#x4E2A;&#x51FD;&#x6570;&#x4E0E;&#x6570;&#x636E;&#x65E0;&#x5173;&#xFF0C;&#x5F53;&#x4E00;&#x4E2A;&#x8FDE;&#x63A5;&#x88AB;&#x5173;&#x95ED;&#x6216;&#x51FA;&#x73B0;&#x9519;&#x8BEF;&#xFF0C;&#x5B83;&#x4EEC;&#x4F1A;&#x88AB;&#x8C03;&#x7528;&#x6765;&#x901A;&#x77E5;&#x5230;&#x5E94;&#x7528;&#x7A0B;&#x5E8F;&#x3002;&#x5B9A;&#x4E49;&#x4E86;&#x5982;&#x4E0B;&#x7684;&#x4E8B;&#x4EF6;&#x6807;&#x5FD7;&#xFF1A;</p>
 <ol>
-<li>BEV_EVENT_READING<br> 表示当bufferevent在读操作时有一个事件到来。  </li>
-<li>BEV_EVENT_WRITING<br> 表示当bufferevent在写操作时有一个事件到来。  </li>
-<li>BEV_EVENT_ERROR<br> 表示bufferevent在操作时有错误发生。需要更多关于错误信息，调用<code>EVUTIL_SOCKET_ERROR()</code>。  </li>
-<li>BEV_EVENT_TIMEOUT<br> bufferevent的超时事件。  </li>
-<li>BEV_EVENT_EOF<br> 到达文件末尾。  </li>
-<li>BEV_EVENT_CONNECTED<br> bufferevent完成一个另一端发起请求的连接。  </li>
-</ol>
-<p><br></p>
-<h2 id="延迟的回调">延迟的回调</h2><p>默认上，当对应的情况发生，buffevent回调函数会马上被执行。（对于evbuffer的回调函数也是如此）当存在复杂依赖时这个立刻调用却反而带来麻烦。比如有一个回调函数，当evbuffer A里的数据为空时执行，把数据写到buffer里，另有一个回调函数，当evbuffer A的buffer数据满了时实行，把数据从buffer里读出。由于这些回调都在栈上执行，如果依赖足够冗长，则可能会出现栈溢出。  </p>
-<p>为了解决这个问题，你可以告诉bufferevent（或者evbuffer）应该推迟执行它的回调函数。这样当条件满足后回调不会立刻执行，而是进入event_loop()的队列里，当队列里的常规回调函数执行完毕后，这个延迟的回调函数才被调用。  </p>
-<p><br></p>
-<h2 id="bufferevent可选的标志">bufferevent可选的标志</h2><p>在创建一个bufferevent时你可以使用一个或多个标志。可用的标志有：  </p>
-<ol>
-<li>BEV_OPT_CLOSE_ON_FREE<br> 当bufferevent被释放时，关闭底层传输。这会关闭一个底层的socker，释放一个底层的bufferevent等。  </li>
-<li>BEV_OPT_THREADSAFE<br> 自动为bufferevent分配锁，所以可安全用于多线程。  </li>
-<li>BEV_OPT_DEFER_CALLBACKS<br> 如果设置了这个标志，bufferevent推迟所有回调的执行，如上所述。  </li>
-<li>BEV_OPT_UNLOCK_CALLBACKS<br> 默认上若一个bufferevent设置成线程安全，则当用户提供的回调调用时会获取该bufferevent的锁。设置这个标志来让Libevent在完成你的回调函数后释放bufferevent的锁。  </li>
+<li>BEV_EVENT_READING<br> &#x8868;&#x793A;&#x5F53;bufferevent&#x5728;&#x8BFB;&#x64CD;&#x4F5C;&#x65F6;&#x6709;&#x4E00;&#x4E2A;&#x4E8B;&#x4EF6;&#x5230;&#x6765;&#x3002;  </li>
+<li>BEV_EVENT_WRITING<br> &#x8868;&#x793A;&#x5F53;bufferevent&#x5728;&#x5199;&#x64CD;&#x4F5C;&#x65F6;&#x6709;&#x4E00;&#x4E2A;&#x4E8B;&#x4EF6;&#x5230;&#x6765;&#x3002;  </li>
+<li>BEV_EVENT_ERROR<br> &#x8868;&#x793A;bufferevent&#x5728;&#x64CD;&#x4F5C;&#x65F6;&#x6709;&#x9519;&#x8BEF;&#x53D1;&#x751F;&#x3002;&#x9700;&#x8981;&#x66F4;&#x591A;&#x5173;&#x4E8E;&#x9519;&#x8BEF;&#x4FE1;&#x606F;&#xFF0C;&#x8C03;&#x7528;<code>EVUTIL_SOCKET_ERROR()</code>&#x3002;  </li>
+<li>BEV_EVENT_TIMEOUT<br> bufferevent&#x7684;&#x8D85;&#x65F6;&#x4E8B;&#x4EF6;&#x3002;  </li>
+<li>BEV_EVENT_EOF<br> &#x5230;&#x8FBE;&#x6587;&#x4EF6;&#x672B;&#x5C3E;&#x3002;  </li>
+<li>BEV_EVENT_CONNECTED<br> bufferevent&#x5B8C;&#x6210;&#x4E00;&#x4E2A;&#x53E6;&#x4E00;&#x7AEF;&#x53D1;&#x8D77;&#x8BF7;&#x6C42;&#x7684;&#x8FDE;&#x63A5;&#x3002;  </li>
 </ol>
 <p><br></p>
-<h2 id="使用基于socket的bufferevent">使用基于socket的bufferevent</h2><p>基于socket的bufferevent使用起来最简单。基于socket的bufferevent使用Libevent的底层事件机制来检测底层网络socket是否可读写，也使用底层网络调用（比如readv，writev，WSASend，或者WSARecv）来传输和接收数据。  </p>
-<h3 id="创建一个基于socket的bufferevent">创建一个基于socket的bufferevent</h3><p>使用<code>bufferevent_socket_new()</code>来创建。接口如下：  </p>
+<h2 id="&#x5EF6;&#x8FDF;&#x7684;&#x56DE;&#x8C03;"><a href="#&#x5EF6;&#x8FDF;&#x7684;&#x56DE;&#x8C03;" class="headerlink" title="&#x5EF6;&#x8FDF;&#x7684;&#x56DE;&#x8C03;"></a>&#x5EF6;&#x8FDF;&#x7684;&#x56DE;&#x8C03;</h2><p>&#x9ED8;&#x8BA4;&#x4E0A;&#xFF0C;&#x5F53;&#x5BF9;&#x5E94;&#x7684;&#x60C5;&#x51B5;&#x53D1;&#x751F;&#xFF0C;buffevent&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x4F1A;&#x9A6C;&#x4E0A;&#x88AB;&#x6267;&#x884C;&#x3002;&#xFF08;&#x5BF9;&#x4E8E;evbuffer&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x4E5F;&#x662F;&#x5982;&#x6B64;&#xFF09;&#x5F53;&#x5B58;&#x5728;&#x590D;&#x6742;&#x4F9D;&#x8D56;&#x65F6;&#x8FD9;&#x4E2A;&#x7ACB;&#x523B;&#x8C03;&#x7528;&#x5374;&#x53CD;&#x800C;&#x5E26;&#x6765;&#x9EBB;&#x70E6;&#x3002;&#x6BD4;&#x5982;&#x6709;&#x4E00;&#x4E2A;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#xFF0C;&#x5F53;evbuffer A&#x91CC;&#x7684;&#x6570;&#x636E;&#x4E3A;&#x7A7A;&#x65F6;&#x6267;&#x884C;&#xFF0C;&#x628A;&#x6570;&#x636E;&#x5199;&#x5230;buffer&#x91CC;&#xFF0C;&#x53E6;&#x6709;&#x4E00;&#x4E2A;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#xFF0C;&#x5F53;evbuffer A&#x7684;buffer&#x6570;&#x636E;&#x6EE1;&#x4E86;&#x65F6;&#x5B9E;&#x884C;&#xFF0C;&#x628A;&#x6570;&#x636E;&#x4ECE;buffer&#x91CC;&#x8BFB;&#x51FA;&#x3002;&#x7531;&#x4E8E;&#x8FD9;&#x4E9B;&#x56DE;&#x8C03;&#x90FD;&#x5728;&#x6808;&#x4E0A;&#x6267;&#x884C;&#xFF0C;&#x5982;&#x679C;&#x4F9D;&#x8D56;&#x8DB3;&#x591F;&#x5197;&#x957F;&#xFF0C;&#x5219;&#x53EF;&#x80FD;&#x4F1A;&#x51FA;&#x73B0;&#x6808;&#x6EA2;&#x51FA;&#x3002;  </p>
+<p>&#x4E3A;&#x4E86;&#x89E3;&#x51B3;&#x8FD9;&#x4E2A;&#x95EE;&#x9898;&#xFF0C;&#x4F60;&#x53EF;&#x4EE5;&#x544A;&#x8BC9;bufferevent&#xFF08;&#x6216;&#x8005;evbuffer&#xFF09;&#x5E94;&#x8BE5;&#x63A8;&#x8FDF;&#x6267;&#x884C;&#x5B83;&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x3002;&#x8FD9;&#x6837;&#x5F53;&#x6761;&#x4EF6;&#x6EE1;&#x8DB3;&#x540E;&#x56DE;&#x8C03;&#x4E0D;&#x4F1A;&#x7ACB;&#x523B;&#x6267;&#x884C;&#xFF0C;&#x800C;&#x662F;&#x8FDB;&#x5165;event_loop()&#x7684;&#x961F;&#x5217;&#x91CC;&#xFF0C;&#x5F53;&#x961F;&#x5217;&#x91CC;&#x7684;&#x5E38;&#x89C4;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x6267;&#x884C;&#x5B8C;&#x6BD5;&#x540E;&#xFF0C;&#x8FD9;&#x4E2A;&#x5EF6;&#x8FDF;&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x624D;&#x88AB;&#x8C03;&#x7528;&#x3002;  </p>
+<p><br></p>
+<h2 id="bufferevent&#x53EF;&#x9009;&#x7684;&#x6807;&#x5FD7;"><a href="#bufferevent&#x53EF;&#x9009;&#x7684;&#x6807;&#x5FD7;" class="headerlink" title="bufferevent&#x53EF;&#x9009;&#x7684;&#x6807;&#x5FD7;"></a>bufferevent&#x53EF;&#x9009;&#x7684;&#x6807;&#x5FD7;</h2><p>&#x5728;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;bufferevent&#x65F6;&#x4F60;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;&#x4E00;&#x4E2A;&#x6216;&#x591A;&#x4E2A;&#x6807;&#x5FD7;&#x3002;&#x53EF;&#x7528;&#x7684;&#x6807;&#x5FD7;&#x6709;&#xFF1A;  </p>
+<ol>
+<li>BEV_OPT_CLOSE_ON_FREE<br> &#x5F53;bufferevent&#x88AB;&#x91CA;&#x653E;&#x65F6;&#xFF0C;&#x5173;&#x95ED;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#x3002;&#x8FD9;&#x4F1A;&#x5173;&#x95ED;&#x4E00;&#x4E2A;&#x5E95;&#x5C42;&#x7684;socker&#xFF0C;&#x91CA;&#x653E;&#x4E00;&#x4E2A;&#x5E95;&#x5C42;&#x7684;bufferevent&#x7B49;&#x3002;  </li>
+<li>BEV_OPT_THREADSAFE<br> &#x81EA;&#x52A8;&#x4E3A;bufferevent&#x5206;&#x914D;&#x9501;&#xFF0C;&#x6240;&#x4EE5;&#x53EF;&#x5B89;&#x5168;&#x7528;&#x4E8E;&#x591A;&#x7EBF;&#x7A0B;&#x3002;  </li>
+<li>BEV_OPT_DEFER_CALLBACKS<br> &#x5982;&#x679C;&#x8BBE;&#x7F6E;&#x4E86;&#x8FD9;&#x4E2A;&#x6807;&#x5FD7;&#xFF0C;bufferevent&#x63A8;&#x8FDF;&#x6240;&#x6709;&#x56DE;&#x8C03;&#x7684;&#x6267;&#x884C;&#xFF0C;&#x5982;&#x4E0A;&#x6240;&#x8FF0;&#x3002;  </li>
+<li>BEV_OPT_UNLOCK_CALLBACKS<br> &#x9ED8;&#x8BA4;&#x4E0A;&#x82E5;&#x4E00;&#x4E2A;bufferevent&#x8BBE;&#x7F6E;&#x6210;&#x7EBF;&#x7A0B;&#x5B89;&#x5168;&#xFF0C;&#x5219;&#x5F53;&#x7528;&#x6237;&#x63D0;&#x4F9B;&#x7684;&#x56DE;&#x8C03;&#x8C03;&#x7528;&#x65F6;&#x4F1A;&#x83B7;&#x53D6;&#x8BE5;bufferevent&#x7684;&#x9501;&#x3002;&#x8BBE;&#x7F6E;&#x8FD9;&#x4E2A;&#x6807;&#x5FD7;&#x6765;&#x8BA9;Libevent&#x5728;&#x5B8C;&#x6210;&#x4F60;&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x540E;&#x91CA;&#x653E;bufferevent&#x7684;&#x9501;&#x3002;  </li>
+</ol>
+<p><br></p>
+<h2 id="&#x4F7F;&#x7528;&#x57FA;&#x4E8E;socket&#x7684;bufferevent"><a href="#&#x4F7F;&#x7528;&#x57FA;&#x4E8E;socket&#x7684;bufferevent" class="headerlink" title="&#x4F7F;&#x7528;&#x57FA;&#x4E8E;socket&#x7684;bufferevent"></a>&#x4F7F;&#x7528;&#x57FA;&#x4E8E;socket&#x7684;bufferevent</h2><p>&#x57FA;&#x4E8E;socket&#x7684;bufferevent&#x4F7F;&#x7528;&#x8D77;&#x6765;&#x6700;&#x7B80;&#x5355;&#x3002;&#x57FA;&#x4E8E;socket&#x7684;bufferevent&#x4F7F;&#x7528;Libevent&#x7684;&#x5E95;&#x5C42;&#x4E8B;&#x4EF6;&#x673A;&#x5236;&#x6765;&#x68C0;&#x6D4B;&#x5E95;&#x5C42;&#x7F51;&#x7EDC;socket&#x662F;&#x5426;&#x53EF;&#x8BFB;&#x5199;&#xFF0C;&#x4E5F;&#x4F7F;&#x7528;&#x5E95;&#x5C42;&#x7F51;&#x7EDC;&#x8C03;&#x7528;&#xFF08;&#x6BD4;&#x5982;readv&#xFF0C;writev&#xFF0C;WSASend&#xFF0C;&#x6216;&#x8005;WSARecv&#xFF09;&#x6765;&#x4F20;&#x8F93;&#x548C;&#x63A5;&#x6536;&#x6570;&#x636E;&#x3002;  </p>
+<h3 id="&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x57FA;&#x4E8E;socket&#x7684;bufferevent"><a href="#&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x57FA;&#x4E8E;socket&#x7684;bufferevent" class="headerlink" title="&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x57FA;&#x4E8E;socket&#x7684;bufferevent"></a>&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x57FA;&#x4E8E;socket&#x7684;bufferevent</h3><p>&#x4F7F;&#x7528;<code>bufferevent_socket_new()</code>&#x6765;&#x521B;&#x5EFA;&#x3002;&#x63A5;&#x53E3;&#x5982;&#x4E0B;&#xFF1A;  </p>
 <pre><code>struct bufferevent *bufferevent_socket_new(
     struct event_base *base,
     evutil_socket_t fd,
     enum bufferevent_options options);
-</code></pre><p><code>base</code>是event_base，<code>options</code>是bufferevent标志的位掩码（BEV_OPT_CLOSE_ON_FREE等）。而<code>fd</code>则是可选的socket fd，如果你想稍后再设置fd，可以传-1。  </p>
-<p>提示： 确保你提供的socket是非阻塞模式的，Libevent提供了一个便捷的函数<code>evutil_make_socket_nonblocking()</code>来设置一个socket为非阻塞。  </p>
-<p>如果成功，这个函数返回一个bufferevent，如果失败，返回NULL。  </p>
-<h3 id="在bufferevent上启用连接">在bufferevent上启用连接</h3><p>如果bufferevent的socket还没连接，你可以创建一个连接，接口：  </p>
+</code></pre><p><code>base</code>&#x662F;event_base&#xFF0C;<code>options</code>&#x662F;bufferevent&#x6807;&#x5FD7;&#x7684;&#x4F4D;&#x63A9;&#x7801;&#xFF08;BEV_OPT_CLOSE_ON_FREE&#x7B49;&#xFF09;&#x3002;&#x800C;<code>fd</code>&#x5219;&#x662F;&#x53EF;&#x9009;&#x7684;socket fd&#xFF0C;&#x5982;&#x679C;&#x4F60;&#x60F3;&#x7A0D;&#x540E;&#x518D;&#x8BBE;&#x7F6E;fd&#xFF0C;&#x53EF;&#x4EE5;&#x4F20;-1&#x3002;  </p>
+<p>&#x63D0;&#x793A;&#xFF1A; &#x786E;&#x4FDD;&#x4F60;&#x63D0;&#x4F9B;&#x7684;socket&#x662F;&#x975E;&#x963B;&#x585E;&#x6A21;&#x5F0F;&#x7684;&#xFF0C;Libevent&#x63D0;&#x4F9B;&#x4E86;&#x4E00;&#x4E2A;&#x4FBF;&#x6377;&#x7684;&#x51FD;&#x6570;<code>evutil_make_socket_nonblocking()</code>&#x6765;&#x8BBE;&#x7F6E;&#x4E00;&#x4E2A;socket&#x4E3A;&#x975E;&#x963B;&#x585E;&#x3002;  </p>
+<p>&#x5982;&#x679C;&#x6210;&#x529F;&#xFF0C;&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x8FD4;&#x56DE;&#x4E00;&#x4E2A;bufferevent&#xFF0C;&#x5982;&#x679C;&#x5931;&#x8D25;&#xFF0C;&#x8FD4;&#x56DE;NULL&#x3002;  </p>
+<h3 id="&#x5728;bufferevent&#x4E0A;&#x542F;&#x7528;&#x8FDE;&#x63A5;"><a href="#&#x5728;bufferevent&#x4E0A;&#x542F;&#x7528;&#x8FDE;&#x63A5;" class="headerlink" title="&#x5728;bufferevent&#x4E0A;&#x542F;&#x7528;&#x8FDE;&#x63A5;"></a>&#x5728;bufferevent&#x4E0A;&#x542F;&#x7528;&#x8FDE;&#x63A5;</h3><p>&#x5982;&#x679C;bufferevent&#x7684;socket&#x8FD8;&#x6CA1;&#x8FDE;&#x63A5;&#xFF0C;&#x4F60;&#x53EF;&#x4EE5;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x8FDE;&#x63A5;&#xFF0C;&#x63A5;&#x53E3;&#xFF1A;  </p>
 <pre><code>int bufferevent_socket_connect(struct bufferevent *bev,
     struct sockaddr *address, int addrlen);
-</code></pre><p>参数<code>address</code>和<code>addrlen</code>跟标准的<code>connect()</code>一样。如果bufferevent还没有一个socker，调用这个函数会为它创建一个新的socket，并设置socket为非阻塞。  </p>
-<p>如果bufferevent已经有一个socket，调用<code>bufferevent_socket_connect()</code>告诉Libevent该socket未连接，在连接成功之前不会有读或写操作返回。  </p>
-<p>在连接返回前向输出buffer添加数据则是可以的。  </p>
-<p>如果连接成功建立，这个函数返回0，如果出现错误，返回-1。  </p>
-<h4 id="Example">Example</h4><pre><code>#include &lt;event2/event.h&gt;
+</code></pre><p>&#x53C2;&#x6570;<code>address</code>&#x548C;<code>addrlen</code>&#x8DDF;&#x6807;&#x51C6;&#x7684;<code>connect()</code>&#x4E00;&#x6837;&#x3002;&#x5982;&#x679C;bufferevent&#x8FD8;&#x6CA1;&#x6709;&#x4E00;&#x4E2A;socker&#xFF0C;&#x8C03;&#x7528;&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x4F1A;&#x4E3A;&#x5B83;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x65B0;&#x7684;socket&#xFF0C;&#x5E76;&#x8BBE;&#x7F6E;socket&#x4E3A;&#x975E;&#x963B;&#x585E;&#x3002;  </p>
+<p>&#x5982;&#x679C;bufferevent&#x5DF2;&#x7ECF;&#x6709;&#x4E00;&#x4E2A;socket&#xFF0C;&#x8C03;&#x7528;<code>bufferevent_socket_connect()</code>&#x544A;&#x8BC9;Libevent&#x8BE5;socket&#x672A;&#x8FDE;&#x63A5;&#xFF0C;&#x5728;&#x8FDE;&#x63A5;&#x6210;&#x529F;&#x4E4B;&#x524D;&#x4E0D;&#x4F1A;&#x6709;&#x8BFB;&#x6216;&#x5199;&#x64CD;&#x4F5C;&#x8FD4;&#x56DE;&#x3002;  </p>
+<p>&#x5728;&#x8FDE;&#x63A5;&#x8FD4;&#x56DE;&#x524D;&#x5411;&#x8F93;&#x51FA;buffer&#x6DFB;&#x52A0;&#x6570;&#x636E;&#x5219;&#x662F;&#x53EF;&#x4EE5;&#x7684;&#x3002;  </p>
+<p>&#x5982;&#x679C;&#x8FDE;&#x63A5;&#x6210;&#x529F;&#x5EFA;&#x7ACB;&#xFF0C;&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x8FD4;&#x56DE;0&#xFF0C;&#x5982;&#x679C;&#x51FA;&#x73B0;&#x9519;&#x8BEF;&#xFF0C;&#x8FD4;&#x56DE;-1&#x3002;  </p>
+<h4 id="example"><a href="#Example" class="headerlink" title="Example"></a>Example</h4><pre><code>#include &lt;event2/event.h&gt;
 #include &lt;event2/bufferevent.h&gt;
 #include &lt;sys/socket.h&gt;
 #include &lt;string.h&gt;
@@ -129,7 +129,7 @@
 void eventcb(struct bufferevent *bev, short events, void *ptr)
 {
     if (events &amp; BEV_EVENT_CONNECTED) {
-         /* We&#39;re connected to 127.0.0.1:8080.   Ordinarily we&#39;d do
+         /* We&apos;re connected to 127.0.0.1:8080.   Ordinarily we&apos;d do
             something here, like start reading or writing. */
     } else if (events &amp; BEV_EVENT_ERROR) {
          /* An error occured while connecting. */
@@ -163,17 +163,17 @@ int main_loop(void)
     event_base_dispatch(base);
     return 0;
 }
-</code></pre><p>注意如果你尝试使用<code>bufferevent_socket_connect()</code>来触发调用<code>connect()</code>，你只会有一个<code>BEV_EVENT_CONNECTED</code>事件。如果你自己调用<code>connect()</code>，该连接触发的是一个写事件。  </p>
-<h3 id="使用hostname来建立连接">使用hostname来建立连接</h3><p>更普遍的做法是把解析host和创建连接合并为一个操作，这里有一个接口：</p>
+</code></pre><p>&#x6CE8;&#x610F;&#x5982;&#x679C;&#x4F60;&#x5C1D;&#x8BD5;&#x4F7F;&#x7528;<code>bufferevent_socket_connect()</code>&#x6765;&#x89E6;&#x53D1;&#x8C03;&#x7528;<code>connect()</code>&#xFF0C;&#x4F60;&#x53EA;&#x4F1A;&#x6709;&#x4E00;&#x4E2A;<code>BEV_EVENT_CONNECTED</code>&#x4E8B;&#x4EF6;&#x3002;&#x5982;&#x679C;&#x4F60;&#x81EA;&#x5DF1;&#x8C03;&#x7528;<code>connect()</code>&#xFF0C;&#x8BE5;&#x8FDE;&#x63A5;&#x89E6;&#x53D1;&#x7684;&#x662F;&#x4E00;&#x4E2A;&#x5199;&#x4E8B;&#x4EF6;&#x3002;  </p>
+<h3 id="&#x4F7F;&#x7528;hostname&#x6765;&#x5EFA;&#x7ACB;&#x8FDE;&#x63A5;"><a href="#&#x4F7F;&#x7528;hostname&#x6765;&#x5EFA;&#x7ACB;&#x8FDE;&#x63A5;" class="headerlink" title="&#x4F7F;&#x7528;hostname&#x6765;&#x5EFA;&#x7ACB;&#x8FDE;&#x63A5;"></a>&#x4F7F;&#x7528;hostname&#x6765;&#x5EFA;&#x7ACB;&#x8FDE;&#x63A5;</h3><p>&#x66F4;&#x666E;&#x904D;&#x7684;&#x505A;&#x6CD5;&#x662F;&#x628A;&#x89E3;&#x6790;host&#x548C;&#x521B;&#x5EFA;&#x8FDE;&#x63A5;&#x5408;&#x5E76;&#x4E3A;&#x4E00;&#x4E2A;&#x64CD;&#x4F5C;&#xFF0C;&#x8FD9;&#x91CC;&#x6709;&#x4E00;&#x4E2A;&#x63A5;&#x53E3;&#xFF1A;</p>
 <pre><code>int bufferevent_socket_connect_hostname(struct bufferevent *bev,
     struct evdns_base *dns_base, int family, const char *hostname,
     int port);
 int bufferevent_socket_get_dns_error(struct bufferevent *bev);
-</code></pre><p>这个函数解析DNS名字<code>hostname</code>，查找地址的类属（AF_INET，AF_INET6和AF_UNSPEC）。如果解析失败则调用错误回调函数，如果成功则创建一个连接。  </p>
-<p>参数<code>dns_base</code>可选，如果为NULL，Libevent会阻塞直到完成域名查找，而这一般非你所愿。如果不为NULL，Libevent会使用它来异步查找域名。  </p>
-<p>跟<code>bufferevent_socket_connect()</code>一样，这个函数告诉Libevent任何已有的socket是未连接的，在完成域名解析且连接成功创建和返回前，该连接的读或写操作不应返回。  </p>
-<p>如果出现错误，可能是DNS域名查找出错，你可以调用<code>bufferevent_socket_get_dns_error()</code>来查看最近的错误。如果让会的error为0，则检测不到DNS错误。  </p>
-<h4 id="Example:_Trivial_HTTP_v0_client">Example: Trivial HTTP v0 client</h4><pre><code>/* Don&#39;t actually copy this code: it is a poor way to implement an
+</code></pre><p>&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x89E3;&#x6790;DNS&#x540D;&#x5B57;<code>hostname</code>&#xFF0C;&#x67E5;&#x627E;&#x5730;&#x5740;&#x7684;&#x7C7B;&#x5C5E;&#xFF08;AF_INET&#xFF0C;AF_INET6&#x548C;AF_UNSPEC&#xFF09;&#x3002;&#x5982;&#x679C;&#x89E3;&#x6790;&#x5931;&#x8D25;&#x5219;&#x8C03;&#x7528;&#x9519;&#x8BEF;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#xFF0C;&#x5982;&#x679C;&#x6210;&#x529F;&#x5219;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x8FDE;&#x63A5;&#x3002;  </p>
+<p>&#x53C2;&#x6570;<code>dns_base</code>&#x53EF;&#x9009;&#xFF0C;&#x5982;&#x679C;&#x4E3A;NULL&#xFF0C;Libevent&#x4F1A;&#x963B;&#x585E;&#x76F4;&#x5230;&#x5B8C;&#x6210;&#x57DF;&#x540D;&#x67E5;&#x627E;&#xFF0C;&#x800C;&#x8FD9;&#x4E00;&#x822C;&#x975E;&#x4F60;&#x6240;&#x613F;&#x3002;&#x5982;&#x679C;&#x4E0D;&#x4E3A;NULL&#xFF0C;Libevent&#x4F1A;&#x4F7F;&#x7528;&#x5B83;&#x6765;&#x5F02;&#x6B65;&#x67E5;&#x627E;&#x57DF;&#x540D;&#x3002;  </p>
+<p>&#x8DDF;<code>bufferevent_socket_connect()</code>&#x4E00;&#x6837;&#xFF0C;&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x544A;&#x8BC9;Libevent&#x4EFB;&#x4F55;&#x5DF2;&#x6709;&#x7684;socket&#x662F;&#x672A;&#x8FDE;&#x63A5;&#x7684;&#xFF0C;&#x5728;&#x5B8C;&#x6210;&#x57DF;&#x540D;&#x89E3;&#x6790;&#x4E14;&#x8FDE;&#x63A5;&#x6210;&#x529F;&#x521B;&#x5EFA;&#x548C;&#x8FD4;&#x56DE;&#x524D;&#xFF0C;&#x8BE5;&#x8FDE;&#x63A5;&#x7684;&#x8BFB;&#x6216;&#x5199;&#x64CD;&#x4F5C;&#x4E0D;&#x5E94;&#x8FD4;&#x56DE;&#x3002;  </p>
+<p>&#x5982;&#x679C;&#x51FA;&#x73B0;&#x9519;&#x8BEF;&#xFF0C;&#x53EF;&#x80FD;&#x662F;DNS&#x57DF;&#x540D;&#x67E5;&#x627E;&#x51FA;&#x9519;&#xFF0C;&#x4F60;&#x53EF;&#x4EE5;&#x8C03;&#x7528;<code>bufferevent_socket_get_dns_error()</code>&#x6765;&#x67E5;&#x770B;&#x6700;&#x8FD1;&#x7684;&#x9519;&#x8BEF;&#x3002;&#x5982;&#x679C;&#x8BA9;&#x4F1A;&#x7684;error&#x4E3A;0&#xFF0C;&#x5219;&#x68C0;&#x6D4B;&#x4E0D;&#x5230;DNS&#x9519;&#x8BEF;&#x3002;  </p>
+<h4 id="example-trivial-http-v0-client"><a href="#Example-Trivial-HTTP-v0-client" class="headerlink" title="Example: Trivial HTTP v0 client"></a>Example: Trivial HTTP v0 client</h4><pre><code>/* Don&apos;t actually copy this code: it is a poor way to implement an
    HTTP client.  Have a look at evhttp instead.
 */
 #include &lt;event2/dns.h&gt;
@@ -237,12 +237,12 @@ int main(int argc, char **argv)
     return 0;
 }
 </code></pre><p><br></p>
-<h2 id="bufferevent通用操作">bufferevent通用操作</h2><p>这节的函数适用于多种bufferevent实现。  </p>
-<h3 id="释放一个bufferevent">释放一个bufferevent</h3><pre><code>void bufferevent_free(struct bufferevent *bev);
-</code></pre><p>Bufferevent在内部有引用计数，如果当你释放它时它有延迟的回调函数，则再回调被执行前它不会被释放。  </p>
-<p>然而<code>bufferevent_free()</code>会尝试尽快释放bufferevent，如果bufferevent上有等待写的数据，在bufferevent被释放前它可能不会刷新缓存。   </p>
-<p>如果设置了<code>BEV_OPT_CLOSE_ON_FREE</code>标志，且该buffereavent有一个socket或一个底层bufferevent，这个底层传输会在释放时被关闭。  </p>
-<h3 id="操作回调、设置水位和启用功能">操作回调、设置水位和启用功能</h3><pre><code>typedef void (*bufferevent_data_cb)(struct bufferevent *bev, void *ctx);
+<h2 id="bufferevent&#x901A;&#x7528;&#x64CD;&#x4F5C;"><a href="#bufferevent&#x901A;&#x7528;&#x64CD;&#x4F5C;" class="headerlink" title="bufferevent&#x901A;&#x7528;&#x64CD;&#x4F5C;"></a>bufferevent&#x901A;&#x7528;&#x64CD;&#x4F5C;</h2><p>&#x8FD9;&#x8282;&#x7684;&#x51FD;&#x6570;&#x9002;&#x7528;&#x4E8E;&#x591A;&#x79CD;bufferevent&#x5B9E;&#x73B0;&#x3002;  </p>
+<h3 id="&#x91CA;&#x653E;&#x4E00;&#x4E2A;bufferevent"><a href="#&#x91CA;&#x653E;&#x4E00;&#x4E2A;bufferevent" class="headerlink" title="&#x91CA;&#x653E;&#x4E00;&#x4E2A;bufferevent"></a>&#x91CA;&#x653E;&#x4E00;&#x4E2A;bufferevent</h3><pre><code>void bufferevent_free(struct bufferevent *bev);
+</code></pre><p>Bufferevent&#x5728;&#x5185;&#x90E8;&#x6709;&#x5F15;&#x7528;&#x8BA1;&#x6570;&#xFF0C;&#x5982;&#x679C;&#x5F53;&#x4F60;&#x91CA;&#x653E;&#x5B83;&#x65F6;&#x5B83;&#x6709;&#x5EF6;&#x8FDF;&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#xFF0C;&#x5219;&#x518D;&#x56DE;&#x8C03;&#x88AB;&#x6267;&#x884C;&#x524D;&#x5B83;&#x4E0D;&#x4F1A;&#x88AB;&#x91CA;&#x653E;&#x3002;  </p>
+<p>&#x7136;&#x800C;<code>bufferevent_free()</code>&#x4F1A;&#x5C1D;&#x8BD5;&#x5C3D;&#x5FEB;&#x91CA;&#x653E;bufferevent&#xFF0C;&#x5982;&#x679C;bufferevent&#x4E0A;&#x6709;&#x7B49;&#x5F85;&#x5199;&#x7684;&#x6570;&#x636E;&#xFF0C;&#x5728;bufferevent&#x88AB;&#x91CA;&#x653E;&#x524D;&#x5B83;&#x53EF;&#x80FD;&#x4E0D;&#x4F1A;&#x5237;&#x65B0;&#x7F13;&#x5B58;&#x3002;   </p>
+<p>&#x5982;&#x679C;&#x8BBE;&#x7F6E;&#x4E86;<code>BEV_OPT_CLOSE_ON_FREE</code>&#x6807;&#x5FD7;&#xFF0C;&#x4E14;&#x8BE5;buffereavent&#x6709;&#x4E00;&#x4E2A;socket&#x6216;&#x4E00;&#x4E2A;&#x5E95;&#x5C42;bufferevent&#xFF0C;&#x8FD9;&#x4E2A;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#x4F1A;&#x5728;&#x91CA;&#x653E;&#x65F6;&#x88AB;&#x5173;&#x95ED;&#x3002;  </p>
+<h3 id="&#x64CD;&#x4F5C;&#x56DE;&#x8C03;-&#x8BBE;&#x7F6E;&#x6C34;&#x4F4D;&#x548C;&#x542F;&#x7528;&#x529F;&#x80FD;"><a href="#&#x64CD;&#x4F5C;&#x56DE;&#x8C03;&#x3001;&#x8BBE;&#x7F6E;&#x6C34;&#x4F4D;&#x548C;&#x542F;&#x7528;&#x529F;&#x80FD;" class="headerlink" title="&#x64CD;&#x4F5C;&#x56DE;&#x8C03;&#x3001;&#x8BBE;&#x7F6E;&#x6C34;&#x4F4D;&#x548C;&#x542F;&#x7528;&#x529F;&#x80FD;"></a>&#x64CD;&#x4F5C;&#x56DE;&#x8C03;&#x3001;&#x8BBE;&#x7F6E;&#x6C34;&#x4F4D;&#x548C;&#x542F;&#x7528;&#x529F;&#x80FD;</h3><pre><code>typedef void (*bufferevent_data_cb)(struct bufferevent *bev, void *ctx);
 typedef void (*bufferevent_event_cb)(struct bufferevent *bev,
     short events, void *ctx);
 
@@ -255,18 +255,18 @@ void bufferevent_getcb(struct bufferevent *bufev,
     bufferevent_data_cb *writecb_ptr,
     bufferevent_event_cb *eventcb_ptr,
     void **cbarg_ptr);
-</code></pre><p>函数<code>bufferevent_setcb()</code>改变一个多或多个回调函数。参数readcb, writecb和eventcb在可读、可写或有事件被触发时被调用（各自被调用）。最后一个用户提供的参数<em>cbarg</em>将作为参数传给<code>bufferevent_callcb()</code>：你可以使用它来传递数据给你的回调函数。回调函数的参数<em>events</em>则是事件标志的位掩码。  </p>
-<p>你若给某个回调函数入参传一个NULL指针，则禁用该回调函数。注意到所有的回调函数共享入参<em>cbarg</em>，修改该参数会影响所有回调函数。  </p>
-<h4 id="启用/禁用">启用/禁用</h4><pre><code>void bufferevent_enable(struct bufferevent *bufev, short events);
+</code></pre><p>&#x51FD;&#x6570;<code>bufferevent_setcb()</code>&#x6539;&#x53D8;&#x4E00;&#x4E2A;&#x591A;&#x6216;&#x591A;&#x4E2A;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x3002;&#x53C2;&#x6570;readcb, writecb&#x548C;eventcb&#x5728;&#x53EF;&#x8BFB;&#x3001;&#x53EF;&#x5199;&#x6216;&#x6709;&#x4E8B;&#x4EF6;&#x88AB;&#x89E6;&#x53D1;&#x65F6;&#x88AB;&#x8C03;&#x7528;&#xFF08;&#x5404;&#x81EA;&#x88AB;&#x8C03;&#x7528;&#xFF09;&#x3002;&#x6700;&#x540E;&#x4E00;&#x4E2A;&#x7528;&#x6237;&#x63D0;&#x4F9B;&#x7684;&#x53C2;&#x6570;<em>cbarg</em>&#x5C06;&#x4F5C;&#x4E3A;&#x53C2;&#x6570;&#x4F20;&#x7ED9;<code>bufferevent_callcb()</code>&#xFF1A;&#x4F60;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;&#x5B83;&#x6765;&#x4F20;&#x9012;&#x6570;&#x636E;&#x7ED9;&#x4F60;&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x3002;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x7684;&#x53C2;&#x6570;<em>events</em>&#x5219;&#x662F;&#x4E8B;&#x4EF6;&#x6807;&#x5FD7;&#x7684;&#x4F4D;&#x63A9;&#x7801;&#x3002;  </p>
+<p>&#x4F60;&#x82E5;&#x7ED9;&#x67D0;&#x4E2A;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x5165;&#x53C2;&#x4F20;&#x4E00;&#x4E2A;NULL&#x6307;&#x9488;&#xFF0C;&#x5219;&#x7981;&#x7528;&#x8BE5;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x3002;&#x6CE8;&#x610F;&#x5230;&#x6240;&#x6709;&#x7684;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x5171;&#x4EAB;&#x5165;&#x53C2;<em>cbarg</em>&#xFF0C;&#x4FEE;&#x6539;&#x8BE5;&#x53C2;&#x6570;&#x4F1A;&#x5F71;&#x54CD;&#x6240;&#x6709;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x3002;  </p>
+<h4 id="&#x542F;&#x7528;&#x7981;&#x7528;"><a href="#&#x542F;&#x7528;-&#x7981;&#x7528;" class="headerlink" title="&#x542F;&#x7528;/&#x7981;&#x7528;"></a>&#x542F;&#x7528;/&#x7981;&#x7528;</h4><pre><code>void bufferevent_enable(struct bufferevent *bufev, short events);
 void bufferevent_disable(struct bufferevent *bufev, short events);
 
 short bufferevent_get_enabled(struct bufferevent *bufev);
-</code></pre><p>你可以在一个bufferevent上启用或禁用指定的事件：<em>EV_READ, EV_WRITE</em>, 或<em>EV_READ|EV_WRITE</em>。当读或写被禁用后，bufferevent将不会尝试读或写数据。<br>当输出缓存为空时没有必要禁用写操作：bufferevent会自动停止写，当有缓存里有数据时会自动重新开始写socket。<br>类似的，当输入缓存达到最高水位时也没必要禁用读操作，bufferevent会自动停止再读入数据，当输入缓存又有空间时bufferevent会自动重新开始读入数据到缓存。<br>默认上，一个新创建的bufferevent启用了写操作，但不包括读操作（读写buffer的操作）。<br>可以调用<code>bufferevent_get_enabled()</code>来查看bufferevent当前启用了哪些事件。  </p>
-<h4 id="设置水位">设置水位</h4><pre><code>void bufferevent_setwatermark(struct bufferevent *bufev, short events,
+</code></pre><p>&#x4F60;&#x53EF;&#x4EE5;&#x5728;&#x4E00;&#x4E2A;bufferevent&#x4E0A;&#x542F;&#x7528;&#x6216;&#x7981;&#x7528;&#x6307;&#x5B9A;&#x7684;&#x4E8B;&#x4EF6;&#xFF1A;<em>EV_READ, EV_WRITE</em>, &#x6216;<em>EV_READ|EV_WRITE</em>&#x3002;&#x5F53;&#x8BFB;&#x6216;&#x5199;&#x88AB;&#x7981;&#x7528;&#x540E;&#xFF0C;bufferevent&#x5C06;&#x4E0D;&#x4F1A;&#x5C1D;&#x8BD5;&#x8BFB;&#x6216;&#x5199;&#x6570;&#x636E;&#x3002;<br>&#x5F53;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x4E3A;&#x7A7A;&#x65F6;&#x6CA1;&#x6709;&#x5FC5;&#x8981;&#x7981;&#x7528;&#x5199;&#x64CD;&#x4F5C;&#xFF1A;bufferevent&#x4F1A;&#x81EA;&#x52A8;&#x505C;&#x6B62;&#x5199;&#xFF0C;&#x5F53;&#x6709;&#x7F13;&#x5B58;&#x91CC;&#x6709;&#x6570;&#x636E;&#x65F6;&#x4F1A;&#x81EA;&#x52A8;&#x91CD;&#x65B0;&#x5F00;&#x59CB;&#x5199;socket&#x3002;<br>&#x7C7B;&#x4F3C;&#x7684;&#xFF0C;&#x5F53;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x8FBE;&#x5230;&#x6700;&#x9AD8;&#x6C34;&#x4F4D;&#x65F6;&#x4E5F;&#x6CA1;&#x5FC5;&#x8981;&#x7981;&#x7528;&#x8BFB;&#x64CD;&#x4F5C;&#xFF0C;bufferevent&#x4F1A;&#x81EA;&#x52A8;&#x505C;&#x6B62;&#x518D;&#x8BFB;&#x5165;&#x6570;&#x636E;&#xFF0C;&#x5F53;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x53C8;&#x6709;&#x7A7A;&#x95F4;&#x65F6;bufferevent&#x4F1A;&#x81EA;&#x52A8;&#x91CD;&#x65B0;&#x5F00;&#x59CB;&#x8BFB;&#x5165;&#x6570;&#x636E;&#x5230;&#x7F13;&#x5B58;&#x3002;<br>&#x9ED8;&#x8BA4;&#x4E0A;&#xFF0C;&#x4E00;&#x4E2A;&#x65B0;&#x521B;&#x5EFA;&#x7684;bufferevent&#x542F;&#x7528;&#x4E86;&#x5199;&#x64CD;&#x4F5C;&#xFF0C;&#x4F46;&#x4E0D;&#x5305;&#x62EC;&#x8BFB;&#x64CD;&#x4F5C;&#xFF08;&#x8BFB;&#x5199;buffer&#x7684;&#x64CD;&#x4F5C;&#xFF09;&#x3002;<br>&#x53EF;&#x4EE5;&#x8C03;&#x7528;<code>bufferevent_get_enabled()</code>&#x6765;&#x67E5;&#x770B;bufferevent&#x5F53;&#x524D;&#x542F;&#x7528;&#x4E86;&#x54EA;&#x4E9B;&#x4E8B;&#x4EF6;&#x3002;  </p>
+<h4 id="&#x8BBE;&#x7F6E;&#x6C34;&#x4F4D;"><a href="#&#x8BBE;&#x7F6E;&#x6C34;&#x4F4D;" class="headerlink" title="&#x8BBE;&#x7F6E;&#x6C34;&#x4F4D;"></a>&#x8BBE;&#x7F6E;&#x6C34;&#x4F4D;</h4><pre><code>void bufferevent_setwatermark(struct bufferevent *bufev, short events,
     size_t lowmark, size_t highmark);
-</code></pre><p>函数<code>bufferevent_setwatermark()</code>调整读、写水位，或都调整。 如果参数<em>events</em>设置了EV_READ，则调整读水位，如果设置<em>EV_WRITE</em>则调整写水位。   </p>
-<p>高水位如果设置为0，则表示不限制。  </p>
-<h4 id="Example-1">Example</h4><pre><code>#include &lt;event2/event.h&gt;
+</code></pre><p>&#x51FD;&#x6570;<code>bufferevent_setwatermark()</code>&#x8C03;&#x6574;&#x8BFB;&#x3001;&#x5199;&#x6C34;&#x4F4D;&#xFF0C;&#x6216;&#x90FD;&#x8C03;&#x6574;&#x3002; &#x5982;&#x679C;&#x53C2;&#x6570;<em>events</em>&#x8BBE;&#x7F6E;&#x4E86;EV_READ&#xFF0C;&#x5219;&#x8C03;&#x6574;&#x8BFB;&#x6C34;&#x4F4D;&#xFF0C;&#x5982;&#x679C;&#x8BBE;&#x7F6E;<em>EV_WRITE</em>&#x5219;&#x8C03;&#x6574;&#x5199;&#x6C34;&#x4F4D;&#x3002;   </p>
+<p>&#x9AD8;&#x6C34;&#x4F4D;&#x5982;&#x679C;&#x8BBE;&#x7F6E;&#x4E3A;0&#xFF0C;&#x5219;&#x8868;&#x793A;&#x4E0D;&#x9650;&#x5236;&#x3002;  </p>
+<h4 id="example"><a href="#Example-1" class="headerlink" title="Example"></a>Example</h4><pre><code>#include &lt;event2/event.h&gt;
 #include &lt;event2/bufferevent.h&gt;
 #include &lt;event2/buffer.h&gt;
 #include &lt;event2/util.h&gt;
@@ -338,23 +338,23 @@ struct bufferevent *setup_bufferevent(void)
     bufferevent_enable(b1, EV_READ); /* Start reading. */
     return b1;
 }
-</code></pre><h3 id="操作bufferevent里的数据">操作bufferevent里的数据</h3><p>bufferevent提供一些函数让你可以向网络中读写数据：</p>
-<h4 id="Interface">Interface</h4><pre><code>struct evbuffer *bufferevent_get_input(struct bufferevent *bufev);
+</code></pre><h3 id="&#x64CD;&#x4F5C;bufferevent&#x91CC;&#x7684;&#x6570;&#x636E;"><a href="#&#x64CD;&#x4F5C;bufferevent&#x91CC;&#x7684;&#x6570;&#x636E;" class="headerlink" title="&#x64CD;&#x4F5C;bufferevent&#x91CC;&#x7684;&#x6570;&#x636E;"></a>&#x64CD;&#x4F5C;bufferevent&#x91CC;&#x7684;&#x6570;&#x636E;</h3><p>bufferevent&#x63D0;&#x4F9B;&#x4E00;&#x4E9B;&#x51FD;&#x6570;&#x8BA9;&#x4F60;&#x53EF;&#x4EE5;&#x5411;&#x7F51;&#x7EDC;&#x4E2D;&#x8BFB;&#x5199;&#x6570;&#x636E;&#xFF1A;</p>
+<h4 id="interface"><a href="#Interface" class="headerlink" title="Interface"></a>Interface</h4><pre><code>struct evbuffer *bufferevent_get_input(struct bufferevent *bufev);
 struct evbuffer *bufferevent_get_output(struct bufferevent *bufev);
-</code></pre><p>这两个基础函数非常有用，分别返回输入缓存和输出缓存。evbuffer更多操作函数，见下节。  </p>
-<p>注意，程序可能只从输入缓存里读取数据（而不添加数据），只向输出缓存里添加数据（而不删除）。  </p>
-<p>如果输出缓存里太少数据而导致bufferevent的写操作被推迟，可以向输出缓存里添加数据，bufferevent就会自动重新开始把输出缓存里的数据写socket。对于输入缓存也类似。  </p>
-<h4 id="Interface-1">Interface</h4><pre><code>int bufferevent_write(struct bufferevent *bufev,
+</code></pre><p>&#x8FD9;&#x4E24;&#x4E2A;&#x57FA;&#x7840;&#x51FD;&#x6570;&#x975E;&#x5E38;&#x6709;&#x7528;&#xFF0C;&#x5206;&#x522B;&#x8FD4;&#x56DE;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x548C;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x3002;evbuffer&#x66F4;&#x591A;&#x64CD;&#x4F5C;&#x51FD;&#x6570;&#xFF0C;&#x89C1;&#x4E0B;&#x8282;&#x3002;  </p>
+<p>&#x6CE8;&#x610F;&#xFF0C;&#x7A0B;&#x5E8F;&#x53EF;&#x80FD;&#x53EA;&#x4ECE;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x91CC;&#x8BFB;&#x53D6;&#x6570;&#x636E;&#xFF08;&#x800C;&#x4E0D;&#x6DFB;&#x52A0;&#x6570;&#x636E;&#xFF09;&#xFF0C;&#x53EA;&#x5411;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x91CC;&#x6DFB;&#x52A0;&#x6570;&#x636E;&#xFF08;&#x800C;&#x4E0D;&#x5220;&#x9664;&#xFF09;&#x3002;  </p>
+<p>&#x5982;&#x679C;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x91CC;&#x592A;&#x5C11;&#x6570;&#x636E;&#x800C;&#x5BFC;&#x81F4;bufferevent&#x7684;&#x5199;&#x64CD;&#x4F5C;&#x88AB;&#x63A8;&#x8FDF;&#xFF0C;&#x53EF;&#x4EE5;&#x5411;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x91CC;&#x6DFB;&#x52A0;&#x6570;&#x636E;&#xFF0C;bufferevent&#x5C31;&#x4F1A;&#x81EA;&#x52A8;&#x91CD;&#x65B0;&#x5F00;&#x59CB;&#x628A;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x91CC;&#x7684;&#x6570;&#x636E;&#x5199;socket&#x3002;&#x5BF9;&#x4E8E;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x4E5F;&#x7C7B;&#x4F3C;&#x3002;  </p>
+<h4 id="interface"><a href="#Interface-1" class="headerlink" title="Interface"></a>Interface</h4><pre><code>int bufferevent_write(struct bufferevent *bufev,
     const void *data, size_t size);
 int bufferevent_write_buffer(struct bufferevent *bufev,
     struct evbuffer *buf);
-</code></pre><p>这2个函数添加数据到输出缓存里，调用<code>bufferevent_write()</code>把内存里<em>data</em>位置的<em>size</em>字节添加到输出缓存的末尾。调用<code>bufferevent_write_buffer()</code>则把<em>buf</em>的整块内存添加到输出缓存的末端，并把<em>buf</em>的数据删除。<br>成功返回0，遇到出错返回-1。</p>
-<h4 id="Interface-2">Interface</h4><pre><code>size_t bufferevent_read(struct bufferevent *bufev, void *data, size_t size);
+</code></pre><p>&#x8FD9;2&#x4E2A;&#x51FD;&#x6570;&#x6DFB;&#x52A0;&#x6570;&#x636E;&#x5230;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x91CC;&#xFF0C;&#x8C03;&#x7528;<code>bufferevent_write()</code>&#x628A;&#x5185;&#x5B58;&#x91CC;<em>data</em>&#x4F4D;&#x7F6E;&#x7684;<em>size</em>&#x5B57;&#x8282;&#x6DFB;&#x52A0;&#x5230;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x7684;&#x672B;&#x5C3E;&#x3002;&#x8C03;&#x7528;<code>bufferevent_write_buffer()</code>&#x5219;&#x628A;<em>buf</em>&#x7684;&#x6574;&#x5757;&#x5185;&#x5B58;&#x6DFB;&#x52A0;&#x5230;&#x8F93;&#x51FA;&#x7F13;&#x5B58;&#x7684;&#x672B;&#x7AEF;&#xFF0C;&#x5E76;&#x628A;<em>buf</em>&#x7684;&#x6570;&#x636E;&#x5220;&#x9664;&#x3002;<br>&#x6210;&#x529F;&#x8FD4;&#x56DE;0&#xFF0C;&#x9047;&#x5230;&#x51FA;&#x9519;&#x8FD4;&#x56DE;-1&#x3002;</p>
+<h4 id="interface"><a href="#Interface-2" class="headerlink" title="Interface"></a>Interface</h4><pre><code>size_t bufferevent_read(struct bufferevent *bufev, void *data, size_t size);
 int bufferevent_read_buffer(struct bufferevent *bufev,
     struct evbuffer *buf);
-</code></pre><p>这2个函数从输入缓存里读取数据。调用bufferevent_read()从输入缓存里删除<em>size</em>字节，存到内存的<em>data</em>位置，返回被删除的字节数。bufferevent_read_buffer()则删除输入缓存里的所有数据，存放到<em>buf</em>里，成功返回0，失败返回-1。  </p>
-<p>注意使用bufferevent_read()，内存<em>data</em>位置一定要有足够的空间来容纳<em>size</em>字节的数据。   </p>
-<h4 id="Example-2">Example</h4><pre><code>#include &lt;event2/bufferevent.h&gt;
+</code></pre><p>&#x8FD9;2&#x4E2A;&#x51FD;&#x6570;&#x4ECE;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x91CC;&#x8BFB;&#x53D6;&#x6570;&#x636E;&#x3002;&#x8C03;&#x7528;bufferevent_read()&#x4ECE;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x91CC;&#x5220;&#x9664;<em>size</em>&#x5B57;&#x8282;&#xFF0C;&#x5B58;&#x5230;&#x5185;&#x5B58;&#x7684;<em>data</em>&#x4F4D;&#x7F6E;&#xFF0C;&#x8FD4;&#x56DE;&#x88AB;&#x5220;&#x9664;&#x7684;&#x5B57;&#x8282;&#x6570;&#x3002;bufferevent_read_buffer()&#x5219;&#x5220;&#x9664;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x91CC;&#x7684;&#x6240;&#x6709;&#x6570;&#x636E;&#xFF0C;&#x5B58;&#x653E;&#x5230;<em>buf</em>&#x91CC;&#xFF0C;&#x6210;&#x529F;&#x8FD4;&#x56DE;0&#xFF0C;&#x5931;&#x8D25;&#x8FD4;&#x56DE;-1&#x3002;  </p>
+<p>&#x6CE8;&#x610F;&#x4F7F;&#x7528;bufferevent_read()&#xFF0C;&#x5185;&#x5B58;<em>data</em>&#x4F4D;&#x7F6E;&#x4E00;&#x5B9A;&#x8981;&#x6709;&#x8DB3;&#x591F;&#x7684;&#x7A7A;&#x95F4;&#x6765;&#x5BB9;&#x7EB3;<em>size</em>&#x5B57;&#x8282;&#x7684;&#x6570;&#x636E;&#x3002;   </p>
+<h4 id="example"><a href="#Example-2" class="headerlink" title="Example"></a>Example</h4><pre><code>#include &lt;event2/bufferevent.h&gt;
 #include &lt;event2/buffer.h&gt;
 
 #include &lt;ctype.h&gt;
@@ -362,11 +362,11 @@ int bufferevent_read_buffer(struct bufferevent *bufev,
 void
 read_callback_uppercase(struct bufferevent *bev, void *ctx)
 {
-        /* This callback removes the data from bev&#39;s input buffer 128
+        /* This callback removes the data from bev&apos;s input buffer 128
            bytes at a time, uppercases it, and starts sending it
            back.
 
-           (Watch out!  In practice, you shouldn&#39;t use toupper to implement
+           (Watch out!  In practice, you shouldn&apos;t use toupper to implement
            a network protocol, unless you know for a fact that the current
            locale is the one you want to be using.)
          */
@@ -390,7 +390,7 @@ struct proxy_info {
 void
 read_callback_proxy(struct bufferevent *bev, void *ctx)
 {
-        /* You might use a function like this if you&#39;re implementing
+        /* You might use a function like this if you&apos;re implementing
            a simple proxy: it will take data from one connection (on
            bev), and write it to another, copying as little as
            possible. */
@@ -407,9 +407,9 @@ struct count {
 void
 write_callback_fibonacci(struct bufferevent *bev, void *ctx)
 {
-        /* Here&#39;s a callback that adds some Fibonacci numbers to the
+        /* Here&apos;s a callback that adds some Fibonacci numbers to the
            output buffer of bev.  It stops once we have added 1k of
-           data; once this data is drained, we&#39;ll add more. */
+           data; once this data is drained, we&apos;ll add more. */
         struct count *c = ctx;
 
         struct evbuffer *tmp = evbuffer_new();
@@ -424,45 +424,45 @@ write_callback_fibonacci(struct bufferevent *bev, void *ctx)
         /* Now we add the whole contents of tmp to bev. */
         bufferevent_write_buffer(bev, tmp);
 
-        /* We don&#39;t need tmp any longer. */
+        /* We don&apos;t need tmp any longer. */
         evbuffer_free(tmp);
 }
-</code></pre><h3 id="读和写的超时">读和写的超时</h3><p>跟其他事件一样，bufferevent如果一定时间之后都没有读写数据，会执行超时回调函数。  </p>
-<h4 id="Interface-3">Interface</h4><pre><code>void bufferevent_set_timeouts(struct bufferevent *bufev,
+</code></pre><h3 id="&#x8BFB;&#x548C;&#x5199;&#x7684;&#x8D85;&#x65F6;"><a href="#&#x8BFB;&#x548C;&#x5199;&#x7684;&#x8D85;&#x65F6;" class="headerlink" title="&#x8BFB;&#x548C;&#x5199;&#x7684;&#x8D85;&#x65F6;"></a>&#x8BFB;&#x548C;&#x5199;&#x7684;&#x8D85;&#x65F6;</h3><p>&#x8DDF;&#x5176;&#x4ED6;&#x4E8B;&#x4EF6;&#x4E00;&#x6837;&#xFF0C;bufferevent&#x5982;&#x679C;&#x4E00;&#x5B9A;&#x65F6;&#x95F4;&#x4E4B;&#x540E;&#x90FD;&#x6CA1;&#x6709;&#x8BFB;&#x5199;&#x6570;&#x636E;&#xFF0C;&#x4F1A;&#x6267;&#x884C;&#x8D85;&#x65F6;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x3002;  </p>
+<h4 id="interface"><a href="#Interface-3" class="headerlink" title="Interface"></a>Interface</h4><pre><code>void bufferevent_set_timeouts(struct bufferevent *bufev,
     const struct timeval *timeout_read, const struct timeval *timeout_write);
-</code></pre><p>传NULL给超时入参来删除对应的超时回调，然后在Libevent 2.1.2-alpha之前并不适用所有的事件类型。<br>注意，超时时间只有在bufferevent尝试读或写才开始计算，换句话说，如果bufferevent禁用读操作，或者输入缓存满了（达到最高水位），读操作超时时间不会启用。同样，写操作超时时间也并不会被启用如果禁用了些操作，或者没有数据可写。  </p>
-<p>如果读或写超时发生了，对应的读或写操作会被停止。事件回调函数会被执行，以标识<code>BEV_EVENT_TIMEOUT|BEV_EVENT_READING</code>或<code>BEV_EVENT_TIMEOUT|BEV_EVENT_WRITING</code>。  </p>
-<h3 id="刷新bufferevent">刷新bufferevent</h3><h4 id="Interface-4">Interface</h4><pre><code>int bufferevent_flush(struct bufferevent *bufev,
+</code></pre><p>&#x4F20;NULL&#x7ED9;&#x8D85;&#x65F6;&#x5165;&#x53C2;&#x6765;&#x5220;&#x9664;&#x5BF9;&#x5E94;&#x7684;&#x8D85;&#x65F6;&#x56DE;&#x8C03;&#xFF0C;&#x7136;&#x540E;&#x5728;Libevent 2.1.2-alpha&#x4E4B;&#x524D;&#x5E76;&#x4E0D;&#x9002;&#x7528;&#x6240;&#x6709;&#x7684;&#x4E8B;&#x4EF6;&#x7C7B;&#x578B;&#x3002;<br>&#x6CE8;&#x610F;&#xFF0C;&#x8D85;&#x65F6;&#x65F6;&#x95F4;&#x53EA;&#x6709;&#x5728;bufferevent&#x5C1D;&#x8BD5;&#x8BFB;&#x6216;&#x5199;&#x624D;&#x5F00;&#x59CB;&#x8BA1;&#x7B97;&#xFF0C;&#x6362;&#x53E5;&#x8BDD;&#x8BF4;&#xFF0C;&#x5982;&#x679C;bufferevent&#x7981;&#x7528;&#x8BFB;&#x64CD;&#x4F5C;&#xFF0C;&#x6216;&#x8005;&#x8F93;&#x5165;&#x7F13;&#x5B58;&#x6EE1;&#x4E86;&#xFF08;&#x8FBE;&#x5230;&#x6700;&#x9AD8;&#x6C34;&#x4F4D;&#xFF09;&#xFF0C;&#x8BFB;&#x64CD;&#x4F5C;&#x8D85;&#x65F6;&#x65F6;&#x95F4;&#x4E0D;&#x4F1A;&#x542F;&#x7528;&#x3002;&#x540C;&#x6837;&#xFF0C;&#x5199;&#x64CD;&#x4F5C;&#x8D85;&#x65F6;&#x65F6;&#x95F4;&#x4E5F;&#x5E76;&#x4E0D;&#x4F1A;&#x88AB;&#x542F;&#x7528;&#x5982;&#x679C;&#x7981;&#x7528;&#x4E86;&#x4E9B;&#x64CD;&#x4F5C;&#xFF0C;&#x6216;&#x8005;&#x6CA1;&#x6709;&#x6570;&#x636E;&#x53EF;&#x5199;&#x3002;  </p>
+<p>&#x5982;&#x679C;&#x8BFB;&#x6216;&#x5199;&#x8D85;&#x65F6;&#x53D1;&#x751F;&#x4E86;&#xFF0C;&#x5BF9;&#x5E94;&#x7684;&#x8BFB;&#x6216;&#x5199;&#x64CD;&#x4F5C;&#x4F1A;&#x88AB;&#x505C;&#x6B62;&#x3002;&#x4E8B;&#x4EF6;&#x56DE;&#x8C03;&#x51FD;&#x6570;&#x4F1A;&#x88AB;&#x6267;&#x884C;&#xFF0C;&#x4EE5;&#x6807;&#x8BC6;<code>BEV_EVENT_TIMEOUT|BEV_EVENT_READING</code>&#x6216;<code>BEV_EVENT_TIMEOUT|BEV_EVENT_WRITING</code>&#x3002;  </p>
+<h3 id="&#x5237;&#x65B0;bufferevent"><a href="#&#x5237;&#x65B0;bufferevent" class="headerlink" title="&#x5237;&#x65B0;bufferevent"></a>&#x5237;&#x65B0;bufferevent</h3><h4 id="interface"><a href="#Interface-4" class="headerlink" title="Interface"></a>Interface</h4><pre><code>int bufferevent_flush(struct bufferevent *bufev,
     short iotype, enum bufferevent_flush_mode state);
-</code></pre><p>刷新bufferevent来告诉bufferevent忽略其他限制读或写操作的设置，强制从底层传输读或写尽可能多的数据。  </p>
-<p>参数<em>iotype</em>应为EV_READ, EV_WRITE, 或EV_READ|EV_WRITE，表示应该处理读、写操作，或两者。<br>参数<em>state</em>应为BEV_NORMAL, BEV_FLUSH, 或BEV_FINISHED。BEV_FINISHED表示应该告诉另一端数据发送完毕，BEV_NORMAL和BEV_FLUSH的差别跟bufferevent的类型有关。  </p>
-<p>函数bufferevent_flush()失败的话返回-1，如果没有数据可刷新，返回0，如果刷新了数据，返回1。  </p>
+</code></pre><p>&#x5237;&#x65B0;bufferevent&#x6765;&#x544A;&#x8BC9;bufferevent&#x5FFD;&#x7565;&#x5176;&#x4ED6;&#x9650;&#x5236;&#x8BFB;&#x6216;&#x5199;&#x64CD;&#x4F5C;&#x7684;&#x8BBE;&#x7F6E;&#xFF0C;&#x5F3A;&#x5236;&#x4ECE;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#x8BFB;&#x6216;&#x5199;&#x5C3D;&#x53EF;&#x80FD;&#x591A;&#x7684;&#x6570;&#x636E;&#x3002;  </p>
+<p>&#x53C2;&#x6570;<em>iotype</em>&#x5E94;&#x4E3A;EV_READ, EV_WRITE, &#x6216;EV_READ|EV_WRITE&#xFF0C;&#x8868;&#x793A;&#x5E94;&#x8BE5;&#x5904;&#x7406;&#x8BFB;&#x3001;&#x5199;&#x64CD;&#x4F5C;&#xFF0C;&#x6216;&#x4E24;&#x8005;&#x3002;<br>&#x53C2;&#x6570;<em>state</em>&#x5E94;&#x4E3A;BEV_NORMAL, BEV_FLUSH, &#x6216;BEV_FINISHED&#x3002;BEV_FINISHED&#x8868;&#x793A;&#x5E94;&#x8BE5;&#x544A;&#x8BC9;&#x53E6;&#x4E00;&#x7AEF;&#x6570;&#x636E;&#x53D1;&#x9001;&#x5B8C;&#x6BD5;&#xFF0C;BEV_NORMAL&#x548C;BEV_FLUSH&#x7684;&#x5DEE;&#x522B;&#x8DDF;bufferevent&#x7684;&#x7C7B;&#x578B;&#x6709;&#x5173;&#x3002;  </p>
+<p>&#x51FD;&#x6570;bufferevent_flush()&#x5931;&#x8D25;&#x7684;&#x8BDD;&#x8FD4;&#x56DE;-1&#xFF0C;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x6570;&#x636E;&#x53EF;&#x5237;&#x65B0;&#xFF0C;&#x8FD4;&#x56DE;0&#xFF0C;&#x5982;&#x679C;&#x5237;&#x65B0;&#x4E86;&#x6570;&#x636E;&#xFF0C;&#x8FD4;&#x56DE;1&#x3002;  </p>
 <p><br></p>
-<h2 id="类型相关的bufferevent函数">类型相关的bufferevent函数</h2><p>这些函数并不支持所有类型的bufferevent。  </p>
-<h4 id="Interface-5">Interface</h4><pre><code>int bufferevent_priority_set(struct bufferevent *bufev, int pri);
+<h2 id="&#x7C7B;&#x578B;&#x76F8;&#x5173;&#x7684;bufferevent&#x51FD;&#x6570;"><a href="#&#x7C7B;&#x578B;&#x76F8;&#x5173;&#x7684;bufferevent&#x51FD;&#x6570;" class="headerlink" title="&#x7C7B;&#x578B;&#x76F8;&#x5173;&#x7684;bufferevent&#x51FD;&#x6570;"></a>&#x7C7B;&#x578B;&#x76F8;&#x5173;&#x7684;bufferevent&#x51FD;&#x6570;</h2><p>&#x8FD9;&#x4E9B;&#x51FD;&#x6570;&#x5E76;&#x4E0D;&#x652F;&#x6301;&#x6240;&#x6709;&#x7C7B;&#x578B;&#x7684;bufferevent&#x3002;  </p>
+<h4 id="interface"><a href="#Interface-5" class="headerlink" title="Interface"></a>Interface</h4><pre><code>int bufferevent_priority_set(struct bufferevent *bufev, int pri);
 int bufferevent_get_priority(struct bufferevent *bufev);
-</code></pre><p>调整<em>bufev</em>的优先级为<em>pri</em>。参见<code>event_priority_set()</code>获取更多优先级的信息。  </p>
-<p>成功返回0，失败返回-1，只适用于基于socket的bufferevent。  </p>
-<h4 id="Interface-6">Interface</h4><pre><code>int bufferevent_setfd(struct bufferevent *bufev, evutil_socket_t fd);
+</code></pre><p>&#x8C03;&#x6574;<em>bufev</em>&#x7684;&#x4F18;&#x5148;&#x7EA7;&#x4E3A;<em>pri</em>&#x3002;&#x53C2;&#x89C1;<code>event_priority_set()</code>&#x83B7;&#x53D6;&#x66F4;&#x591A;&#x4F18;&#x5148;&#x7EA7;&#x7684;&#x4FE1;&#x606F;&#x3002;  </p>
+<p>&#x6210;&#x529F;&#x8FD4;&#x56DE;0&#xFF0C;&#x5931;&#x8D25;&#x8FD4;&#x56DE;-1&#xFF0C;&#x53EA;&#x9002;&#x7528;&#x4E8E;&#x57FA;&#x4E8E;socket&#x7684;bufferevent&#x3002;  </p>
+<h4 id="interface"><a href="#Interface-6" class="headerlink" title="Interface"></a>Interface</h4><pre><code>int bufferevent_setfd(struct bufferevent *bufev, evutil_socket_t fd);
 evutil_socket_t bufferevent_getfd(struct bufferevent *bufev);
-</code></pre><p>设置或获取基于fd事件的文件描述符fd，只支持基于socket的bufferevent。失败返回-1，<code>setfd()</code>成功则返回0。  </p>
-<h4 id="Interface-7">Interface</h4><pre><code>struct event_base *bufferevent_get_base(struct bufferevent *bev);
-</code></pre><p>返回bufferevent的event_base。  </p>
-<h4 id="Interface-8">Interface</h4><pre><code>struct bufferevent *bufferevent_get_underlying(struct bufferevent *bufev);
-</code></pre><p>当底层传输使用的是另一个bufferevent，通过这个函数来获取这个底层传输的bufferevent。</p>
+</code></pre><p>&#x8BBE;&#x7F6E;&#x6216;&#x83B7;&#x53D6;&#x57FA;&#x4E8E;fd&#x4E8B;&#x4EF6;&#x7684;&#x6587;&#x4EF6;&#x63CF;&#x8FF0;&#x7B26;fd&#xFF0C;&#x53EA;&#x652F;&#x6301;&#x57FA;&#x4E8E;socket&#x7684;bufferevent&#x3002;&#x5931;&#x8D25;&#x8FD4;&#x56DE;-1&#xFF0C;<code>setfd()</code>&#x6210;&#x529F;&#x5219;&#x8FD4;&#x56DE;0&#x3002;  </p>
+<h4 id="interface"><a href="#Interface-7" class="headerlink" title="Interface"></a>Interface</h4><pre><code>struct event_base *bufferevent_get_base(struct bufferevent *bev);
+</code></pre><p>&#x8FD4;&#x56DE;bufferevent&#x7684;event_base&#x3002;  </p>
+<h4 id="interface"><a href="#Interface-8" class="headerlink" title="Interface"></a>Interface</h4><pre><code>struct bufferevent *bufferevent_get_underlying(struct bufferevent *bufev);
+</code></pre><p>&#x5F53;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#x4F7F;&#x7528;&#x7684;&#x662F;&#x53E6;&#x4E00;&#x4E2A;bufferevent&#xFF0C;&#x901A;&#x8FC7;&#x8FD9;&#x4E2A;&#x51FD;&#x6570;&#x6765;&#x83B7;&#x53D6;&#x8FD9;&#x4E2A;&#x5E95;&#x5C42;&#x4F20;&#x8F93;&#x7684;bufferevent&#x3002;</p>
 <p><br></p>
-<h2 id="手工加锁或解锁bufferevent">手工加锁或解锁bufferevent</h2><p>跟evbuffer一样，有时候你想确保bufferevent上得一些操作是原子操作的。Libevent提供供你手工加锁和解锁的函数。</p>
-<h4 id="Interface-9">Interface</h4><pre><code>void bufferevent_lock(struct bufferevent *bufev);
+<h2 id="&#x624B;&#x5DE5;&#x52A0;&#x9501;&#x6216;&#x89E3;&#x9501;bufferevent"><a href="#&#x624B;&#x5DE5;&#x52A0;&#x9501;&#x6216;&#x89E3;&#x9501;bufferevent" class="headerlink" title="&#x624B;&#x5DE5;&#x52A0;&#x9501;&#x6216;&#x89E3;&#x9501;bufferevent"></a>&#x624B;&#x5DE5;&#x52A0;&#x9501;&#x6216;&#x89E3;&#x9501;bufferevent</h2><p>&#x8DDF;evbuffer&#x4E00;&#x6837;&#xFF0C;&#x6709;&#x65F6;&#x5019;&#x4F60;&#x60F3;&#x786E;&#x4FDD;bufferevent&#x4E0A;&#x5F97;&#x4E00;&#x4E9B;&#x64CD;&#x4F5C;&#x662F;&#x539F;&#x5B50;&#x64CD;&#x4F5C;&#x7684;&#x3002;Libevent&#x63D0;&#x4F9B;&#x4F9B;&#x4F60;&#x624B;&#x5DE5;&#x52A0;&#x9501;&#x548C;&#x89E3;&#x9501;&#x7684;&#x51FD;&#x6570;&#x3002;</p>
+<h4 id="interface"><a href="#Interface-9" class="headerlink" title="Interface"></a>Interface</h4><pre><code>void bufferevent_lock(struct bufferevent *bufev);
 void bufferevent_unlock(struct bufferevent *bufev);
-</code></pre><p>注意，如果bufferevent在创建时如果没有提供BEV_OPT_THREADSAFE线程，或者启用Libevent的线程支持，加锁一个bufferevent是没有效果的。  </p>
-<p>加锁bufferevent也会锁上它关联的evbuffer。这些函数是可以重入的：对一个已获取的锁再次加锁是安全的，当然，也要由对应的解锁调用。  </p>
+</code></pre><p>&#x6CE8;&#x610F;&#xFF0C;&#x5982;&#x679C;bufferevent&#x5728;&#x521B;&#x5EFA;&#x65F6;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x63D0;&#x4F9B;BEV_OPT_THREADSAFE&#x7EBF;&#x7A0B;&#xFF0C;&#x6216;&#x8005;&#x542F;&#x7528;Libevent&#x7684;&#x7EBF;&#x7A0B;&#x652F;&#x6301;&#xFF0C;&#x52A0;&#x9501;&#x4E00;&#x4E2A;bufferevent&#x662F;&#x6CA1;&#x6709;&#x6548;&#x679C;&#x7684;&#x3002;  </p>
+<p>&#x52A0;&#x9501;bufferevent&#x4E5F;&#x4F1A;&#x9501;&#x4E0A;&#x5B83;&#x5173;&#x8054;&#x7684;evbuffer&#x3002;&#x8FD9;&#x4E9B;&#x51FD;&#x6570;&#x662F;&#x53EF;&#x4EE5;&#x91CD;&#x5165;&#x7684;&#xFF1A;&#x5BF9;&#x4E00;&#x4E2A;&#x5DF2;&#x83B7;&#x53D6;&#x7684;&#x9501;&#x518D;&#x6B21;&#x52A0;&#x9501;&#x662F;&#x5B89;&#x5168;&#x7684;&#xFF0C;&#x5F53;&#x7136;&#xFF0C;&#x4E5F;&#x8981;&#x7531;&#x5BF9;&#x5E94;&#x7684;&#x89E3;&#x9501;&#x8C03;&#x7528;&#x3002;  </p>
 <p><br></p>
-<h2 id="废弃的bufferevent功能">废弃的bufferevent功能</h2><p>略。</p>
+<h2 id="&#x5E9F;&#x5F03;&#x7684;bufferevent&#x529F;&#x80FD;"><a href="#&#x5E9F;&#x5F03;&#x7684;bufferevent&#x529F;&#x80FD;" class="headerlink" title="&#x5E9F;&#x5F03;&#x7684;bufferevent&#x529F;&#x80FD;"></a>&#x5E9F;&#x5F03;&#x7684;bufferevent&#x529F;&#x80FD;</h2><p>&#x7565;&#x3002;</p>
 <p><br></p>
 <blockquote>
-<p>完成于 2013年 7月 6日 星期六 22时42分03秒 CST</p>
+<p>&#x5B8C;&#x6210;&#x4E8E; 2013&#x5E74; 7&#x6708; 6&#x65E5; &#x661F;&#x671F;&#x516D; 22&#x65F6;42&#x5206;03&#x79D2; CST</p>
 </blockquote>
-<p><br><br>– EOF –</p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -537,7 +537,7 @@ void bufferevent_unlock(struct bufferevent *bufev);
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>

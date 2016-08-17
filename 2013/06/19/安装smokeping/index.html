@@ -12,7 +12,7 @@
 
     <!-- css -->
     <link href="http://fonts.useso.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/style.css">
 
     </head>
 
@@ -49,52 +49,52 @@
 	
 	    
 	    
-		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装rrdtool"><span class="toc-text">安装rrdtool</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装smokeping"><span class="toc-text">安装smokeping</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装mod_fastcgi(apache_modules)"><span class="toc-text">安装mod_fastcgi(apache modules)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改apache配置"><span class="toc-text">修改apache配置</span></a></li></ol> </div>
+		<div class="article-toc"> Toc <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安装rrdtool"><span class="toc-text">安装rrdtool</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装smokeping"><span class="toc-text">安装smokeping</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安装mod_fastcgiapache-modules"><span class="toc-text">安装mod_fastcgi(apache modules)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#修改apache配置"><span class="toc-text">修改apache配置</span></a></li></ol> </div>
 	    
 
-	    <h2 id="安装rrdtool">安装rrdtool</h2><p>在mac上我使用port来安装第三方软件，为了方便，还是使用port来安装rrdtool。</p>
+	    <h2 id="&#x5B89;&#x88C5;rrdtool"><a href="#&#x5B89;&#x88C5;rrdtool" class="headerlink" title="&#x5B89;&#x88C5;rrdtool"></a>&#x5B89;&#x88C5;rrdtool</h2><p>&#x5728;mac&#x4E0A;&#x6211;&#x4F7F;&#x7528;port&#x6765;&#x5B89;&#x88C5;&#x7B2C;&#x4E09;&#x65B9;&#x8F6F;&#x4EF6;&#xFF0C;&#x4E3A;&#x4E86;&#x65B9;&#x4FBF;&#xFF0C;&#x8FD8;&#x662F;&#x4F7F;&#x7528;port&#x6765;&#x5B89;&#x88C5;rrdtool&#x3002;</p>
 <pre><code>sudo port install rrdtool
-</code></pre><p>macport会安装相应的依赖，比如一些perl的模块RRD等。<br>但smokeping改为编译源代码来安装。<br>因为port会额外安装一个apache2，版本还是跟系统自带的apache一样，太不智能了，不想维护2个apache。  </p>
+</code></pre><p>macport&#x4F1A;&#x5B89;&#x88C5;&#x76F8;&#x5E94;&#x7684;&#x4F9D;&#x8D56;&#xFF0C;&#x6BD4;&#x5982;&#x4E00;&#x4E9B;perl&#x7684;&#x6A21;&#x5757;RRD&#x7B49;&#x3002;<br>&#x4F46;smokeping&#x6539;&#x4E3A;&#x7F16;&#x8BD1;&#x6E90;&#x4EE3;&#x7801;&#x6765;&#x5B89;&#x88C5;&#x3002;<br>&#x56E0;&#x4E3A;port&#x4F1A;&#x989D;&#x5916;&#x5B89;&#x88C5;&#x4E00;&#x4E2A;apache2&#xFF0C;&#x7248;&#x672C;&#x8FD8;&#x662F;&#x8DDF;&#x7CFB;&#x7EDF;&#x81EA;&#x5E26;&#x7684;apache&#x4E00;&#x6837;&#xFF0C;&#x592A;&#x4E0D;&#x667A;&#x80FD;&#x4E86;&#xFF0C;&#x4E0D;&#x60F3;&#x7EF4;&#x62A4;2&#x4E2A;apache&#x3002;  </p>
 <p><br></p>
-<h2 id="安装smokeping">安装smokeping</h2><p>下载smokeping的tar包，解压，编译、安装到<code>/usr/local/smokeping</code>：  </p>
+<h2 id="&#x5B89;&#x88C5;smokeping"><a href="#&#x5B89;&#x88C5;smokeping" class="headerlink" title="&#x5B89;&#x88C5;smokeping"></a>&#x5B89;&#x88C5;smokeping</h2><p>&#x4E0B;&#x8F7D;smokeping&#x7684;tar&#x5305;&#xFF0C;&#x89E3;&#x538B;&#xFF0C;&#x7F16;&#x8BD1;&#x3001;&#x5B89;&#x88C5;&#x5230;<code>/usr/local/smokeping</code>&#xFF1A;  </p>
 <pre><code>./configure --prefix=/usr/local/smokeping
-// 根据configure执行结果，会提示执行脚本`build-perl-modules.sh`来下载需要perl模块
+// &#x6839;&#x636E;configure&#x6267;&#x884C;&#x7ED3;&#x679C;&#xFF0C;&#x4F1A;&#x63D0;&#x793A;&#x6267;&#x884C;&#x811A;&#x672C;`build-perl-modules.sh`&#x6765;&#x4E0B;&#x8F7D;&#x9700;&#x8981;perl&#x6A21;&#x5757;
 ./build-perl-modules.sh /usr/local/smokeping/thirdparty
 make
 sudo make install
-</code></pre><p>把smokeping目录设置为apache可读可写：</p>
+</code></pre><p>&#x628A;smokeping&#x76EE;&#x5F55;&#x8BBE;&#x7F6E;&#x4E3A;apache&#x53EF;&#x8BFB;&#x53EF;&#x5199;&#xFF1A;</p>
 <pre><code>sudo chown -R _www:_www /usr/local/smokeping/
-</code></pre><p>测试配置文件，根据报错来修改配置config文件</p>
+</code></pre><p>&#x6D4B;&#x8BD5;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF0C;&#x6839;&#x636E;&#x62A5;&#x9519;&#x6765;&#x4FEE;&#x6539;&#x914D;&#x7F6E;config&#x6587;&#x4EF6;</p>
 <pre><code>/usr/local/smokeping/bin/smokeping --check
 </code></pre><p><br></p>
-<h2 id="安装mod_fastcgi(apache_modules)">安装mod_fastcgi(apache modules)</h2><p>参考: <a href="http://www.ccpt.cc/install_fastcgi_in_mac_and_example/" target="_blank" rel="external">FastCGI的安装(Mac)与简单示例</a>  </p>
+<h2 id="&#x5B89;&#x88C5;mod_fastcgiapache-modules"><a href="#&#x5B89;&#x88C5;mod-fastcgi-apache-modules" class="headerlink" title="&#x5B89;&#x88C5;mod_fastcgi(apache modules)"></a>&#x5B89;&#x88C5;mod_fastcgi(apache modules)</h2><p>&#x53C2;&#x8003;: <a href="http://www.ccpt.cc/install_fastcgi_in_mac_and_example/" target="_blank" rel="external">FastCGI&#x7684;&#x5B89;&#x88C5;(Mac)&#x4E0E;&#x7B80;&#x5355;&#x793A;&#x4F8B;</a>  </p>
 <pre><code class="plain">tar zxvf mod_fastcgi-2.4.6.tar.gz  
 cd mod_fastcgi-2.4.6  
 cp Makefile.AP2 Makefile  
-  //修改Makefile中，不同的系统不一样，换成你apache库的所在目录  
+  //&#x4FEE;&#x6539;Makefile&#x4E2D;&#xFF0C;&#x4E0D;&#x540C;&#x7684;&#x7CFB;&#x7EDF;&#x4E0D;&#x4E00;&#x6837;&#xFF0C;&#x6362;&#x6210;&#x4F60;apache&#x5E93;&#x7684;&#x6240;&#x5728;&#x76EE;&#x5F55;  
   top_dir = /usr/share/httpd  
-  //在Makefile中增加一项:  
+  //&#x5728;Makefile&#x4E2D;&#x589E;&#x52A0;&#x4E00;&#x9879;:  
   CFLAGS = -arch x86_64  
-//运行  
+//&#x8FD0;&#x884C;  
 make  
 make install
 </code></pre>
-<p>其中编译出错，找不到cc：  </p>
+<p>&#x5176;&#x4E2D;&#x7F16;&#x8BD1;&#x51FA;&#x9519;&#xFF0C;&#x627E;&#x4E0D;&#x5230;cc&#xFF1A;  </p>
 <pre><code class="plain">popozhu ~/Downloads/mod_fastcgi-2.4.6$ make
 /usr/share/apr-1/build-1/libtool --silent --mode=compile /Applications/Xcode.app/Contents/Developer/Toolchains/OSX10.8.xctoolchain/usr/bin/cc -I/usr/local/include    -DDARWIN -DSIGPROCMASK_SETS_THREAD_MASK    -I/usr/include/apache2 -I. -I/usr/include/apr-1  -c mod_fastcgi.c &amp;&amp; touch mod_fastcgi.slo
 env: /Applications/Xcode.app/Contents/Developer/Toolchains/OSX10.8.xctoolchain/usr/bin/cc: No such file or directory
 make: *** [mod_fastcgi.slo] Error 1
 </code></pre>
-<p>做一个链接，搞定:</p>
+<p>&#x505A;&#x4E00;&#x4E2A;&#x94FE;&#x63A5;&#xFF0C;&#x641E;&#x5B9A;:</p>
 <pre><code class="plain">$ sudo ln -s /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/  
 /Applications/Xcode.app/Contents/Developer/Toolchains/OSX10.8.xctoolchain
 </code></pre>
-<p>这就把<strong>mod_fastcgi.so</strong>安装到<code>/usr/libexec/apache2</code>目录下.</p>
+<p>&#x8FD9;&#x5C31;&#x628A;<strong>mod_fastcgi.so</strong>&#x5B89;&#x88C5;&#x5230;<code>/usr/libexec/apache2</code>&#x76EE;&#x5F55;&#x4E0B;.</p>
 <p><br></p>
-<h2 id="修改apache配置">修改apache配置</h2><p>在配置文件<code>/private/etc/apache2/httpd.conf</code>中，增加对fastcgi模块的加载：  </p>
+<h2 id="&#x4FEE;&#x6539;apache&#x914D;&#x7F6E;"><a href="#&#x4FEE;&#x6539;apache&#x914D;&#x7F6E;" class="headerlink" title="&#x4FEE;&#x6539;apache&#x914D;&#x7F6E;"></a>&#x4FEE;&#x6539;apache&#x914D;&#x7F6E;</h2><p>&#x5728;&#x914D;&#x7F6E;&#x6587;&#x4EF6;<code>/private/etc/apache2/httpd.conf</code>&#x4E2D;&#xFF0C;&#x589E;&#x52A0;&#x5BF9;fastcgi&#x6A21;&#x5757;&#x7684;&#x52A0;&#x8F7D;&#xFF1A;  </p>
 <pre><code class="plain">LoadModule fastcgi_module libexec/apache2/mod_fastcgi.so
 </code></pre>
-<p>添加smokeping的根目录，在目录中启用fcgi，同时做一个alias：</p>
+<p>&#x6DFB;&#x52A0;smokeping&#x7684;&#x6839;&#x76EE;&#x5F55;&#xFF0C;&#x5728;&#x76EE;&#x5F55;&#x4E2D;&#x542F;&#x7528;fcgi&#xFF0C;&#x540C;&#x65F6;&#x505A;&#x4E00;&#x4E2A;alias&#xFF1A;</p>
 <pre><code>&lt;Directory &quot;/usr/local/smokeping/htdocs/&quot;&gt;
     Allow from all
     AllowOverride None
@@ -104,23 +104,23 @@ make: *** [mod_fastcgi.slo] Error 1
 &lt;/Directory&gt;
 Alias /smokeping &quot;/usr/local/smokeping/htdocs/&quot;
 Alias /cache &quot;/usr/local/smokeping/cache/&quot;
-</code></pre><p>重启apache:</p>
+</code></pre><p>&#x91CD;&#x542F;apache:</p>
 <pre><code class="plain">popozhu /private/etc/apache2$ sudo apachectl restart
 popozhu /private/etc/apache2$ ps -ef | grep httpd
-    0 30702     1   0  2:32下午 ??         0:00.18 /usr/sbin/httpd -D FOREGROUND
-   70 30704 30702   0  2:32下午 ??         0:00.00 /usr/sbin/httpd -D FOREGROUND
-  501 30706 42154   0  2:32下午 ttys001    0:00.00 grep httpd
+    0 30702     1   0  2:32&#x4E0B;&#x5348; ??         0:00.18 /usr/sbin/httpd -D FOREGROUND
+   70 30704 30702   0  2:32&#x4E0B;&#x5348; ??         0:00.00 /usr/sbin/httpd -D FOREGROUND
+  501 30706 42154   0  2:32&#x4E0B;&#x5348; ttys001    0:00.00 grep httpd
 </code></pre>
-<p>使用smokeping的fcgi:</p>
+<p>&#x4F7F;&#x7528;smokeping&#x7684;fcgi:</p>
 <pre><code class="plain">sudo cp /usr/local/smokeping/htdocs/smokeping.fcgi.dist /usr/local/smokeping/htdocs/smokeping.fcgi
 </code></pre>
-<p>在浏览器中查看smokeping的前端：</p>
+<p>&#x5728;&#x6D4F;&#x89C8;&#x5668;&#x4E2D;&#x67E5;&#x770B;smokeping&#x7684;&#x524D;&#x7AEF;&#xFF1A;</p>
 <pre><code class="plain">http://127.0.0.1/smokeping/smokeping.fcgi
 </code></pre>
-<p>启动后台fping程序：</p>
+<p>&#x542F;&#x52A8;&#x540E;&#x53F0;fping&#x7A0B;&#x5E8F;&#xFF1A;</p>
 <pre><code class="plain">sudo /usr/local/smokeping/bin/smokeping
 </code></pre>
-<p><br><br>– EOF –</p>
+<p><br><br>&#x2013; EOF &#x2013;</p>
 
 	
 
@@ -195,7 +195,7 @@ popozhu /private/etc/apache2$ ps -ef | grep httpd
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
 
 
-<script src="/js/script.js" type="text/javascript"></script>
+<script src="/js/script.js"></script>
 
 
     </body>
